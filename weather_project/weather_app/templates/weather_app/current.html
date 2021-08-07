@@ -1,9 +1,85 @@
 {% extends "weather_app/base.html" %}
 
 {% block content %}
-  
+
 <h1>Current Weather</h1>
 
-<p>Temperature: {{ weather.current.temp }} °C</p>
+<table class="table table-hover">
+    <tbody>
+        <tr>
+            <th scope="row">Date and time</th>
+            <td>{{ dt }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Sunrise</th>
+            <td>{{ sunrise }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Sunset</th>
+            <td>{{ sunset }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Temperature</th>
+            <td>{{ weather.current.temp }} °C</td>
+        </tr>
+        <tr>
+            <th scope="row">Temperature feels like</th>
+            <td>{{ weather.current.feels_like }} °C</td>
+        </tr>
+        <tr>
+            <th scope="row">Atmospheric pressure on the sea level</th>
+            <td>{{ weather.current.pressure }} hPa</td>
+        </tr>
+        <tr>
+            <th scope="row">Humidity</th>
+            <td>{{ weather.current.humidity }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Dew point</th>
+            <td>{{ weather.current.dew_point }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Cloudiness</th>
+            <td>{{ weather.current.clouds }} %</td>
+        </tr>
+        <tr>
+            <th scope="row">UV index</th>
+            <td>{{ weather.current.uvi }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Visibility (average)</th>
+            <td>{{ weather.current.visibility }} m</td>
+        </tr>
+        <tr>
+            <th scope="row">Wind speed</th>
+            <td>{{ weather.current.wind_speed }} m/sec.</td>
+        </tr>
+        <tr>
+            <th scope="row">Wind gust</th>
+            <td>{{ weather.current.wind_gust }} m/sec.</td>
+        </tr>
+        <tr>
+            <th scope="row">Wind direction</th>
+            <td>{{ weather.current.wind_deg }} °</td>
+        </tr>
+        <tr>
+            <th scope="row">Rain volume for last hour</th>
+            <td>{{ weather.current.rain.1h }} mm/h</td>
+        </tr>
+        <tr>
+            <th scope="row">Snow volume for last hour</th>
+            <td>{{ weather.current.snow.1h }} mm/h</td>
+        </tr>
+        <tr>
+            <th scope="row">Description</th>
+            <td>{{ weather.current.weather.description }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Icon</th>
+            <td>{{ weather.current.weather.icon }}</td>
+        </tr>
+    </tbody>
+</table>
+
 
 {% endblock content %}
