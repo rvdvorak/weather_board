@@ -7,25 +7,31 @@
 {% for location in found_locations %}
 
 <p>
-    {% if location.properties.name %}
-    {{ location.properties.name }},
-    {% endif %}
-    
-    {% if location.properties.city %}
-    {{ location.properties.city }},
-    {% endif %}
+    <form action="{% url 'current' %}" method="GET">
+        {% csrf_token %}
+        <input type="hidden" name="location_index" value="{{ forloop.counter }}">
+        <button type="submit" class="btn btn-link">
+            {% if location.properties.name %}
+            {{ location.properties.name }},
+            {% endif %}
 
-    {% if location.properties.region %}
-    {{ location.properties.region }},
-    {% endif %}
+            {% if location.properties.city %}
+            {{ location.properties.city }},
+            {% endif %}
 
-    {% if location.properties.country %}
-    {{ location.properties.country }},
-    {% endif %}
+            {% if location.properties.region %}
+            {{ location.properties.region }},
+            {% endif %}
 
-    {% if location.properties.continent %}
-    {{ location.properties.continent }}
-    {% endif %}
+            {% if location.properties.country %}
+            {{ location.properties.country }},
+            {% endif %}
+
+            {% if location.properties.continent %}
+            {{ location.properties.continent }}
+            {% endif %}
+        </button>
+    </form>
 </p>
 
 {% endfor %}
