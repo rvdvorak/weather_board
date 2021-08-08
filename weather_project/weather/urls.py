@@ -24,4 +24,5 @@ urlpatterns = [
     path('forecast/', views.forecast, name='forecast'),
     path('history/', views.history, name='history'),
     path('saved/', views.saved, name='saved'),
+    path('locations/', views.locations, name='locations'),
 ]

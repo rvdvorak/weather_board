@@ -54,8 +54,8 @@
                         </ul>
                     </li>
                 </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search Location" aria-label="Search">
+                <form action="{% url 'locations' %}" method="GET" class="d-flex">
+                    <input name="search_location" class="form-control me-2" type="search" placeholder="Search Location" aria-label="Search Location">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>

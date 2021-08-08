@@ -1,0 +1,33 @@
+{% extends "weather_app/base.html" %}
+
+{% block content %}
+
+<h1>Locations</h1>
+
+{% for location in found_locations %}
+
+<p>
+    {% if location.properties.name %}
+    {{ location.properties.name }},
+    {% endif %}
+    
+    {% if location.properties.city %}
+    {{ location.properties.city }},
+    {% endif %}
+
+    {% if location.properties.region %}
+    {{ location.properties.region }},
+    {% endif %}
+
+    {% if location.properties.country %}
+    {{ location.properties.country }},
+    {% endif %}
+
+    {% if location.properties.continent %}
+    {{ location.properties.continent }}
+    {% endif %}
+</p>
+
+{% endfor %}
+
+{% endblock content %}
