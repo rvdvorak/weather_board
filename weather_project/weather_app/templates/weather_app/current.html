@@ -2,26 +2,27 @@
 
 {% block content %}
 
-<h1>Current Weather</h1>
+<br>
 
-<h2>{{ location.properties.label }}</h2>
+<h1>{{ location.properties.label }}</h1>
 
-<h3>{{ dt }}</h3>
+<h5>{{ weather.current.dt|date:"j. F Y, H:i" }}</h5>
+
+<!-- <h5>{{ weather.current.dt|date:"" }}</h5> -->
+
+<br>
+
+<h1>
+    <img src="http://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png" alt="">
+    {{ weather.current.temp }} °C
+</h1>
+
+<h5>{{ weather.current.weather.0.description|title }}</h5>
+
+<br>
 
 <table class="table table-hover">
     <tbody>
-        <tr>
-            <th scope="row">Sunrise</th>
-            <td>{{ sunrise }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Sunset</th>
-            <td>{{ sunset }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Temperature</th>
-            <td>{{ weather.current.temp }} °C</td>
-        </tr>
         <tr>
             <th scope="row">Temperature feels like</th>
             <td>{{ weather.current.feels_like }} °C</td>
@@ -32,11 +33,11 @@
         </tr>
         <tr>
             <th scope="row">Humidity</th>
-            <td>{{ weather.current.humidity }}</td>
+            <td>{{ weather.current.humidity }} %</td>
         </tr>
         <tr>
             <th scope="row">Dew point</th>
-            <td>{{ weather.current.dew_point }}</td>
+            <td>{{ weather.current.dew_point }} °C</td>
         </tr>
         <tr>
             <th scope="row">Cloudiness</th>
@@ -71,12 +72,12 @@
             <td>{{ weather.current.snow.1h }} mm/h</td>
         </tr>
         <tr>
-            <th scope="row">Description</th>
-            <td>{{ weather.current.weather.description }}</td>
+            <th scope="row">Sunrise</th>
+            <td>{{ weather.current.sunrise|date:"H:i" }}</td>
         </tr>
         <tr>
-            <th scope="row">Icon</th>
-            <td>{{ weather.current.weather.icon }}</td>
+            <th scope="row">Sunset</th>
+            <td>{{ weather.current.sunset|date:"H:i" }}</td>
         </tr>
     </tbody>
 </table>
