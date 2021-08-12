@@ -1,3 +1,0 @@
-('{"lat":49.2075,"lon":16.6861,"timezone":"Europe/Prague","timezone_offset":7200,"current":{"dt":1628198747,"sunrise":1628134255,"sunset":1628188053,"temp":14.27,"feels_like":14.05,"pressure":1005,"humidity":88,"dew_point":12.31,"uvi":0,"clouds":0,"visibility":10000,"wind_speed":4.02,"wind_deg":290,"weather":[{"id":800,"main":"Clear","description":"clear '
- 'sky","icon":"01n"}]}}')('{"lat":49.2075,"lon":16.6861,"timezone":"Europe/Prague","timezone_offset":7200,"current":{"dt":1628198747,"sunrise":1628134255,"sunset":1628188053,"temp":14.27,"feels_like":14.05,"pressure":1005,"humidity":88,"dew_point":12.31,"uvi":0,"clouds":0,"visibility":10000,"wind_speed":4.02,"wind_deg":290,"weather":[{"id":800,"main":"Clear","description":"clear '
- 'sky","icon":"01n"}]}}')

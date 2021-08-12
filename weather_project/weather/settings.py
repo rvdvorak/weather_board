@@ -31,13 +31,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # NA POŘADÍ ZÁLEŽÍ !!!
+    'weather_app',
+    'adminlte3',
+    # AdminLTE theme for Django Admin only
+    # 'adminlte3_theme',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'weather_app',
 ]
 
 MIDDLEWARE = [
