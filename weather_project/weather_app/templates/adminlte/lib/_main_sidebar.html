@@ -1,0 +1,46 @@
+{% extends 'adminlte/lib/_main_sidebar.html' %}
+{% load adminlte_helpers %}
+{%load static %}
+
+<!-- Brand Logo -->
+{% block logo %}
+<a href="{% url 'home' %}" class="brand-link">
+    <img src="{% static 'weather_app/Frog_eye.svg' %}" alt="Bufo App Logo" class="brand-image img-circle elevation-3"
+        style="opacity: 1">
+    {% block logo_text %}<span class="brand-text font-weight-light"><b>Bufo</b> App</span>{% endblock logo_text %}
+</a>
+{% endblock logo %}
+
+{% block user_panel %}
+<!-- Sidebar user panel (optional) -->
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+    <div class="image">
+        <img src="{% static 'weather_app/user_avatar.png' %}" class="img-circle elevation-2 .bg-light" alt="User Image">
+    </div>
+    <div class="info">
+        <a href="#" class="d-block">{% firstof request.user.get_full_name request.user.username 'Log in / Sign up' %}</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block nav_heading %}{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    {% url 'current' as url %}
+    <a class="nav-link {% if request.path == url %}active{% endif %}" href="{% url 'current' %}">Current</a>
+</li>
+<li class="nav-item">
+    {% url 'forecast' as url %}
+    <a class="nav-link {% if request.path == url %}active{% endif %}" href="{% url 'forecast' %}">Forecast</a>
+</li>
+<li class="nav-item">
+    {% url 'history' as url %}
+    <a class="nav-link {% if request.path == url %}active{% endif %}" href="{% url 'history' %}">History</a>
+</li>
+<li class="nav-item">
+    {% url 'saved' as url %}
+    <a class="nav-link {% if request.path == url %}active{% endif %}" href="{% url 'saved' %}">Saved</a>
+</li>
+
+{% endblock nav_links %}
