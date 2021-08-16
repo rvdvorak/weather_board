@@ -19,11 +19,7 @@ from weather_app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('current/', views.current, name='current'),
-    path('forecast/', views.forecast, name='forecast'),
-    path('history/', views.history, name='history'),
-    path('saved/', views.saved, name='saved'),
-    path('locations/', views.locations, name='locations'),
+    path('', views.weather, name='weather'),
+    path('search_results/', views.search_results, name='search_results'),
     path('set_location/', views.set_location, name='set_location'),
 ]

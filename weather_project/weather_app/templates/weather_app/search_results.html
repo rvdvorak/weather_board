@@ -13,7 +13,9 @@
             {% csrf_token %}
             <input type="hidden" name="location_index" value="{{ forloop.counter }}">
             <button type="submit" class="btn btn-link">
-                {% if location.properties.name %}
+                {{ location.properties.label }}
+
+                <!-- {% if location.properties.name %}
                 {{ location.properties.name }},
                 {% endif %}
 
@@ -31,7 +33,7 @@
 
                 {% if location.properties.continent %}
                 {{ location.properties.continent }}
-                {% endif %}
+                {% endif %} -->
             </button>
         </form>
     </p>

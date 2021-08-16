@@ -14,10 +14,8 @@
 
 <h1>
     <img src="http://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png" alt="">
-    {{ weather.current.temp }} °C
+    {{ weather.current.temp|floatformat:1 }} °C / {{ weather.current.weather.0.description }}
 </h1>
-
-<h5>{{ weather.current.weather.0.description|title }}</h5>
 
 <br>
 
