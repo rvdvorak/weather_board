@@ -3,8 +3,6 @@
 {% block content %}
 
 {% if found_locations %}
-  
-    <h1>Select location</h1>
 
     {% for location in found_locations %}
 
@@ -42,7 +40,10 @@
 
 {% else %}
   
-    <h1>No location found...</h1>
+    <h4>You probably entered the location incorrectly.
+        <br>
+        <b>Please try again.</b
+    ></h4>
 
 {% endif %}
 
