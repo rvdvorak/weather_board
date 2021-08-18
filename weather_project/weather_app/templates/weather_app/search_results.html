@@ -4,16 +4,16 @@
 
 {% if found_locations %}
 
-    {% for location in found_locations %}
+{% for location in found_locations %}
 
-    <p>
-        <form action="{% url 'set_location' %}" method="GET">
-            {% csrf_token %}
-            <input type="hidden" name="location_index" value="{{ forloop.counter }}">
-            <button type="submit" class="btn btn-link">
-                {{ location.properties.label }}
+<p>
+<form action="{% url 'set_location' %}" method="GET">
+    {% csrf_token %}
+    <input type="hidden" name="location_index" value="{{ forloop.counter }}">
+    <button type="submit" class="btn btn-link">
+        {{ location.properties.label }}
 
-                <!-- {% if location.properties.name %}
+        <!-- {% if location.properties.name %}
                 {{ location.properties.name }},
                 {% endif %}
 
@@ -32,18 +32,15 @@
                 {% if location.properties.continent %}
                 {{ location.properties.continent }}
                 {% endif %} -->
-            </button>
-        </form>
-    </p>
+    </button>
+</form>
+</p>
 
-    {% endfor %}
+{% endfor %}
 
 {% else %}
-  
-    <h4>You probably entered the location incorrectly.
-        <br>
-        <b>Please try again.</b
-    ></h4>
+
+{% include 'weather_app\widgets\nothing_found.html' %}
 
 {% endif %}
 

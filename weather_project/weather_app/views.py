@@ -45,7 +45,9 @@ def weather_dashboard(request):
         return render(request, 'weather_app/no_location.html', {'headline': headline})
 
 def search_results(request):
+    # TO DO: Ošetřit návratové kódy HTTP Response (found_locations)
     global found_locations
+    found_locations = None
     search_text = request.GET.get('search_text')
     found_locations = requests.get(
         'https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71&size=50&text=' + search_text)
