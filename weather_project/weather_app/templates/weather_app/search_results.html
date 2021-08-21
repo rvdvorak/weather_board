@@ -2,6 +2,12 @@
 
 {% block content %}
 
+
+{% if message %}
+{% include 'weather_app/widgets/message.html' %}
+{% endif %}
+    
+
 {% if found_locations %}
 
 {% for location in found_locations %}
@@ -37,10 +43,6 @@
 </p>
 
 {% endfor %}
-
-{% else %}
-
-{% include 'weather_app\widgets\nothing_found.html' %}
 
 {% endif %}
 

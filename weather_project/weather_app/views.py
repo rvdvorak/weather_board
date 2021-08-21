@@ -41,23 +41,45 @@ def weather_dashboard(request):
         return render(request, 'weather_app/weather_dashboard.html',
             {'selected_location': selected_location, 'weather': weather, 'headline': headline, 'chart_data': chart_data})
     else:
-        headline = 'Please search location...'
-        return render(request, 'weather_app/no_location.html', {'headline': headline})
+        headline = 'Weather Dashboard'
+        message = {
+            'style': 'success',
+            'header': '',
+            'content': 'Please search location.',
+        }
+        return render(request, 'weather_app/weather_dashboard.html',
+            {'message': message})
 
 def search_results(request):
     # TO DO: Ošetřit návratové kódy HTTP Response (found_locations)
     global found_locations
+
     found_locations = None
     search_text = request.GET.get('search_text')
-    found_locations = requests.get(
+    openrouteservice_response = requests.get(
         'https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71&size=50&text=' + search_text)
-    found_locations = found_locations.json()['features']
-    if found_locations:
-        headline = 'Select location'
-        return render(request, 'weather_app/search_results.html', {'found_locations': found_locations, 'headline': headline})
+    print ('OpenRouteService response status code: ', openrouteservice_response.status_code)
+
+    if openrouteservice_response.status_code == 200:
+        found_locations = openrouteservice_response.json()['features']
+        if found_locations:
+            headline = 'Select location'
+            return render(request, 'weather_app/search_results.html', {'found_locations': found_locations, 'headline': headline})
+        else:
+            message = {
+                'style': 'warning',
+                'header': 'No location found',
+                'content': 'You probably entered the location incorrectly. Please try again.',
+            }
+            return render(request, 'weather_app/search_results.html', {'message': message})
     else:
-        headline = 'Nothing found...'
-        return render(request, 'weather_app/search_results.html', {'found_locations': found_locations, 'headline': headline})
+        message = {
+            'style': 'danger',
+            'header': 'Location server error',
+            'content': f'''Something went wrong while requesting the location server. Please try again later. (Status code: {openrouteservice_response.status_code})''',
+        }
+        return render(request, 'weather_app/search_results.html', {'message': message})
+        
     
 def set_location(request):
     global found_locations
