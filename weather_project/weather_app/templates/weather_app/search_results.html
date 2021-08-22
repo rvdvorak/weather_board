@@ -2,47 +2,64 @@
 
 {% block content %}
 
-
 {% if message %}
 {% include 'weather_app/widgets/message.html' %}
 {% endif %}
-    
 
 {% if found_locations %}
 
-{% for location in found_locations %}
 
-<p>
-<form action="{% url 'set_location' %}" method="GET">
-    {% csrf_token %}
-    <input type="hidden" name="location_index" value="{{ forloop.counter }}">
-    <button type="submit" class="btn btn-link">
-        {{ location.properties.label }}
+<div class="row justify-content-md-center">
+    <div class="col-md-auto">
+        <div class="card card-lightblue shadow">
+            <div class="card-header">
+                <h3 class="card-title">Select location</h3>
+            </div>
+            <div class="card-body">
 
-        <!-- {% if location.properties.name %}
-                {{ location.properties.name }},
-                {% endif %}
+                    {% for location in found_locations %}
 
-                {% if location.properties.city %}
-                {{ location.properties.city }},
-                {% endif %}
+                    <p>
+                    <form action="{% url 'set_location' %}" method="GET">
+                        {% csrf_token %}
+                        <input type="hidden" name="location_index" value="{{ forloop.counter }}">
+                        <button type="submit" class="btn btn-block btn-outline-secondary">
+                            {{ location.properties.label }}
+                        </button>
+                    </form>
+                    </p>
+            
+                    {% endfor %}
 
-                {% if location.properties.region %}
-                {{ location.properties.region }},
-                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
-                {% if location.properties.country %}
-                {{ location.properties.country }},
-                {% endif %}
 
-                {% if location.properties.continent %}
-                {{ location.properties.continent }}
-                {% endif %} -->
-    </button>
-</form>
-</p>
 
-{% endfor %}
+<!-- <div class="card card-lightblue shadow">
+    <div class="card-header">
+        <h3 class="card-title">Select location</h3>
+    </div>
+    <div class="card-body">
+
+        {% for location in found_locations %}
+
+        <p>
+        <form action="{% url 'set_location' %}" method="GET">
+            {% csrf_token %}
+            <input type="hidden" name="location_index" value="{{ forloop.counter }}">
+            <button type="submit" class="btn btn-block btn-outline-secondary">
+                {{ location.properties.label }}
+            </button>
+        </form>
+        </p>
+
+        {% endfor %}
+
+    </div>
+</div> -->
 
 {% endif %}
 

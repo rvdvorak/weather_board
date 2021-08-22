@@ -1,0 +1,12 @@
+<div class="info-box bg-lightblue shadow">
+    <div class="info-box-content" style="text-align: center">
+        <h2>{{ selected_location.properties.label }}</h2>
+        <h5>{{ weather.current.dt|date:"l, j. F Y, H:i" }}</h5>
+        <h1>
+            <img src="http://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png" alt="">
+            <b>{{ weather.current.temp|floatformat:1 }} °C</b>
+        </h1>
+        <h3>Feels like {{ weather.current.feels_like|floatformat:1 }} °C</h3>
+        <h3>{{ weather.current.weather.0.description|title }}</h3>
+    </div>
+</div>

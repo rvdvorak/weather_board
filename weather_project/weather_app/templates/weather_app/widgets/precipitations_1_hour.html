@@ -2,11 +2,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
     integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
 
-<div class="card card-lightblue">
+<div class="card card-lightblue shadow">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
-            Precipitations in next 60 minutes</h3>
+            Precipitations in next 1 hour</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -14,7 +14,27 @@
         </div>
     </div>
     <div class="card-body p-2">
+
+
         <div class="chart">
+            <div class="chartjs-size-monitor">
+                <div class="chartjs-size-monitor-expand">
+                    <div class="">
+
+                    </div>
+                </div>
+                <div class="chartjs-size-monitor-shrink">
+                    <div class="">
+
+                    </div>
+                </div>
+            </div>
+        <canvas id="myChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;"
+            width="498" height="500" class="chartjs-render-monitor">
+        </canvas>
+    </div>
+
+        <!-- <div class="chart">
             <div class="chartjs-size-monitor">
                 <div class="chartjs-size-monitor-expand">
                     <div class="">
@@ -28,7 +48,8 @@
             <canvas id="myChart"
                 style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 412px;"
                 width="412" height="250" class="chartjs-render-monitor"></canvas>
-        </div>
+        </div> -->
+    
     </div>
 </div>
 

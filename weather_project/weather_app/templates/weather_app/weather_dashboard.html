@@ -8,10 +8,26 @@
 {% include 'weather_app/widgets/message.html' %}
 {% endif %}
     
-{% if weather %}
-{% include 'weather_app/widgets/current_summary.html' %}
-{% include 'weather_app/widgets/current_details.html' %}
-{% include 'weather_app/widgets/precipitations_60_minutes.html' %}
-{% endif %}
+<div class="row">
+    
+    {% if weather %}
+    <div class="col-lg-6 col-xl-4">
+
+        {% include 'weather_app/widgets/current_weather_summary.html' %}
+
+    </div>
+    <div class="col-lg-6 col-xl-4">
+        
+        {% include 'weather_app/widgets/current_weather_details.html' %}
+
+    </div>
+    <div class="col-lg-6 col-xl-4">
+        
+        {% include 'weather_app/widgets/precipitations_1_hour.html' %}
+
+    </div>
+    {% endif %}
+
+</div>
 
 {% endblock content %}
