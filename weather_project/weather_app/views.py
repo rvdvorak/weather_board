@@ -5,9 +5,9 @@ import requests
 import pprint
 import json
 
+# TO DO: Remove
 found_locations = None
 selected_location = None
-
 
 def weather_dashboard(request):
     global selected_location
@@ -30,22 +30,26 @@ def weather_dashboard(request):
             'header': 'Hint',
             'content': 'Search the location to show the weather.',
         }
-        return render(request, 'weather_app/weather_dashboard.html', {'message': message})
+        return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
 
     lat = selected_location['geometry']['coordinates'][1]
     lon = selected_location['geometry']['coordinates'][0]
-    weather_query = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid=6fe37effcfa866ecec5fd235699a402d&units=metric'
-    weather_response = requests.get(weather_query)
 
-    if not weather_response.status_code == 200:
+    print(lat)
+    print(lon)
+
+    weather_API_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid=6fe37effcfa866ecec5fd235699a402d&units=metric'
+    weather_API_response = requests.get(weather_API_request)
+
+    if not weather_API_response.status_code == 200:
         message = {
             'style': 'danger',
             'header': 'Weather data error',
-            'content': f'Request for weather data failed. Please try again later. (Weather server status: {weather_response.status_code})'
+            'content': f'Request for weather data failed. Please try again later. (Weather server status: {weather_API_response.status_code})'
         }
-        return render(request, 'weather_app/weather_dashboard.html', {'message': message})
+        return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
 
-    weather = weather_response.json()
+    weather = weather_API_response.json()
     weather = convert_timestamps_to_datetime(weather)
 
     chart_data = {
@@ -58,11 +62,11 @@ def weather_dashboard(request):
         chart_data['minutely']['dt'].append(minute['dt'].strftime("%H:%M"))
         chart_data['minutely']['precipitation'].append(minute['precipitation'])
 
-    return render(request, 'weather_app/weather_dashboard.html',
+    return render(request, 'weather_app/pages/weather_dashboard.html',
                   {'selected_location': selected_location, 'weather': weather, 'chart_data': chart_data})
 
 
-def search_results(request):
+def locations(request):
     global found_locations
 
     found_locations = None
@@ -74,20 +78,20 @@ def search_results(request):
             'header': 'Hint',
             'content': 'First enter the name of the location you want to search.',
         }
-        return render(request, 'weather_app/search_results.html', {'message': message})
+        return render(request, 'weather_app/pages/locations.html', {'message': message})
 
-    location_query = 'https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71&size=50&text=' + search_text
-    location_response = requests.get(location_query)
+    location_API_request = 'https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71&size=50&text=' + search_text
+    location_API_response = requests.get(location_API_request)
 
-    if not location_response.status_code == 200:
+    if not location_API_response.status_code == 200:
         message = {
             'style': 'danger',
             'header': 'Search location error',
             'content': f'Search request failed. Please try again later. (Location server status: {openrouteservice_response.status_code})',
         }
-        return render(request, 'weather_app/search_results.html', {'message': message})
+        return render(request, 'weather_app/pages/locations.html', {'message': message})
 
-    found_locations = location_response.json()['features']
+    found_locations = location_API_response.json()['features']
 
     if not found_locations:
         message = {
@@ -95,9 +99,9 @@ def search_results(request):
             'header': 'No location found',
             'content': 'You probably entered the location incorrectly. Please try again.',
         }
-        return render(request, 'weather_app/search_results.html', {'message': message})
+        return render(request, 'weather_app/pages/locations.html', {'message': message})
 
-    return render(request, 'weather_app/search_results.html', {'found_locations': found_locations})
+    return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations})
 
 
 def set_location(request):

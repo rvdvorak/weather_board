@@ -1,33 +1,33 @@
 {% extends "weather_app/base.html" %}
 
-{% block header %}Weather Dasboard{% endblock header %}
-
 {% block content %}
 
+<!-- Error message widget -->
 {% if message %}
 {% include 'weather_app/widgets/message.html' %}
 {% endif %}
     
+<!-- Current weather widgets -->
+{% if weather %}
+
 <div class="row">
-    
-    {% if weather %}
     <div class="col-lg-6 col-xl-4">
 
-        {% include 'weather_app/widgets/current_weather_summary.html' %}
+        {% include 'weather_app/widgets/weather/current/summary.html' %}
 
     </div>
     <div class="col-lg-6 col-xl-4">
         
-        {% include 'weather_app/widgets/current_weather_details.html' %}
+        {% include 'weather_app/widgets/weather/forecast/1h_precipitations_chart.html' %}
 
     </div>
     <div class="col-lg-6 col-xl-4">
         
-        {% include 'weather_app/widgets/precipitations_1_hour.html' %}
+        {% include 'weather_app/widgets/weather/current/details_table.html' %}
 
     </div>
-    {% endif %}
-
 </div>
+
+{% endif %}
 
 {% endblock content %}
