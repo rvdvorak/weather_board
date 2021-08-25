@@ -8,30 +8,70 @@ import json
 
 def weather_dashboard(request):
     def get_location(request):
+        latitude = request.GET.get('latitude')
+        longitude = request.GET.get('longitude')
+        label = request.GET.get('label')
+        if not (latitude and longitude and label):
+            return {
+                'location': None,
+                'message': {
+                    'style': 'lightblue',
+                    'headline': 'No location selected',
+                    'description': 'Search location to get started.',
+                }
+            }
         try:
-            latitude = float(request.GET.get('latitude'))
-            longitude = float(request.GET.get('longitude'))
-            label = str(request.GET.get('label'))
+            latitude = float(latitude)
+            longitude = float(longitude)
+            label = str(label)
         except:
-            print('location type error')
-            return False
+            return {
+                'location': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Incorrect location data',
+                    'description': 'Location data type error.',
+                }
+            }
         if not (-90 <= latitude <= 90):
-            print('location latitude out of range')
-            return False
+            return {
+                'location': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Incorrect coordinates',
+                    'description': 'Latitude out of range.',
+                }
+            }
         if not (-180 <= longitude <= 180):
-            print('location longitude out of range')
-            return False
+            return {
+                'location': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Incorrect coordinates',
+                    'description': 'Longitude out of range.',
+                }
+            }
         if label == '':
-            print('location missing label')
-            return False
-        location = {
-            'latitude': latitude,
-            'longitude': longitude,
-            'label': label,
+            return {
+                'location': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Incomplete location data',
+                    'description': 'Missing location label.',
+                }
+            }
+        return {
+            'location': {
+                'latitude': latitude,
+                'longitude': longitude,
+                'label': label,
+            },
+            'message': {
+                'style': 'success',
+                'headline': 'Location OK',
+                'description': 'Location data is correct.',
+            }
         }
-        print('location:')
-        pprint.pprint(location)
-        return location
 
     def get_weather(location):
         url = 'https://api.openweathermap.org/data/2.5/onecall'
@@ -43,10 +83,23 @@ def weather_dashboard(request):
         }
         response = requests.get(url, params=params)
         if not response.status_code == 200:
-            print('Weather server status:', response.status_code)
-            return False
+            return {
+                'weather': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Weather API error',
+                    'description': f'Weather server status: {response.status_code}',
+                }
+            }
         weather = response.json()
-        return weather
+        return {
+            'weather': weather,
+            'message': {
+                'style': 'success',
+                'headline': 'Weather API response OK',
+                'description': 'Weather data received successfully.',
+            }
+        }
 
     def convert_timestamps_to_datetime(weather):
         weather['current']['dt'] = datetime.fromtimestamp(
@@ -76,30 +129,27 @@ def weather_dashboard(request):
 
     location = get_location(request)
 
-    if not location:
-        message = {
-            'style': 'lightblue',
-            'headline': 'Hint',
-            'description': 'Search location to get started.'
+    if not location['location']:
+        return render(request, 'weather_app/pages/message.html', {'message': location['message']})
+
+    weather = get_weather(location['location'])
+
+    if not weather['weather']:
+        return render(request, 'weather_app/pages/message.html', {'message': weather['message']})
+
+    weather['weather'] = convert_timestamps_to_datetime(weather['weather'])
+
+    chart_data = get_chart_data(weather['weather'])
+
+    return render(
+        request,
+        'weather_app/pages/weather_dashboard.html',
+        {
+            'location': location['location'],
+            'weather': weather['weather'],
+            'chart_data': chart_data,
         }
-        return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
-
-    weather = get_weather(location)
-
-    if not weather:
-        message = {
-            'style': 'danger',
-            'headline': 'Weather API error',
-            'description': 'Request for weather data failed. Please try again later.'
-        }
-        return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
-
-    weather = convert_timestamps_to_datetime(weather)
-
-    chart_data = get_chart_data(weather)
-
-    return render(request, 'weather_app/pages/weather_dashboard.html',
-                  {'location': location, 'weather': weather, 'chart_data': chart_data})
+    )
 
 
 def locations(request):

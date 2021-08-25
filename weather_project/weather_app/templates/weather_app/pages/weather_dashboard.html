@@ -2,14 +2,6 @@
 
 {% block content %}
 
-<!-- Error message widget -->
-{% if message %}
-{% include 'weather_app/widgets/message.html' %}
-{% endif %}
-    
-<!-- Current weather widgets -->
-{% if weather %}
-
 <div class="row">
     <div class="col-lg-6 col-xl-4">
 
@@ -27,7 +19,5 @@
 
     </div>
 </div>
-
-{% endif %}
 
 {% endblock content %}
