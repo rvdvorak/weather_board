@@ -20,9 +20,10 @@
                     {% for location in found_locations %}
 
                     <p>
-                    <form action="{% url 'set_location' %}" method="GET">
-                        {% csrf_token %}
-                        <input type="hidden" name="location_index" value="{{ forloop.counter }}">
+                    <form action="{% url 'weather_dashboard' %}" method="GET">
+                        <input type="hidden" name="latitude" value="{{ location.geometry.coordinates.1 }}">
+                        <input type="hidden" name="longitude" value="{{ location.geometry.coordinates.0 }}">
+                        <input type="hidden" name="label" value="{{ location.properties.label }}">
                         <button type="submit" class="btn btn-block btn-outline-secondary">
                             {{ location.properties.label }}
                         </button>
@@ -35,31 +36,6 @@
         </div>
     </div>
 </div>
-
-
-
-<!-- <div class="card card-lightblue shadow">
-    <div class="card-header">
-        <h3 class="card-title">Select location</h3>
-    </div>
-    <div class="card-body">
-
-        {% for location in found_locations %}
-
-        <p>
-        <form action="{% url 'set_location' %}" method="GET">
-            {% csrf_token %}
-            <input type="hidden" name="location_index" value="{{ forloop.counter }}">
-            <button type="submit" class="btn btn-block btn-outline-secondary">
-                {{ location.properties.label }}
-            </button>
-        </form>
-        </p>
-
-        {% endfor %}
-
-    </div>
-</div> -->
 
 {% endif %}
 

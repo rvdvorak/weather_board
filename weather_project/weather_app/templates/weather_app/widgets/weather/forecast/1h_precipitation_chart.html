@@ -6,7 +6,7 @@
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
-            Precipitations in next 1 hour
+            Precipitation in next 1 hour
         </h3>
     </div>
     <div class="card-body p-3">
@@ -54,10 +54,10 @@
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {{ chart_data.minutely.dt | safe }},
+            labels: {{ chart_data.precipitation_forecast_1h.dt | safe }},
     datasets: [{
-        label: 'Precipitations volume [mm/h]',
-        data: {{ chart_data.minutely.precipitation | safe }},
+        label: 'precipitation volume [mm/h]',
+        data: {{ chart_data.precipitation_forecast_1h.precipitation | safe }},
         backgroundColor: [
         'rgba(0, 0, 255, 1)',
 

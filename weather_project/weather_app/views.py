@@ -1,16 +1,52 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse
 from datetime import datetime
 import requests
 import pprint
 import json
 
-# TO DO: Remove
-found_locations = None
-selected_location = None
 
 def weather_dashboard(request):
-    global selected_location
+    def get_location(request):
+        try:
+            latitude = float(request.GET.get('latitude'))
+            longitude = float(request.GET.get('longitude'))
+            label = str(request.GET.get('label'))
+        except:
+            print('location type error')
+            return False
+        if not (-90 <= latitude <= 90):
+            print('location latitude out of range')
+            return False
+        if not (-180 <= longitude <= 180):
+            print('location longitude out of range')
+            return False
+        if label == '':
+            print('location missing label')
+            return False
+        location = {
+            'latitude': latitude,
+            'longitude': longitude,
+            'label': label,
+        }
+        print('location:')
+        pprint.pprint(location)
+        return location
+
+    def get_weather(location):
+        url = 'https://api.openweathermap.org/data/2.5/onecall'
+        params = {
+            'lat': location['latitude'],
+            'lon': location['longitude'],
+            'units': 'metric',
+            'appid': '6fe37effcfa866ecec5fd235699a402d',
+        }
+        response = requests.get(url, params=params)
+        if not response.status_code == 200:
+            print('Weather server status:', response.status_code)
+            return False
+        weather = response.json()
+        return weather
 
     def convert_timestamps_to_datetime(weather):
         weather['current']['dt'] = datetime.fromtimestamp(
@@ -24,59 +60,56 @@ def weather_dashboard(request):
                 weather['minutely'][minute]['dt'])
         return weather
 
-    if not selected_location:
+    def get_chart_data(weather):
+        chart_data = {
+            'precipitation_forecast_1h': {
+                'dt': [],
+                'precipitation': [],
+            }
+        }
+        for minute in weather['minutely']:
+            chart_data['precipitation_forecast_1h']['dt'].append(
+                minute['dt'].strftime("%H:%M"))
+            chart_data['precipitation_forecast_1h']['precipitation'].append(
+                minute['precipitation'])
+        return chart_data
+
+    location = get_location(request)
+
+    if not location:
         message = {
             'style': 'lightblue',
-            'header': 'Hint',
-            'content': 'Search the location to show the weather.',
+            'headline': 'Hint',
+            'description': 'Search location to get started.'
         }
         return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
 
-    lat = selected_location['geometry']['coordinates'][1]
-    lon = selected_location['geometry']['coordinates'][0]
+    weather = get_weather(location)
 
-    print(lat)
-    print(lon)
-
-    weather_API_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid=6fe37effcfa866ecec5fd235699a402d&units=metric'
-    weather_API_response = requests.get(weather_API_request)
-
-    if not weather_API_response.status_code == 200:
+    if not weather:
         message = {
             'style': 'danger',
-            'header': 'Weather data error',
-            'content': f'Request for weather data failed. Please try again later. (Weather server status: {weather_API_response.status_code})'
+            'headline': 'Weather API error',
+            'description': 'Request for weather data failed. Please try again later.'
         }
         return render(request, 'weather_app/pages/weather_dashboard.html', {'message': message})
 
-    weather = weather_API_response.json()
     weather = convert_timestamps_to_datetime(weather)
 
-    chart_data = {
-        'minutely': {
-            'dt': [],
-            'precipitation': [],
-        }
-    }
-    for minute in weather['minutely']:
-        chart_data['minutely']['dt'].append(minute['dt'].strftime("%H:%M"))
-        chart_data['minutely']['precipitation'].append(minute['precipitation'])
+    chart_data = get_chart_data(weather)
 
     return render(request, 'weather_app/pages/weather_dashboard.html',
-                  {'selected_location': selected_location, 'weather': weather, 'chart_data': chart_data})
+                  {'location': location, 'weather': weather, 'chart_data': chart_data})
 
 
 def locations(request):
-    global found_locations
-
-    found_locations = None
-    search_text = request.GET.get('search_text')
+    search_text = str(request.GET.get('search_text'))
 
     if not search_text:
         message = {
             'style': 'lightblue',
-            'header': 'Hint',
-            'content': 'First enter the name of the location you want to search.',
+            'headline': 'Hint',
+            'description': 'First enter the name of the location you want to search.',
         }
         return render(request, 'weather_app/pages/locations.html', {'message': message})
 
@@ -86,8 +119,8 @@ def locations(request):
     if not location_API_response.status_code == 200:
         message = {
             'style': 'danger',
-            'header': 'Search location error',
-            'content': f'Search request failed. Please try again later. (Location server status: {openrouteservice_response.status_code})',
+            'headline': 'Search location error',
+            'description': f'Search request failed. Please try again later. (Location server status: {location_API_response.status_code})',
         }
         return render(request, 'weather_app/pages/locations.html', {'message': message})
 
@@ -96,17 +129,9 @@ def locations(request):
     if not found_locations:
         message = {
             'style': 'lightblue',
-            'header': 'No location found',
-            'content': 'You probably entered the location incorrectly. Please try again.',
+            'headline': 'No location found',
+            'description': 'You probably entered the location incorrectly. Please try again.',
         }
         return render(request, 'weather_app/pages/locations.html', {'message': message})
 
     return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations})
-
-
-def set_location(request):
-    global found_locations
-    global selected_location
-    location_index = int(request.GET.get('location_index')) - 1
-    selected_location = found_locations[location_index]
-    return redirect('weather_dashboard')

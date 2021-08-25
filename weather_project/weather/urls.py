@@ -21,5 +21,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.weather_dashboard, name='weather_dashboard'),
     path('locations/', views.locations, name='locations'),
-    path('location/set/', views.set_location, name='set_location'),
 ]
