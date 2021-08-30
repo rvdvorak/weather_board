@@ -13,7 +13,7 @@ def weather_dashboard(request):
         label = request.GET.get('label')
         if not (latitude and longitude and label):
             return {
-                'location': None,
+                'data': None,
                 'message': {
                     'style': 'lightblue',
                     'headline': 'No location selected',
@@ -26,7 +26,7 @@ def weather_dashboard(request):
             label = str(label)
         except:
             return {
-                'location': None,
+                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Incorrect location data',
@@ -35,7 +35,7 @@ def weather_dashboard(request):
             }
         if not (-90 <= latitude <= 90):
             return {
-                'location': None,
+                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Incorrect coordinates',
@@ -44,7 +44,7 @@ def weather_dashboard(request):
             }
         if not (-180 <= longitude <= 180):
             return {
-                'location': None,
+                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Incorrect coordinates',
@@ -53,7 +53,7 @@ def weather_dashboard(request):
             }
         if label == '':
             return {
-                'location': None,
+                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Incomplete location data',
@@ -61,15 +61,10 @@ def weather_dashboard(request):
                 }
             }
         return {
-            'location': {
+            'data': {
                 'latitude': latitude,
                 'longitude': longitude,
                 'label': label,
-            },
-            'message': {
-                'style': 'success',
-                'headline': 'Location OK',
-                'description': 'Location data is correct.',
             }
         }
 
@@ -84,7 +79,7 @@ def weather_dashboard(request):
         response = requests.get(url, params=params)
         if not response.status_code == 200:
             return {
-                'weather': None,
+                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Weather API error',
@@ -93,13 +88,11 @@ def weather_dashboard(request):
             }
         weather = response.json()
         return {
-            'weather': weather,
-            'message': {
-                'style': 'success',
-                'headline': 'Weather API response OK',
-                'description': 'Weather data received successfully.',
-            }
+            'data': weather,
         }
+
+    def get_air_pollution(location):
+        pass
 
     def convert_timestamps_to_datetime(weather):
         weather['current']['dt'] = datetime.fromtimestamp(
@@ -128,60 +121,77 @@ def weather_dashboard(request):
         return chart_data
 
     location = get_location(request)
-
-    if not location['location']:
+    if not location['data']:
         return render(request, 'weather_app/pages/message.html', {'message': location['message']})
-
-    weather = get_weather(location['location'])
-
-    if not weather['weather']:
+    weather = get_weather(location['data'])
+    if not weather['data']:
         return render(request, 'weather_app/pages/message.html', {'message': weather['message']})
-
-    weather['weather'] = convert_timestamps_to_datetime(weather['weather'])
-
-    chart_data = get_chart_data(weather['weather'])
-
-    return render(
-        request,
-        'weather_app/pages/weather_dashboard.html',
+    weather['data'] = convert_timestamps_to_datetime(weather['data'])
+    chart_data = get_chart_data(weather['data'])
+    return render(request, 'weather_app/pages/weather_dashboard.html',
         {
-            'location': location['location'],
-            'weather': weather['weather'],
+            'location': location['data'],
+            'weather': weather['data'],
             'chart_data': chart_data,
         }
     )
 
 
 def locations(request):
-    search_text = str(request.GET.get('search_text'))
+    def search_locations(request):
+        search_text = request.GET.get('search_text')
+        if not search_text:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'warning',
+                    'headline': 'Notice',
+                    'description': 'First enter the name of the location you want to search.',
+                }
+            }
+        try:
+            search_text = str(search_text)
+        except:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'warning',
+                    'headline': 'Notice',
+                    'description': 'First enter the name of the location you want to search.',
+                }
+            }
 
-    if not search_text:
-        message = {
-            'style': 'lightblue',
-            'headline': 'Hint',
-            'description': 'First enter the name of the location you want to search.',
+        url = 'https://api.openrouteservice.org/geocode/search'
+        params = {
+            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+            'size': 20,
+            'text': search_text,
         }
-        return render(request, 'weather_app/pages/locations.html', {'message': message})
-
-    location_API_request = 'https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71&size=50&text=' + search_text
-    location_API_response = requests.get(location_API_request)
-
-    if not location_API_response.status_code == 200:
-        message = {
-            'style': 'danger',
-            'headline': 'Search location error',
-            'description': f'Search request failed. Please try again later. (Location server status: {location_API_response.status_code})',
+        response = requests.get(url, params=params)
+        if not response.status_code == 200:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Search location failed',
+                    'description': f'Location server status: {response.status_code}',
+                }
+            }
+        found_locations = response.json()['features']
+        if not found_locations:
+            return {
+                'data': None,
+                'message' : {
+                    'style': 'warning',
+                    'headline': 'No location found',
+                    'description': 'You probably entered the location incorrectly. Please try again.',
+                }
+            }
+        return {
+            'data': found_locations,
         }
-        return render(request, 'weather_app/pages/locations.html', {'message': message})
 
-    found_locations = location_API_response.json()['features']
-
-    if not found_locations:
-        message = {
-            'style': 'lightblue',
-            'headline': 'No location found',
-            'description': 'You probably entered the location incorrectly. Please try again.',
-        }
-        return render(request, 'weather_app/pages/locations.html', {'message': message})
-
-    return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations})
+    found_locations = search_locations(request)
+    if not found_locations['data']:
+        return render(request, 'weather_app/pages/message.html', {'message': found_locations['message']})
+    return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations['data']})
