@@ -56,7 +56,7 @@
         data: {
             labels: {{ chart_data.precipitation_forecast_1h.dt | safe }},
     datasets: [{
-        label: 'precipitation volume [mm/h]',
+        label: 'Precipitation volume [mm/h]',
         data: {{ chart_data.precipitation_forecast_1h.precipitation | safe }},
         backgroundColor: [
         'rgba(0, 0, 255, 1)',
@@ -72,7 +72,9 @@
     options: {
         scales: {
             y: {
-                beginAtZero: true
+                type: 'logarithmic',
+                beginAtZero: true,
+                max: 100,
             }
         }
     }
