@@ -83,18 +83,12 @@ def weather_dashboard(request):
                 'message': {
                     'style': 'danger',
                     'headline': 'Weather API error',
-                    'description': f'Weather server status: {response.status_code}',
+                    'description': f'OpenWeatherMap.org status: {response.status_code}',
                 }
             }
         weather = response.json()
-        return {
-            'data': weather,
-        }
-
-    def get_air_pollution(location):
-        pass
-
-    def convert_timestamps_to_datetime(weather):
+        
+        # Convert Unix timestamps to datetime
         weather['current']['dt'] = datetime.fromtimestamp(
             weather['current']['dt'])
         weather['current']['sunrise'] = datetime.fromtimestamp(
@@ -104,7 +98,57 @@ def weather_dashboard(request):
         for minute in range(len(weather['minutely'])):
             weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
                 weather['minutely'][minute]['dt'])
-        return weather
+
+        return {
+            'data': weather,
+        }
+
+    def get_air_pollution(location):
+        url = 'http://api.openweathermap.org/data/2.5/air_pollution'
+        params = {
+            'lat': location['latitude'],
+            'lon': location['longitude'],
+            'appid': '6fe37effcfa866ecec5fd235699a402d',
+        }
+        response = requests.get(url, params=params)
+        if not response.status_code == 200:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Air pollution API error',
+                    'description': f'OpenWeatherMap.org status: {response.status_code}',
+                }
+            }
+        current = response.json()['list'][0]
+        current['dt'] = datetime.fromtimestamp(current['dt'])
+
+        url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
+        params = {
+            'lat': location['latitude'],
+            'lon': location['longitude'],
+            'appid': '6fe37effcfa866ecec5fd235699a402d',
+        }
+        response = requests.get(url, params=params)
+        if not response.status_code == 200:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Air pollution API error',
+                    'description': f'OpenWeatherMap.org status: {response.status_code}',
+                }
+            }
+        forecast = response.json()['list']
+        for hour in range(len(forecast)):
+            forecast[hour]['dt'] = datetime.fromtimestamp(forecast[hour]['dt'])
+
+        return {
+            'data': {
+                'current': current,
+                'forecast': forecast,
+            }            
+        }
 
     def get_chart_data(weather):
         chart_data = {
@@ -123,15 +167,22 @@ def weather_dashboard(request):
     location = get_location(request)
     if not location['data']:
         return render(request, 'weather_app/pages/message.html', {'message': location['message']})
+
     weather = get_weather(location['data'])
     if not weather['data']:
         return render(request, 'weather_app/pages/message.html', {'message': weather['message']})
-    weather['data'] = convert_timestamps_to_datetime(weather['data'])
+
+    air_pollution = get_air_pollution(location['data'])
+    if not air_pollution['data']:
+        return render(request, 'weather_app/pages/message.html', {'message': air_pollution['message']})
+
     chart_data = get_chart_data(weather['data'])
+
     return render(request, 'weather_app/pages/weather_dashboard.html',
         {
             'location': location['data'],
             'weather': weather['data'],
+            'air_pollution': air_pollution['data'],
             'chart_data': chart_data,
         }
     )
@@ -174,7 +225,7 @@ def locations(request):
                 'message': {
                     'style': 'danger',
                     'headline': 'Search location failed',
-                    'description': f'Location server status: {response.status_code}',
+                    'description': f'OpenRouteService.org status: {response.status_code}',
                 }
             }
         found_locations = response.json()['features']

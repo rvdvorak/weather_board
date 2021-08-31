@@ -1,0 +1,79 @@
+<div class="card card-lightblue shadow">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-smog" style="width: 1.5em; text-align: left"></i>
+            Air pollution
+        </h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body p-0">
+        <table class="table table-hover">
+            <tbody>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>CO</b></td>
+                    <td scope="row">Carbon monoxide</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.co }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>NO</b></td>
+                    <td scope="row">Nitrogen monoxide</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.no }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>NO<sub>2</sub></b></td>
+                    <td scope="row">Nitrogen dioxide</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.no2 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>O<sub>3</sub></b></td>
+                    <td scope="row">Ozone</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.o3 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>SO<sub>2</sub></b></td>
+                    <td scope="row">Sulphur dioxide</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.so2 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>NH<sub>3</sub></b></td>
+                    <td scope="row">Ammonia</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.nh3 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>PM<sub>2.5</sub></b></td>
+                    <td scope="row">Fine particles matter</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.pm2_5 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+                <tr>
+                    <td scope="row" style="text-align: center"><b>PM<sub>10</sub></b></td>
+                    <td scope="row">Coarse particles matter</td>
+                    <td style="text-align: right; padding-right: 0.15em">
+                        {{ air_pollution.current.components.pm10 }}
+                    </td>
+                    <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
