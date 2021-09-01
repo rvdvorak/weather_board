@@ -143,6 +143,49 @@ def weather_dashboard(request):
         for hour in range(len(forecast)):
             forecast[hour]['dt'] = datetime.fromtimestamp(forecast[hour]['dt'])
 
+        aqi_stars = {
+            1: [
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                ],
+            2: [
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                    'far fa-star',
+                ],
+            3: [
+                    'fas fa-star',
+                    'fas fa-star',
+                    'fas fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                    ],
+            4: [
+                    'fas fa-star',
+                    'fas fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                ],
+            5: [
+                    'fas fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                    'far fa-star',
+                ],
+        }
+        
+        current['main']['aqi_stars'] = aqi_stars[current['main']['aqi']]
+
+        print('STARS')
+        pprint.pprint(current['main']['aqi_stars'])
+
         return {
             'data': {
                 'current': current,
