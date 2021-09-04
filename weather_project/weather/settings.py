@@ -33,9 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # NA POŘADÍ ZÁLEŽÍ !!!
     'weather_app',
-    'adminlte3',
-    # AdminLTE theme for Django Admin only
-    # 'adminlte3_theme',
+    'sass_processor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,11 +120,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
+]
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+SASS_PROCESSOR_ROOT = BASE_DIR / "static"
+
+SASS_PRECISION = 8
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
