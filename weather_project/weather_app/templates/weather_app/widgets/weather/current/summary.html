@@ -11,7 +11,7 @@
         <h3>Feels like {{ weather.current.feels_like|floatformat:1 }} °C</h3>
         <h3>{{ weather.current.weather.0.description|capfirst }}</h3>
         <br>
-        <h3>Air quality index: {{ air_pollution.current.main.aqi }}</h3>
+        <h3>Air quality:</h3>
         <h2>
             {% for star in air_pollution.current.main.aqi_stars %}
             <i class="{{ star }}"></i>
