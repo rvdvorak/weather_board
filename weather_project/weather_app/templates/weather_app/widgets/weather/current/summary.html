@@ -1,13 +1,13 @@
 <div class="info-box bg-lightblue shadow">
     <div class="info-box-content" style="text-align: center">
-        <h1>{{ location.label }}</h1>
+        <h2>{{ location.label }}</h2>
         <h6>Latitude: {{ location.latitude }}</h6>
         <h6>Longitude: {{ location.longitude }}</h6>
         <h3>{{ weather.current.dt|date:"D, j. M Y, H:i" }}</h3>
-        <h1>
+        <h2>
             <img src="http://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png">
             <b>{{ weather.current.temp|floatformat:1 }} °C</b>
-        </h1>
+        </h2>
         <h3>Feels like {{ weather.current.feels_like|floatformat:1 }} °C</h3>
         <h3>{{ weather.current.weather.0.description|capfirst }}</h3>
         <br>
