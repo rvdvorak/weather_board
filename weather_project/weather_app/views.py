@@ -95,10 +95,34 @@ def weather_dashboard(request):
             weather['current']['sunrise'])
         weather['current']['sunset'] = datetime.fromtimestamp(
             weather['current']['sunset'])
+
         for minute in range(len(weather['minutely'])):
             weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
                 weather['minutely'][minute]['dt'])
 
+        for hour in range(len(weather['hourly'])):
+            weather['hourly'][hour]['dt'] = datetime.fromtimestamp(
+                weather['hourly'][hour]['dt'])
+
+        for day in range(len(weather['daily'])):
+            weather['daily'][day]['dt'] = datetime.fromtimestamp(
+                weather['daily'][day]['dt'])        
+            weather['daily'][day]['sunrise'] = datetime.fromtimestamp(
+                weather['daily'][day]['sunrise'])       
+            weather['daily'][day]['sunset'] = datetime.fromtimestamp(
+                weather['daily'][day]['sunset'])
+
+        if 'alerts' in weather:
+            for alert in range(len(weather['alerts'])):
+                weather['alerts'][alert]['start'] = datetime.fromtimestamp(
+                    weather['alerts'][alert]['start'])
+                weather['alerts'][alert]['end'] = datetime.fromtimestamp(
+                    weather['alerts'][alert]['end'])
+
+            pprint.pprint(weather['alerts'])
+
+
+        
         return {
             'data': weather,
         }

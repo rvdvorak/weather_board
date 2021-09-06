@@ -1,0 +1,32 @@
+<div class="card card-warning shadow">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-exclamation-triangle" style="width: 1.5em; text-align: left"></i>
+            Weather Alerts
+        </h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body p-0">
+        <table class="table table-hover">
+            <tbody>
+                {% for alert in weather.alerts %}
+                <tr>
+                    <td>
+                        <h2>{{ alert.event }}</h2>
+                        {% for tag in alert.tags %}
+                        <span class="badge bg-danger">{{ tag }}</span>
+                        {% endfor %}
+                        <h6>From: {{ alert.start|date:"D, j. M Y, H:i" }}</h6>
+                        <h6>Until: {{ alert.end|date:"D, j. M Y, H:i" }}</h6>
+                        {% if alert.sender %}
+                        <h6>Issued by: {{ alert.sender }}</h6>
+                        {% endif %}
+                        <h3>Description</h3>
+                        <p>{{ alert.description }}</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
