@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.urls import reverse
 from datetime import datetime
+from urllib.parse import urlencode
 import requests
 import pprint
 import json
@@ -8,51 +10,7 @@ import random
 
 
 def weather_dashboard(request):
-    def get_random_location():
-        latitude = (random.random() * 180) - 90
-        longitude = (random.random() * 360) - 180
-        url = 'https://api.openrouteservice.org/geocode/reverse'
-        params = {
-            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
-            'point.lat': latitude,
-            'point.lon': longitude,
-            'size': 1,
-        }
-        response = requests.get(url, params=params)
-        if not response.status_code == 200:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Location API error',
-                    'description': f'OpenRouteService.org status: {response.status_code}',
-                    'show_search_form': False,
-                }
-            }
-        try:
-            location = response.json()['features'][0]
-            return {
-                'data': {
-                    'latitude': location['geometry']['coordinates'][1],
-                    'longitude': location['geometry']['coordinates'][0],
-                    'label': location['properties']['label'],
-                }
-            }
-        except:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Random location error',
-                    'description': 'Sorry, something went wrong...',
-                    'show_search_form': False,
-                }
-            }
-
     def get_location(request):
-        random_location = request.GET.get('random_location')
-        if random_location:
-            return get_random_location()
         latitude = request.GET.get('latitude')
         longitude = request.GET.get('longitude')
         label = request.GET.get('label')
@@ -118,7 +76,6 @@ def weather_dashboard(request):
             }
         }
 
-
     def get_weather(location):
         url = 'https://api.openweathermap.org/data/2.5/onecall'
         params = {
@@ -139,7 +96,7 @@ def weather_dashboard(request):
                 }
             }
         weather = response.json()
-        
+
         # Convert Unix timestamps to datetime
         weather['current']['dt'] = datetime.fromtimestamp(
             weather['current']['dt'])
@@ -153,17 +110,17 @@ def weather_dashboard(request):
                 weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
                     weather['minutely'][minute]['dt'])
 
-        if 'hourly' in weather:    
+        if 'hourly' in weather:
             for hour in range(len(weather['hourly'])):
                 weather['hourly'][hour]['dt'] = datetime.fromtimestamp(
                     weather['hourly'][hour]['dt'])
 
-        if 'daily' in weather:    
+        if 'daily' in weather:
             for day in range(len(weather['daily'])):
                 weather['daily'][day]['dt'] = datetime.fromtimestamp(
-                    weather['daily'][day]['dt'])        
+                    weather['daily'][day]['dt'])
                 weather['daily'][day]['sunrise'] = datetime.fromtimestamp(
-                    weather['daily'][day]['sunrise'])       
+                    weather['daily'][day]['sunrise'])
                 weather['daily'][day]['sunset'] = datetime.fromtimestamp(
                     weather['daily'][day]['sunset'])
 
@@ -173,7 +130,7 @@ def weather_dashboard(request):
                     weather['alerts'][alert]['start'])
                 weather['alerts'][alert]['end'] = datetime.fromtimestamp(
                     weather['alerts'][alert]['end'])
-       
+
         return {
             'data': weather,
         }
@@ -222,42 +179,42 @@ def weather_dashboard(request):
 
         aqi_stars = {
             1: [
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                ],
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+            ],
             2: [
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                    'far fa-star',
-                ],
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+                'far fa-star',
+            ],
             3: [
-                    'fas fa-star',
-                    'fas fa-star',
-                    'fas fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                    ],
+                'fas fa-star',
+                'fas fa-star',
+                'fas fa-star',
+                'far fa-star',
+                'far fa-star',
+            ],
             4: [
-                    'fas fa-star',
-                    'fas fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                ],
+                'fas fa-star',
+                'fas fa-star',
+                'far fa-star',
+                'far fa-star',
+                'far fa-star',
+            ],
             5: [
-                    'fas fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                    'far fa-star',
-                ],
+                'fas fa-star',
+                'far fa-star',
+                'far fa-star',
+                'far fa-star',
+                'far fa-star',
+            ],
         }
-        
+
         current['main']['aqi_stars'] = aqi_stars[current['main']['aqi']]
 
         print('STARS')
@@ -267,7 +224,7 @@ def weather_dashboard(request):
             'data': {
                 'current': current,
                 'forecast': forecast,
-            }            
+            }
         }
 
     def get_chart_data(weather):
@@ -301,13 +258,13 @@ def weather_dashboard(request):
     chart_data = get_chart_data(weather['data'])
 
     return render(request, 'weather_app/pages/weather_dashboard.html',
-        {
-            'location': location['data'],
-            'weather': weather['data'],
-            'air_pollution': air_pollution['data'],
-            'chart_data': chart_data,
-        }
-    )
+                  {
+                      'location': location['data'],
+                      'weather': weather['data'],
+                      'air_pollution': air_pollution['data'],
+                      'chart_data': chart_data,
+                  }
+                  )
 
 
 def locations(request):
@@ -357,7 +314,7 @@ def locations(request):
         if not found_locations:
             return {
                 'data': None,
-                'message' : {
+                'message': {
                     'style': 'warning',
                     'headline': 'No location found',
                     'description': 'You probably entered the location incorrectly. Please try again.',
@@ -372,3 +329,62 @@ def locations(request):
     if not found_locations['data']:
         return render(request, 'weather_app/pages/message.html', {'message': found_locations['message']})
     return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations['data']})
+
+
+def random_location(request):
+    def get_random_loaction():
+        latitude = (random.random() * 180) - 90
+        longitude = (random.random() * 360) - 180
+        url = 'https://api.openrouteservice.org/geocode/reverse'
+        params = {
+            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+            'point.lat': latitude,
+            'point.lon': longitude,
+            'size': 1,
+        }
+        response = requests.get(url, params=params)
+        if not response.status_code == 200:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Location API error',
+                    'description': f'OpenRouteService.org status: {response.status_code}',
+                    'show_search_form': False,
+                }
+            }
+        try:
+            location = response.json()['features'][0]
+            return {
+                'data': {
+                    'latitude': location['geometry']['coordinates'][1],
+                    'longitude': location['geometry']['coordinates'][0],
+                    'label': location['properties']['label'],
+                }
+            }
+        except:
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Random location error',
+                    'description': 'Sorry, something went wrong...',
+                    'show_search_form': False,
+                }
+            }
+
+    location = get_random_loaction()
+    if not location['data']:
+        return render(request, 'weather_app/pages/message.html', {'message': location['message']})
+    base_url = reverse('weather_dashboard')
+    query_string = urlencode(
+        {
+            'latitude': location['data']['latitude'],
+            'longitude': location['data']['longitude'],
+            'label': location['data']['label'],
+        }
+    )
+    url = f'{base_url}?{query_string}'
+    print('URL', url)
+    response = redirect(url)
+    return response

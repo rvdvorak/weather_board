@@ -1,6 +1,6 @@
 {% load static %}
 
-<nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
+<nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
         <a href="../../index3.html" class="navbar-brand">
             <img src="{% static 'umbrella.svg' %}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
@@ -59,26 +59,25 @@
                         <!-- End Level two -->
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <form class="form-inline ml-0 ml-lg-3" action="{% url 'locations' %}" method="GET">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control form-control-navbar" name="search_text" type="search"
+                                placeholder="Search location" aria-label="Search location">
+                            <div class="input-group-append">
+                                <button class="btn btn-block btn-outline-secondary" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="input-group-append">
+                                <a href="{% url 'random_location' %}" class="btn btn-block btn-outline-secondary btn-sm">
+                                    Random
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </li>
             </ul>
-
-            <!-- SEARCH FORM -->
-            <form class="form-inline ml-0 ml-md-3" action="{% url 'locations' %}" method="GET">
-                <div class="input-group input-group-sm">
-                    <input class="form-control form-control-navbar" name="search_text" type="search"
-                        placeholder="Search location" aria-label="Search location">
-                    <div class="input-group-append">
-                        <button class="btn btn-block btn-outline-secondary" type="submit">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <form class="form-inline ml-0 ml-md-3" action="{% url 'weather_dashboard' %}" method="GET">
-                <input type="hidden" name="random_location" value="true">
-                <button type="submit" class="btn btn-block btn-outline-secondary btn-sm">
-                    Random location
-                </button>
-            </form>
         </div>
     </div>
 </nav>
