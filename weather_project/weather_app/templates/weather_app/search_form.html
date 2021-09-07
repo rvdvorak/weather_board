@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <form action="{% url 'locations' %}" method="GET">
+            <div class="input-group">
+                <input name="search_text" type="search" class="form-control form-control-md"
+                    placeholder="Search Location" aria-label="Search Location">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-block btn-outline-secondary">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
