@@ -32,8 +32,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # NA POŘADÍ ZÁLEŽÍ !!!
-    'weather_app',
     'sass_processor',
+    'weather_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

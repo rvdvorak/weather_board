@@ -1,0 +1,70 @@
+{% extends 'weather_app/widget.html' %}
+
+{% block widget_style %}lightblue{% endblock %}
+
+{% block widget_header_icon %}
+<i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
+{% endblock %}
+
+{% block widget_header_text %}Precipitation 1 hour forecast{% endblock %}
+
+{% block widget_content %}
+
+{% if chart_data.precipitation_forecast_1h.dt %}
+
+<div class="p-3">
+    <div class="chart">
+        <div class="chartjs-size-monitor">
+            <div class="chartjs-size-monitor-expand">
+                <div class=""></div>
+            </div>
+            <div class="chartjs-size-monitor-shrink">
+                <div class=""></div>
+            </div>
+        </div>
+        <canvas id="myChart"
+            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
+            height="500" class="chartjs-render-monitor">
+        </canvas>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
+    integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
+
+<script>    
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.precipitation_forecast_1h.dt | safe }},
+            datasets: [{
+                label: 'Precipitation volume [mm/h]',
+                data: {{ chart_data.precipitation_forecast_1h.precipitation | safe }},
+                backgroundColor: ['rgba(0, 0, 255, 1)'],
+                borderColor: ['rgba(0, 0, 0, 0)'],
+                borderWidth: 0.5
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    type: 'logarithmic',
+                    min: 0.1,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+{% else %}
+
+<div class="p-3">
+    <i>No data available for current location</i>
+</div>
+
+{% endif %}
+
+{% endblock widget_content %}

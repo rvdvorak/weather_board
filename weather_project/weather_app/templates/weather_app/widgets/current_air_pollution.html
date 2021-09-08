@@ -1,0 +1,80 @@
+{% extends 'weather_app/widget.html' %}
+
+{% block widget_style %}lightblue{% endblock %}
+
+{% block widget_header_icon %}
+<i class="fas fa-smog" style="width: 1.5em; text-align: left"></i>
+{% endblock %}
+
+{% block widget_header_text %}Air pollution{% endblock %}
+
+{% block widget_content %}
+<table class="table table-hover">
+    <tbody>
+        <tr>
+            <td style="text-align: center"><b>CO</b></td>
+            <td>Carbon monoxide</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.co }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>NO</b></td>
+            <td>Nitrogen monoxide</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.no }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>NO<sub>2</sub></b></td>
+            <td>Nitrogen dioxide</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.no2 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>O<sub>3</sub></b></td>
+            <td>Ozone</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.o3 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>SO<sub>2</sub></b></td>
+            <td>Sulphur dioxide</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.so2 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>NH<sub>3</sub></b></td>
+            <td>Ammonia</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.nh3 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>PM<sub>2.5</sub></b></td>
+            <td>Fine particles matter</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.pm2_5 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><b>PM<sub>10</sub></b></td>
+            <td>Coarse particles matter</td>
+            <td style="text-align: right; padding-right: 0.15em">
+                {{ air_pollution.current.components.pm10 }}
+            </td>
+            <td style="text-align: left; padding-left: 0.15em">μg/m<sup>3</sup></td>
+        </tr>
+    </tbody>
+</table>
+{% endblock widget_content %}

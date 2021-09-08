@@ -1,0 +1,11 @@
+<div class="card card-{% block widget_style %}{% endblock %} shadow">
+    <div class="card-header">
+        <h3 class="card-title" style="margin: 0px;">
+            {% block widget_header_icon %}{% endblock %}
+            {% block widget_header_text %}{% endblock %}
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        {% block widget_content %}{% endblock %}
+    </div>
+</div>

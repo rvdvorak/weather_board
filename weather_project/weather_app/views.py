@@ -9,7 +9,7 @@ import json
 import random
 
 
-def weather_dashboard(request):
+def dashboard(request):
     def get_location(request):
         latitude = request.GET.get('latitude')
         longitude = request.GET.get('longitude')
@@ -19,7 +19,7 @@ def weather_dashboard(request):
                 'data': None,
                 'message': {
                     'style': 'lightblue',
-                    'headline': 'No location selected',
+                    'headline': 'Select location',
                     'description': 'Search location to get started.',
                     'show_search_form': True,
                 }
@@ -217,9 +217,6 @@ def weather_dashboard(request):
 
         current['main']['aqi_stars'] = aqi_stars[current['main']['aqi']]
 
-        print('STARS')
-        pprint.pprint(current['main']['aqi_stars'])
-
         return {
             'data': {
                 'current': current,
@@ -245,19 +242,19 @@ def weather_dashboard(request):
 
     location = get_location(request)
     if not location['data']:
-        return render(request, 'weather_app/pages/message.html', {'message': location['message']})
+        return render(request, 'weather_app/message.html', {'message': location['message']})
 
     weather = get_weather(location['data'])
     if not weather['data']:
-        return render(request, 'weather_app/pages/message.html', {'message': weather['message']})
+        return render(request, 'weather_app/message.html', {'message': weather['message']})
 
     air_pollution = get_air_pollution(location['data'])
     if not air_pollution['data']:
-        return render(request, 'weather_app/pages/message.html', {'message': air_pollution['message']})
+        return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
 
     chart_data = get_chart_data(weather['data'])
 
-    return render(request, 'weather_app/pages/weather_dashboard.html',
+    return render(request, 'weather_app/dashboard.html',
                   {
                       'location': location['data'],
                       'weather': weather['data'],
@@ -267,82 +264,84 @@ def weather_dashboard(request):
                   )
 
 
-def locations(request):
-    def search_locations(request):
-        search_text = request.GET.get('search_text')
-        if not search_text:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Notice',
-                    'description': 'First enter the name of the location you want to search.',
-                    'show_search_form': True,
+def search_location(request):
+    search_text = request.GET.get('search_text')
+    if not search_text:
+        return render(request, 'weather_app/message.html', {
+            'message': {
+                'style': 'warning',
+                'headline': 'Search location',
+                'description': 'First enter the name of the location to search.',
+                'show_search_form': True,
                 }
             }
-        try:
-            search_text = str(search_text)
-        except:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Notice',
-                    'description': 'First enter the name of the location you want to search.',
-                    'show_search_form': True,
+        )
+    
+    try:
+        search_text = str(search_text)
+    except:
+        return render(request, 'weather_app/message.html', {
+            'message': {
+                'style': 'warning',
+                'headline': 'Search location',
+                'description': 'First enter the name of the location to search.',
+                'show_search_form': True,
                 }
             }
+        )
 
-        url = 'https://api.openrouteservice.org/geocode/search'
-        params = {
-            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
-            'size': 20,
-            'text': search_text,
-        }
-        response = requests.get(url, params=params)
-        if not response.status_code == 200:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Search location failed',
-                    'description': f'OpenRouteService.org status: {response.status_code}',
-                    'show_search_form': False,
+    url='https://api.openrouteservice.org/geocode/search'
+    params={
+        'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+        'size': 20,
+        'text': search_text,
+    }
+    response=requests.get(url, params=params)
+    if not response.status_code == 200:
+        return render(request, 'weather_app/message.html', {
+            'message': {
+                'style': 'danger',
+                'headline': 'Location search failed',
+                'description': f'OpenRouteService.org status: {response.status_code}',
+                'show_search_form': False,
                 }
             }
-        found_locations = response.json()['features']
-        if not found_locations:
-            return {
-                'data': None,
-                'message': {
-                    'style': 'warning',
-                    'headline': 'No location found',
-                    'description': 'You probably entered the location incorrectly. Please try again.',
-                    'show_search_form': True,
+        )
+    found_locations=response.json()['features']
+    if not found_locations:
+        return render(request, 'weather_app/message.html', {
+            'message': {
+                'style': 'warning',
+                'headline': 'No location found',
+                'description': 'You probably entered the name of the location incorrectly. Please try again.',
+                'show_search_form': True,
                 }
             }
-        return {
-            'data': found_locations,
+        )
+    return render(request, 'weather_app/message.html', {
+        'message': {
+            'style': 'success',
+            'headline': 'Select location',
+            'description': None,
+            'found_locations': found_locations,
+            'show_search_form': True,
+            }
         }
-
-    found_locations = search_locations(request)
-    if not found_locations['data']:
-        return render(request, 'weather_app/pages/message.html', {'message': found_locations['message']})
-    return render(request, 'weather_app/pages/locations.html', {'found_locations': found_locations['data']})
+    )
 
 
 def random_location(request):
     def get_random_loaction():
-        latitude = (random.random() * 180) - 90
-        longitude = (random.random() * 360) - 180
-        url = 'https://api.openrouteservice.org/geocode/reverse'
-        params = {
+        latitude=(random.random() * 180) - 90
+        longitude=(random.random() * 360) - 180
+        url='https://api.openrouteservice.org/geocode/reverse'
+        params={
             'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
             'point.lat': latitude,
             'point.lon': longitude,
             'size': 1,
         }
-        response = requests.get(url, params=params)
+        response=requests.get(url, params=params)
         if not response.status_code == 200:
             return {
                 'data': None,
@@ -354,7 +353,7 @@ def random_location(request):
                 }
             }
         try:
-            location = response.json()['features'][0]
+            location=response.json()['features'][0]
             return {
                 'data': {
                     'latitude': location['geometry']['coordinates'][1],
@@ -373,18 +372,18 @@ def random_location(request):
                 }
             }
 
-    location = get_random_loaction()
+    location=get_random_loaction()
     if not location['data']:
-        return render(request, 'weather_app/pages/message.html', {'message': location['message']})
-    base_url = reverse('weather_dashboard')
-    query_string = urlencode(
+        return render(request, 'weather_app/message.html', {'message': location['message']})
+    base_url=reverse('dashboard')
+    query_string=urlencode(
         {
             'latitude': location['data']['latitude'],
             'longitude': location['data']['longitude'],
             'label': location['data']['label'],
         }
     )
-    url = f'{base_url}?{query_string}'
+    url=f'{base_url}?{query_string}'
     print('URL', url)
-    response = redirect(url)
+    response=redirect(url)
     return response
