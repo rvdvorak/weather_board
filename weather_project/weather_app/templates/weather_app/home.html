@@ -1,0 +1,29 @@
+{% extends 'weather_app/base.html' %}
+
+{% block content %}
+<h2 class="text-center" style="padding-top: 1em; padding-bottom: 1em;">
+    Detailed weather informations for next 7&nbsp;days
+</h2>
+<div class="row justify-content-sm-center">
+    <div class="col-md-6 col-lg-5 col-xl-4">
+        <form action="{% url 'search_location' %}" method="GET">
+            <div class="input-group input-group-md">
+                <input class="form-control" name="search_text" type="search"
+                    placeholder="Search location" aria-label="Search location">
+                <div class="input-group-append">
+                    <button class="btn btn-block btn-outline-secondary" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row justify-content-sm-center">
+    <div class="col-md-4 col-lg-3 col-xl-2" style="padding-top: 1em;">
+        <a href="{% url 'random_location' %}" class="btn btn-block btn-outline-secondary btn-md">
+            Random location
+        </a>
+    </div>
+</div>
+{% endblock content %}

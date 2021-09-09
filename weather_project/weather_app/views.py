@@ -9,6 +9,10 @@ import json
 import random
 
 
+def home(request):
+    return render(request, 'weather_app/home.html')
+
+
 def dashboard(request):
     def get_location(request):
         latitude = request.GET.get('latitude')

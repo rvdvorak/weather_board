@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row justify-content-sm-center">
-    <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+    <div class="col-md-8 col-lg-6 col-xl-5">
         <div class="card card-{{ message.style }} shadow">
             <div class="card-header">
                 <h3 class="card-title" style="margin: 0px; font-weight: bold;">
@@ -11,33 +11,25 @@
             </div>
             <div class="card-body">
                 {% if message.description %}
-                <p style="text-align: center;">
-                    {{ message.description }}
-                </p>
+                <div class="row justify-content-sm-center">
+                    <div class="col-sm-9" style="text-align: center;">
+                        {{ message.description }}
+                    </div>
+                </div>
+                <p></p>
                 {% endif %}
                 {% if message.found_locations %}
                 <div class="row justify-content-sm-center">
-                    <div class="col-xs-12 col-sm-9">
-                        {% for location in message.found_locations %}
-                        <p></p>
-                        <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="latitude" value="{{ location.geometry.coordinates.1 }}">
-                            <input type="hidden" name="longitude" value="{{ location.geometry.coordinates.0 }}">
-                            <input type="hidden" name="label" value="{{ location.properties.label }}">
-                            <button type="submit" class="btn btn-link" style="text-align: left;">
-                                {{ location.properties.label }}
-                            </button>
-                        </form>
-                        {% endfor %}
+                    <div class="col-sm-9">
+                        {% include 'weather_app/found_locations.html' %}
                     </div>
                 </div>
+                <p></p>
                 {% endif %}
                 {% if message.show_search_form %}
                 <div class="row justify-content-sm-center">
-                    <div class="col-xs-12 col-sm-9">
-                        <br>
+                    <div class="col-sm-9">
                             {% include 'weather_app/search_form.html' %}
-                        <br>
                     </div>
                 </div>
                 {% endif %}
