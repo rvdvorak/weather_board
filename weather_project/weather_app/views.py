@@ -88,7 +88,22 @@ def dashboard(request):
             'units': 'metric',
             'appid': '6fe37effcfa866ecec5fd235699a402d',
         }
-        response = requests.get(url, params=params)
+        try:
+            response = requests.get(url, params=params, timeout=5)
+        except Exception as err:
+            print('-' * 80)
+            print('API endpoint: ', url)
+            print('Exception: ', err)
+            print('-' * 80)
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Weather service not responding',
+                    'description': 'Please try it again later...',
+                    'show_search_form': False,
+                }
+            }
         if not response.status_code == 200:
             return {
                 'data': None,
@@ -146,7 +161,22 @@ def dashboard(request):
             'lon': location['longitude'],
             'appid': '6fe37effcfa866ecec5fd235699a402d',
         }
-        response = requests.get(url, params=params)
+        try:
+            response = requests.get(url, params=params, timeout=5)
+        except Exception as err:
+            print('-' * 80)
+            print('API endpoint: ', url)
+            print('Exception: ', err)
+            print('-' * 80)
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Weather service not responding',
+                    'description': 'Please try it again later...',
+                    'show_search_form': False,
+                }
+            }
         if not response.status_code == 200:
             return {
                 'data': None,
@@ -166,7 +196,22 @@ def dashboard(request):
             'lon': location['longitude'],
             'appid': '6fe37effcfa866ecec5fd235699a402d',
         }
-        response = requests.get(url, params=params)
+        try:
+            response = requests.get(url, params=params, timeout=5)
+        except Exception as err:
+            print('-' * 80)
+            print('API endpoint: ', url)
+            print('Exception: ', err)
+            print('-' * 80)
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Weather service not responding',
+                    'description': 'Please try it again later...',
+                    'show_search_form': False,
+                }
+            }
         if not response.status_code == 200:
             return {
                 'data': None,
@@ -300,7 +345,22 @@ def search_location(request):
         'size': 20,
         'text': search_text,
     }
-    response=requests.get(url, params=params)
+    try:
+        response = requests.get(url, params=params, timeout=5)
+    except Exception as err:
+        print('-' * 80)
+        print('API endpoint: ', url)
+        print('Exception: ', err)
+        print('-' * 80)
+        return {
+            'data': None,
+            'message': {
+                'style': 'danger',
+                'headline': 'Location service not responding',
+                'description': 'Please try it again later...',
+                'show_search_form': False,
+            }
+        }
     if not response.status_code == 200:
         return render(request, 'weather_app/message.html', {
             'message': {
@@ -345,7 +405,22 @@ def random_location(request):
             'point.lon': longitude,
             'size': 1,
         }
-        response=requests.get(url, params=params)
+        try:
+            response = requests.get(url, params=params, timeout=5)
+        except Exception as err:
+            print('-' * 80)
+            print('API endpoint: ', url)
+            print('Exception: ', err)
+            print('-' * 80)
+            return {
+                'data': None,
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Location service not responding',
+                    'description': 'Please try it again later...',
+                    'show_search_form': False,
+                }
+            }
         if not response.status_code == 200:
             return {
                 'data': None,

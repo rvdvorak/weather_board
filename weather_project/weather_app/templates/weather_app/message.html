@@ -11,23 +11,21 @@
             </div>
             <div class="card-body">
                 {% if message.description %}
-                <div class="row justify-content-sm-center">
+                <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9" style="text-align: center;">
                         {{ message.description }}
                     </div>
                 </div>
-                <p></p>
                 {% endif %}
                 {% if message.found_locations %}
-                <div class="row justify-content-sm-center">
+                <div class="row justify-content-sm-center" style="margin-bottom: 0.75em;">
                     <div class="col-sm-9">
                         {% include 'weather_app/found_locations.html' %}
                     </div>
                 </div>
-                <p></p>
                 {% endif %}
                 {% if message.show_search_form %}
-                <div class="row justify-content-sm-center">
+                <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9">
                             {% include 'weather_app/search_form.html' %}
                     </div>
