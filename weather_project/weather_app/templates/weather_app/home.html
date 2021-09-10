@@ -1,10 +1,10 @@
 {% extends 'weather_app/base.html' %}
 
 {% block content %}
-<h2 class="text-center" style="padding-top: 1em; padding-bottom: 1em;">
-    Detailed weather informations for next 7&nbsp;days
+<h2 class="text-center" style="margin-top: 1rem; margin-bottom: 2rem; font-weight: 100;">
+    Detailed 7&nbsp;days weather forecast for any location
 </h2>
-<div class="row justify-content-sm-center">
+<div class="row justify-content-sm-center" style="margin-bottom: 2rem;">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <form action="{% url 'search_location' %}" method="GET">
             <div class="input-group input-group-md">
@@ -20,7 +20,7 @@
     </div>
 </div>
 <div class="row justify-content-sm-center">
-    <div class="col-md-4 col-lg-3 col-xl-2" style="padding-top: 1em;">
+    <div class="col-md-4 col-lg-3 col-xl-2">
         <a href="{% url 'random_location' %}" class="btn btn-block btn-outline-secondary btn-md">
             Random location
         </a>

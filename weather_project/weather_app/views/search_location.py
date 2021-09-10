@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.urls import reverse
+from urllib.parse import urlencode
 import requests
 import json
 
@@ -73,6 +75,17 @@ def search_location(request):
             }
         }
         )
+    if len(found_locations) == 1:
+        base_url = reverse('dashboard')
+        query_string = urlencode(
+            {
+                'latitude': found_locations[0]['geometry']['coordinates'][1],
+                'longitude': found_locations[0]['geometry']['coordinates'][0],
+                'label': found_locations[0]['properties']['label'],
+            }
+        )
+        url = f'{base_url}?{query_string}'
+        return redirect(url)        
     return render(request, 'weather_app/message.html', {
         'message': {
             'style': 'success',

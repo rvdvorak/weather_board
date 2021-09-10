@@ -77,6 +77,4 @@ def random_location(request):
         }
     )
     url = f'{base_url}?{query_string}'
-    print('URL', url)
-    response = redirect(url)
-    return response
+    return redirect(url)
