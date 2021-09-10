@@ -76,5 +76,5 @@ def random_location(request):
             'label': location['data']['label'],
         }
     )
-    url = f'{base_url}?{query_string}'
-    return redirect(url)
+    uri = f'{base_url}?{query_string}'
+    return redirect(uri)

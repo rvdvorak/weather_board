@@ -56,30 +56,36 @@
             <td style="text-align: right; padding-right: 0.15em">{{ weather.current.wind_speed|floatformat:1 }}</td>
             <td style="text-align: left; padding-left: 0.15em">m/s</td>
         </tr>
+        {% if weather.current.wind_gust %}
         <tr>
             <td style="text-align: center"><i class="fas fa-wind"></i></td>
             <td>Wind gust</td>
             <td style="text-align: right; padding-right: 0.15em">{{ weather.current.wind_gust|floatformat:1 }} </td>
             <td style="text-align: left; padding-left: 0.15em">m/s</td>
-        </tr>
+        </tr>            
+        {% endif %}
         <tr>
             <td style="text-align: center"><i class="far fa-compass"></i></td>
             <td>Wind direction</td>
             <td style="text-align: right; padding-right: 0.15em">{{ weather.current.wind_deg }}</td>
             <td style="text-align: left; padding-left: 0.15em">°</td>
         </tr>
+        {% if weather.current.rain.1h %}
         <tr>
             <td style="text-align: center"><i class="fas fa-cloud-rain"></i></td>
             <td>Rain volume in last 1 hour</td>
-            <td style="text-align: right; padding-right: 0.15em"> {% firstof weather.current.rain.1h '0' %}</td>
+            <td style="text-align: right; padding-right: 0.15em"> {% weather.current.rain.1h %}</td>
             <td style="text-align: left; padding-left: 0.15em">mm/h</td>
         </tr>
+        {% endif %}
+        {% if weather.current.snow.1h %}
         <tr>
             <td style="text-align: center"><i class="far fa-snowflake"></i></td>
             <td>Snow volume in last 1 hour</td>
-            <td style="text-align: right; padding-right: 0.15em">{% firstof weather.current.snow.1h '0' %}</td>
+            <td style="text-align: right; padding-right: 0.15em">{% weather.current.snow.1h %}</td>
             <td style="text-align: left; padding-left: 0.15em">mm/h</td>
         </tr>
+        {% endif %}
         <tr>
             <td style="text-align: center"><i class="bi bi-sunrise-fill"></i></td>
             <td>Sunrise</td>

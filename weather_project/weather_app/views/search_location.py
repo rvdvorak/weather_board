@@ -84,8 +84,8 @@ def search_location(request):
                 'label': found_locations[0]['properties']['label'],
             }
         )
-        url = f'{base_url}?{query_string}'
-        return redirect(url)        
+        uri = f'{base_url}?{query_string}'
+        return redirect(uri)        
     return render(request, 'weather_app/message.html', {
         'message': {
             'style': 'success',
