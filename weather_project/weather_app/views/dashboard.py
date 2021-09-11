@@ -4,63 +4,38 @@ from datetime import datetime
 import requests
 import json
 
+#TODO: Exceptions
 
 def dashboard(request):
     def get_location(request):
-        latitude = request.GET.get('latitude')
-        longitude = request.GET.get('longitude')
-        label = request.GET.get('label')
-        if not (latitude and longitude and label):
-            return {
-                'data': None,
-                'message': {
-                    'style': 'lightblue',
-                    'headline': 'Select location',
-                    'description': 'Search location to get started.',
-                    'show_search_form': True,
-                }
-            }
         try:
-            latitude = float(latitude)
-            longitude = float(longitude)
-            label = str(label)
+            latitude = float(request.GET.get('latitude'))
+            longitude = float(request.GET.get('longitude'))
+            label = str(request.GET.get('label'))
         except:
             return {
-                'data': None,
                 'message': {
-                    'style': 'danger',
-                    'headline': 'Incorrect location data',
-                    'description': 'Location data type error. Try to search location',
+                    'style': 'warning',
+                    'headline': 'Missing or incorrect location data',
+                    'description': 'Try to search the location.',
                     'show_search_form': True,
                 }
             }
-        if not (-90 <= latitude <= 90):
+        if not (-90 <= latitude <= 90) and (-180 <= longitude <= 180):
             return {
-                'data': None,
                 'message': {
-                    'style': 'danger',
-                    'headline': 'Incorrect coordinates',
-                    'description': 'Latitude out of range. Try to search location',
-                    'show_search_form': True,
-                }
-            }
-        if not (-180 <= longitude <= 180):
-            return {
-                'data': None,
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Incorrect coordinates',
-                    'description': 'Longitude out of range. Try to search location',
+                    'style': 'warning',
+                    'headline': 'Incorrect location',
+                    'description': 'Coordinates out of range. Try to search the location.',
                     'show_search_form': True,
                 }
             }
         if label == '':
             return {
-                'data': None,
                 'message': {
-                    'style': 'danger',
+                    'style': 'warning',
                     'headline': 'Incomplete location data',
-                    'description': 'Missing location label. Try to search location',
+                    'description': 'Missing location label. Try to search the location.',
                     'show_search_form': True,
                 }
             }
@@ -88,17 +63,15 @@ def dashboard(request):
             print('Exception: ', err)
             print('-' * 80)
             return {
-                'data': None,
                 'message': {
                     'style': 'warning',
                     'headline': 'Weather service is not responding',
                     'description': 'Please try it again later...',
-                    'show_search_form': False,
+                    'show_search_form': True,
                 }
             }
         if not response.status_code == 200:
             return {
-                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Weather API error',
@@ -109,24 +82,23 @@ def dashboard(request):
         weather = response.json()
 
         # Convert Unix timestamps to datetime
-        weather['current']['dt'] = datetime.fromtimestamp(
-            weather['current']['dt'])
-        weather['current']['sunrise'] = datetime.fromtimestamp(
-            weather['current']['sunrise'])
-        weather['current']['sunset'] = datetime.fromtimestamp(
-            weather['current']['sunset'])
+        try:
+            weather['current']['dt'] = datetime.fromtimestamp(
+                weather['current']['dt'])
+            weather['current']['sunrise'] = datetime.fromtimestamp(
+                weather['current']['sunrise'])
+            weather['current']['sunset'] = datetime.fromtimestamp(
+                weather['current']['sunset'])
 
-        if 'minutely' in weather:
-            for minute in range(len(weather['minutely'])):
-                weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
-                    weather['minutely'][minute]['dt'])
+            if 'minutely' in weather:
+                for minute in range(len(weather['minutely'])):
+                    weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
+                        weather['minutely'][minute]['dt'])
 
-        if 'hourly' in weather:
             for hour in range(len(weather['hourly'])):
                 weather['hourly'][hour]['dt'] = datetime.fromtimestamp(
                     weather['hourly'][hour]['dt'])
 
-        if 'daily' in weather:
             for day in range(len(weather['daily'])):
                 weather['daily'][day]['dt'] = datetime.fromtimestamp(
                     weather['daily'][day]['dt'])
@@ -135,18 +107,28 @@ def dashboard(request):
                 weather['daily'][day]['sunset'] = datetime.fromtimestamp(
                     weather['daily'][day]['sunset'])
 
-        if 'alerts' in weather:
-            for alert in range(len(weather['alerts'])):
-                weather['alerts'][alert]['start'] = datetime.fromtimestamp(
-                    weather['alerts'][alert]['start'])
-                weather['alerts'][alert]['end'] = datetime.fromtimestamp(
-                    weather['alerts'][alert]['end'])
+            if 'alerts' in weather:
+                for alert in range(len(weather['alerts'])):
+                    weather['alerts'][alert]['start'] = datetime.fromtimestamp(
+                        weather['alerts'][alert]['start'])
+                    weather['alerts'][alert]['end'] = datetime.fromtimestamp(
+                        weather['alerts'][alert]['end'])
 
-        return {
-            'data': weather,
-        }
+            return {
+                'data': weather,
+            }
+        except:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Internal error',
+                    'description': 'Timestamp conversion failed.',
+                    'show_search_form': False,
+                }
+            }
 
     def get_air_pollution(location):
+        #TODO: Remove API endpoint
         url = 'http://api.openweathermap.org/data/2.5/air_pollution'
         params = {
             'lat': location['latitude'],
@@ -161,17 +143,15 @@ def dashboard(request):
             print('Exception: ', err)
             print('-' * 80)
             return {
-                'data': None,
                 'message': {
                     'style': 'warning',
                     'headline': 'Weather service is not responding',
                     'description': 'Please try it again later...',
-                    'show_search_form': False,
+                    'show_search_form': True,
                 }
             }
         if not response.status_code == 200:
             return {
-                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Air pollution API error',
@@ -181,7 +161,11 @@ def dashboard(request):
             }
         current = response.json()['list'][0]
         current['dt'] = datetime.fromtimestamp(current['dt'])
+        print('*' * 80)
+        print('current[0]:', current['dt'])
+        print('*' * 80)
 
+        #TODO: Keep only air_pollution/forecast
         url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
         params = {
             'lat': location['latitude'],
@@ -196,17 +180,15 @@ def dashboard(request):
             print('Exception: ', err)
             print('-' * 80)
             return {
-                'data': None,
                 'message': {
                     'style': 'warning',
                     'headline': 'Weather service is not responding',
                     'description': 'Please try it again later...',
-                    'show_search_form': False,
+                    'show_search_form': True,
                 }
             }
         if not response.status_code == 200:
             return {
-                'data': None,
                 'message': {
                     'style': 'danger',
                     'headline': 'Air pollution API error',
@@ -215,6 +197,9 @@ def dashboard(request):
                 }
             }
         forecast = response.json()['list']
+        print('*' * 80)
+        print('forecast[0]:', datetime.fromtimestamp(forecast[0]['dt']))
+        print('*' * 80)
         for hour in range(len(forecast)):
             forecast[hour]['dt'] = datetime.fromtimestamp(forecast[hour]['dt'])
 
@@ -257,7 +242,7 @@ def dashboard(request):
         }
 
         current['main']['aqi_stars'] = aqi_stars[current['main']['aqi']]
-
+        
         return {
             'data': {
                 'current': current,
@@ -282,15 +267,15 @@ def dashboard(request):
         return chart_data
 
     location = get_location(request)
-    if not location['data']:
+    if not 'data' in location:
         return render(request, 'weather_app/message.html', {'message': location['message']})
 
     weather = get_weather(location['data'])
-    if not weather['data']:
+    if not 'data' in weather:
         return render(request, 'weather_app/message.html', {'message': weather['message']})
 
     air_pollution = get_air_pollution(location['data'])
-    if not air_pollution['data']:
+    if not 'data' in air_pollution:
         return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
 
     chart_data = get_chart_data(weather['data'])

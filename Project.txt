@@ -1,0 +1,8 @@
+#TODO: Add OneCall forecast widgets https://openweathermap.org/api/one-call-api#hist_parameter
+#TODO: Add AirPollution forecast widgets https://openweathermap.org/api/air-pollution#forecast
+#TODO: Implement Leaflet map view https://openweathermap.org/api/weathermaps
+#TODO: Implement DB
+#TODO: Implement tests
+#TODO: Add readme.md
+#TODO: Best practices for using JavaScript in Django templates
+#TODO: Deploy Weather App on hukot.net VPS

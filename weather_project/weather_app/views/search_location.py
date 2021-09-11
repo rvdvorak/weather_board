@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 import requests
 import json
 
+#TODO: Exceptions
 
 def search_location(request):
     search_text = request.GET.get('search_text')

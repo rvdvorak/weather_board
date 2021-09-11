@@ -6,7 +6,7 @@ import requests
 import json
 import random
 
-
+#TODO: Exceptions
 
 def random_location(request):
     def get_random_loaction():
