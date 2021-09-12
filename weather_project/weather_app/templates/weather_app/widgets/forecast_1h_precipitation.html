@@ -10,60 +10,62 @@
 
 {% block widget_content %}
 
-{% if chart_data.precipitation_forecast_1h.dt %}
+{% if weather.minutely_chart %}
 
-<div class="p-3">
-    <div class="chart">
-        <div class="chartjs-size-monitor">
-            <div class="chartjs-size-monitor-expand">
-                <div class=""></div>
+    {{ weather.minutely_chart|json_script:"minutelyPrecipitation" }}
+
+    <div class="p-3">
+        <div class="chart">
+            <div class="chartjs-size-monitor">
+                <div class="chartjs-size-monitor-expand">
+                    <div class=""></div>
+                </div>
+                <div class="chartjs-size-monitor-shrink">
+                    <div class=""></div>
+                </div>
             </div>
-            <div class="chartjs-size-monitor-shrink">
-                <div class=""></div>
-            </div>
+            <canvas id="minutelyPrecipitationChart"
+                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
+                height="500" class="chartjs-render-monitor">
+            </canvas>
         </div>
-        <canvas id="myChart"
-            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
-            height="500" class="chartjs-render-monitor">
-        </canvas>
     </div>
-</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
+        integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
-    integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
-
-<script>    
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ chart_data.precipitation_forecast_1h.dt | safe }},
-            datasets: [{
-                label: 'Precipitation volume [mm/h]',
-                data: {{ chart_data.precipitation_forecast_1h.precipitation | safe }},
-                backgroundColor: ['rgba(0, 0, 255, 1)'],
-                borderColor: ['rgba(0, 0, 0, 0)'],
-                borderWidth: 0.5
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    type: 'logarithmic',
-                    min: 0.1,
-                    max: 100
+    <script>
+        const minutelyPrecipitation = JSON.parse(document.getElementById('minutelyPrecipitation').textContent);
+        const ctx = document.getElementById('minutelyPrecipitationChart').getContext('2d');
+        const minutelyPrecipitationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: minutelyPrecipitation.time,
+                datasets: [{
+                    label: 'Precipitation [mm/h]',
+                    data: minutelyPrecipitation.volume,
+                    backgroundColor: ['rgba(0, 0, 255, 1)'],
+                    borderColor: ['rgba(0, 0, 0, 0)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        type: 'logarithmic',
+                        min: 0.1,
+                        max: 100
+                    }
                 }
             }
-        }
-    });
-</script>
+        });
+    </script>
 
 {% else %}
 
-<div style="padding: 1em; text-align: center;">
-    Not available for current location.
-</div>
+    <div style="padding: 1em; text-align: center;">
+        Not available for current location.
+    </div>
 
 {% endif %}
 

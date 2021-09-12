@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from datetime import datetime
 import requests
 import json
+import pprint
 
 #TODO: Exceptions
 
@@ -250,21 +251,17 @@ def dashboard(request):
             }
         }
 
-    def get_chart_data(weather):
-        if not 'minutely' in weather:
-            return None
-        chart_data = {
-            'precipitation_forecast_1h': {
-                'dt': [],
-                'precipitation': [],
+    def add_chart_data(weather):
+        if 'minutely' in weather:
+            minutely_chart = {
+                'time': [],
+                'volume': [],
             }
-        }
-        for minute in weather['minutely']:
-            chart_data['precipitation_forecast_1h']['dt'].append(
-                minute['dt'].strftime("%H:%M"))
-            chart_data['precipitation_forecast_1h']['precipitation'].append(
-                minute['precipitation'])
-        return chart_data
+            for minute in weather['minutely']:
+                minutely_chart['time'].append(minute['dt'].strftime("%H:%M"))
+                minutely_chart['volume'].append(round(minute['precipitation'], 1))
+            weather['minutely_chart'] = minutely_chart
+        return weather
 
     location = get_location(request)
     if not 'data' in location:
@@ -278,12 +275,16 @@ def dashboard(request):
     if not 'data' in air_pollution:
         return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
 
-    chart_data = get_chart_data(weather['data'])
+    weather['data'] = add_chart_data(weather['data'])
+
+    print('+' * 80)
+    pprint.pprint(weather)
+    print('+' * 80)
+
 
     return render(request, 'weather_app/dashboard.html', {
         'location': location['data'],
         'weather': weather['data'],
         'air_pollution': air_pollution['data'],
-        'chart_data': chart_data,
     }
     )
