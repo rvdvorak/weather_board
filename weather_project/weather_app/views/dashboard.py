@@ -4,8 +4,8 @@ from datetime import datetime
 import requests
 import json
 import pprint
+import pytz
 
-#TODO: Exceptions
 
 def dashboard(request):
     def get_location(request):
@@ -19,47 +19,38 @@ def dashboard(request):
                     'style': 'warning',
                     'headline': 'Missing or incorrect location data',
                     'description': 'Try to search the location.',
+                    'show_search_form': True,
                     'admin_details': [
                         'Method: get_location(request)',
-                        f'Exception: {pprint.pformat(err)}',
-                    ],
-                    'show_search_form': True,
-                }
-            }
+                        f'Exception: {pprint.pformat(err)}']}}
         if not (-90 <= latitude <= 90) and (-180 <= longitude <= 180):
             return {
                 'message': {
                     'style': 'warning',
                     'headline': 'Incorrect location',
                     'description': 'Coordinates out of range. Try to search the location.',
-                    'show_search_form': True,
-                }
-            }
+                    'show_search_form': True}}
         if label == '':
             return {
                 'message': {
                     'style': 'warning',
                     'headline': 'Missing location label',
                     'description': 'Try to search the location.',
-                    'show_search_form': True,
-                }
-            }
+                    'show_search_form': True}}
         return {
             'data': {
                 'latitude': latitude,
                 'longitude': longitude,
-                'label': label,
-            }
-        }
+                'label': label}}
 
     def get_weather(location):
+        # API docs: https://openweathermap.org/api/one-call-api
         url = 'https://api.openweathermap.org/data/2.5/onecall'
         params = {
             'lat': location['latitude'],
             'lon': location['longitude'],
             'units': 'metric',
-            'appid': '6fe37effcfa866ecec5fd235699a402d',
-        }
+            'appid': '6fe37effcfa866ecec5fd235699a402d'}
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
@@ -68,14 +59,11 @@ def dashboard(request):
                     'style': 'warning',
                     'headline': 'Weather service is not responding',
                     'description': 'Please try it again later...',
+                    'show_search_form': True,
                     'admin_details': [
                         'Method: get_weather(location)',
                         f'API endpoint: {url}',
-                        f'Exception: {pprint.pformat(err)}',
-                    ],
-                    'show_search_form': True,
-                }
-            }
+                        f'Exception: {pprint.pformat(err)}']}}
         if not response.status_code == 200:
             return {
                 'message': {
@@ -85,49 +73,40 @@ def dashboard(request):
                     'admin_details': [
                         'Method: get_weather(location)',
                         f'API endpoint: {url}',
-                        f'HTTP status: {response.status_code}',
-                    ],
-                    'show_search_form': False,
-                }
-            }
+                        f'HTTP status: {response.status_code}']}}
         weather = response.json()
 
-        # Convert Unix timestamps to datetime
+        # TODO Refactor: Convert UTC timestamps to selected location's datetime
         try:
+            timezone = pytz.timezone(weather['timezone'])
+            utc_offset = weather['timezone_offset']
             weather['current']['dt'] = datetime.fromtimestamp(
-                weather['current']['dt'])
+                weather['current']['dt'] + utc_offset, timezone)
             weather['current']['sunrise'] = datetime.fromtimestamp(
-                weather['current']['sunrise'])
+                weather['current']['sunrise'] + utc_offset, timezone)
             weather['current']['sunset'] = datetime.fromtimestamp(
-                weather['current']['sunset'])
-
+                weather['current']['sunset'] + utc_offset, timezone)
             if 'minutely' in weather:
                 for minute in range(len(weather['minutely'])):
                     weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
-                        weather['minutely'][minute]['dt'])
-
+                        weather['minutely'][minute]['dt'] + utc_offset, timezone)
             for hour in range(len(weather['hourly'])):
                 weather['hourly'][hour]['dt'] = datetime.fromtimestamp(
-                    weather['hourly'][hour]['dt'])
-
+                    weather['hourly'][hour]['dt'] + utc_offset, timezone)
             for day in range(len(weather['daily'])):
                 weather['daily'][day]['dt'] = datetime.fromtimestamp(
-                    weather['daily'][day]['dt'])
+                    weather['daily'][day]['dt'] + utc_offset, timezone)
                 weather['daily'][day]['sunrise'] = datetime.fromtimestamp(
-                    weather['daily'][day]['sunrise'])
+                    weather['daily'][day]['sunrise'] + utc_offset, timezone)
                 weather['daily'][day]['sunset'] = datetime.fromtimestamp(
-                    weather['daily'][day]['sunset'])
-
+                    weather['daily'][day]['sunset'] + utc_offset, timezone)
             if 'alerts' in weather:
                 for alert in range(len(weather['alerts'])):
                     weather['alerts'][alert]['start'] = datetime.fromtimestamp(
-                        weather['alerts'][alert]['start'])
+                        weather['alerts'][alert]['start'] + utc_offset, timezone)
                     weather['alerts'][alert]['end'] = datetime.fromtimestamp(
-                        weather['alerts'][alert]['end'])
-
-            return {
-                'data': weather,
-            }
+                        weather['alerts'][alert]['end'] + utc_offset, timezone)
+            return {'data': weather}
         except Exception as err:
             return {
                 'message': {
@@ -135,22 +114,18 @@ def dashboard(request):
                     'headline': 'Internal error',
                     'description': 'Data processing failed.',
                     'admin_details': [
-                        'Method: get_weather(location)',
                         'Timestamps to datetime conversion failed.',
-                        f'Exception: {pprint.pformat(err)}',
-                    ],
-                    'show_search_form': False,
-                }
-            }
+                        'Method: get_weather(location)',
+                        f'Exception: {pprint.pformat(err)}']}}
 
+    # TODO Exceptions
     def get_air_pollution(location):
         # API docs: https://openweathermap.org/api/air-pollution
         url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
         params = {
             'lat': location['latitude'],
             'lon': location['longitude'],
-            'appid': '6fe37effcfa866ecec5fd235699a402d',
-        }
+            'appid': '6fe37effcfa866ecec5fd235699a402d'}
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
@@ -178,14 +153,14 @@ def dashboard(request):
                         f'API endpoint: {url}',
                         f'HTTP status: {response.status_code}',
                     ],
-                    'show_search_form': False,
                 }
             }
         air_pollution = response.json()['list']
 
         try:
             for hour in range(len(air_pollution)):
-                air_pollution[hour]['dt'] = datetime.fromtimestamp(air_pollution[hour]['dt'])
+                air_pollution[hour]['dt'] = datetime.fromtimestamp(
+                    air_pollution[hour]['dt'] + utc_offset, timezone)
         except Exception as err:
             return {
                 'message': {
@@ -197,7 +172,6 @@ def dashboard(request):
                         'Timestamps to datetime conversion failed.',
                         f'Exception: {pprint.pformat(err)}',
                     ],
-                    'show_search_form': False,
                 }
             }
 
@@ -211,7 +185,8 @@ def dashboard(request):
             }
             for minute in weather['minutely']:
                 minutely_chart['time'].append(minute['dt'].strftime("%H:%M"))
-                minutely_chart['volume'].append(round(minute['precipitation'], 1))
+                minutely_chart['volume'].append(
+                    round(minute['precipitation'], 1))
             weather['minutely_chart'] = minutely_chart
         return weather
 

@@ -6,7 +6,7 @@ import requests
 import json
 import random
 
-#TODO: Exceptions
+#TODO Exceptions
 
 def random_location(request):
     def get_random_loaction():
@@ -32,7 +32,6 @@ def random_location(request):
                     'style': 'warning',
                     'headline': 'Location service is not responding',
                     'description': 'Please try it again later...',
-                    'show_search_form': False,
                 }
             }
         if not response.status_code == 200:
@@ -42,7 +41,6 @@ def random_location(request):
                     'style': 'danger',
                     'headline': 'Location API error',
                     'description': f'OpenRouteService.org status: {response.status_code}',
-                    'show_search_form': False,
                 }
             }
         try:
@@ -61,7 +59,6 @@ def random_location(request):
                     'style': 'danger',
                     'headline': 'Random location error',
                     'description': 'Sorry, something went wrong...',
-                    'show_search_form': False,
                 }
             }
 

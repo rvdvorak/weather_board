@@ -1,11 +1,10 @@
-#TODO: Add exception details into error messages for admins only
-#TODO: Add OneCall forecast widgets https://openweathermap.org/api/one-call-api#hist_parameter
-#TODO: Add AirPollution forecast widgets https://openweathermap.org/api/air-pollution#forecast
-#TODO: Add selected location's time and timezone
-#TODO: Implement Leaflet map view https://openweathermap.org/api/weathermaps
-#TODO: Implement DB
-#TODO: Implement tests
-#TODO: Deploy app and publish repository
+#TODO Add exception details into error messages for admins only
+#TODO Add OneCall forecast widgets https://openweathermap.org/api/one-call-api#hist_parameter
+#TODO Add AirPollution forecast widgets https://openweathermap.org/api/air-pollution#forecast
+#TODO Implement Leaflet map view https://openweathermap.org/api/weathermaps
+#TODO Implement DB
+#TODO Implement tests
+#TODO Deploy app and publish repository
         - admin password
         - production secret
         - readme.md
