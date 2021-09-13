@@ -27,9 +27,19 @@
                 {% if message.show_search_form %}
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9">
-                            {% include 'weather_app/search_form.html' %}
+                        {% include 'weather_app/search_form.html' %}
                     </div>
                 </div>
+                {% endif %}
+                {% if user.is_superuser %}
+                    {% if message.admin_details %}
+                        <h6>Details for admins</h6>
+                        <ul>
+                        {% for item in message.admin_details %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

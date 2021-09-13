@@ -13,12 +13,16 @@ def dashboard(request):
             latitude = float(request.GET.get('latitude'))
             longitude = float(request.GET.get('longitude'))
             label = str(request.GET.get('label'))
-        except:
+        except Exception as err:
             return {
                 'message': {
                     'style': 'warning',
                     'headline': 'Missing or incorrect location data',
                     'description': 'Try to search the location.',
+                    'admin_details': [
+                        'Method: get_location(request)',
+                        f'Exception: {pprint.pformat(err)}',
+                    ],
                     'show_search_form': True,
                 }
             }
@@ -35,8 +39,8 @@ def dashboard(request):
             return {
                 'message': {
                     'style': 'warning',
-                    'headline': 'Incomplete location data',
-                    'description': 'Missing location label. Try to search the location.',
+                    'headline': 'Missing location label',
+                    'description': 'Try to search the location.',
                     'show_search_form': True,
                 }
             }
@@ -59,15 +63,16 @@ def dashboard(request):
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
-            print('-' * 80)
-            print('API endpoint: ', url)
-            print('Exception: ', err)
-            print('-' * 80)
             return {
                 'message': {
                     'style': 'warning',
                     'headline': 'Weather service is not responding',
                     'description': 'Please try it again later...',
+                    'admin_details': [
+                        'Method: get_weather(location)',
+                        f'API endpoint: {url}',
+                        f'Exception: {pprint.pformat(err)}',
+                    ],
                     'show_search_form': True,
                 }
             }
@@ -75,8 +80,13 @@ def dashboard(request):
             return {
                 'message': {
                     'style': 'danger',
-                    'headline': 'Weather API error',
-                    'description': f'OpenWeatherMap.org status: {response.status_code}',
+                    'headline': 'Weather service error',
+                    'description': 'Request for data failed.',
+                    'admin_details': [
+                        'Method: get_weather(location)',
+                        f'API endpoint: {url}',
+                        f'HTTP status: {response.status_code}',
+                    ],
                     'show_search_form': False,
                 }
             }
@@ -118,55 +128,23 @@ def dashboard(request):
             return {
                 'data': weather,
             }
-        except:
+        except Exception as err:
             return {
                 'message': {
                     'style': 'danger',
                     'headline': 'Internal error',
-                    'description': 'Timestamp conversion failed.',
+                    'description': 'Data processing failed.',
+                    'admin_details': [
+                        'Method: get_weather(location)',
+                        'Timestamps to datetime conversion failed.',
+                        f'Exception: {pprint.pformat(err)}',
+                    ],
                     'show_search_form': False,
                 }
             }
 
     def get_air_pollution(location):
-        #TODO: Remove API endpoint
-        url = 'http://api.openweathermap.org/data/2.5/air_pollution'
-        params = {
-            'lat': location['latitude'],
-            'lon': location['longitude'],
-            'appid': '6fe37effcfa866ecec5fd235699a402d',
-        }
-        try:
-            response = requests.get(url, params=params, timeout=5)
-        except Exception as err:
-            print('-' * 80)
-            print('API endpoint: ', url)
-            print('Exception: ', err)
-            print('-' * 80)
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Weather service is not responding',
-                    'description': 'Please try it again later...',
-                    'show_search_form': True,
-                }
-            }
-        if not response.status_code == 200:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Air pollution API error',
-                    'description': f'OpenWeatherMap.org status: {response.status_code}',
-                    'show_search_form': False,
-                }
-            }
-        current = response.json()['list'][0]
-        current['dt'] = datetime.fromtimestamp(current['dt'])
-        print('*' * 80)
-        print('current[0]:', current['dt'])
-        print('*' * 80)
-
-        #TODO: Keep only air_pollution/forecast
+        # API docs: https://openweathermap.org/api/air-pollution
         url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
         params = {
             'lat': location['latitude'],
@@ -176,15 +154,16 @@ def dashboard(request):
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
-            print('-' * 80)
-            print('API endpoint: ', url)
-            print('Exception: ', err)
-            print('-' * 80)
             return {
                 'message': {
                     'style': 'warning',
-                    'headline': 'Weather service is not responding',
+                    'headline': 'Air pollution service is not responding',
                     'description': 'Please try it again later...',
+                    'admin_details': [
+                        'Method: get_air_pollution(location))',
+                        f'API endpoint: {url}',
+                        f'Exception: {pprint.pformat(err)}',
+                    ],
                     'show_search_form': True,
                 }
             }
@@ -192,64 +171,37 @@ def dashboard(request):
             return {
                 'message': {
                     'style': 'danger',
-                    'headline': 'Air pollution API error',
-                    'description': f'OpenWeatherMap.org status: {response.status_code}',
+                    'headline': 'Air pollution service error',
+                    'description': 'Request for data failed.',
+                    'admin_details': [
+                        'Method: get_air_pollution(location)',
+                        f'API endpoint: {url}',
+                        f'HTTP status: {response.status_code}',
+                    ],
                     'show_search_form': False,
                 }
             }
-        forecast = response.json()['list']
-        print('*' * 80)
-        print('forecast[0]:', datetime.fromtimestamp(forecast[0]['dt']))
-        print('*' * 80)
-        for hour in range(len(forecast)):
-            forecast[hour]['dt'] = datetime.fromtimestamp(forecast[hour]['dt'])
+        air_pollution = response.json()['list']
 
-        aqi_stars = {
-            1: [
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-            ],
-            2: [
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-                'far fa-star',
-            ],
-            3: [
-                'fas fa-star',
-                'fas fa-star',
-                'fas fa-star',
-                'far fa-star',
-                'far fa-star',
-            ],
-            4: [
-                'fas fa-star',
-                'fas fa-star',
-                'far fa-star',
-                'far fa-star',
-                'far fa-star',
-            ],
-            5: [
-                'fas fa-star',
-                'far fa-star',
-                'far fa-star',
-                'far fa-star',
-                'far fa-star',
-            ],
-        }
-
-        current['main']['aqi_stars'] = aqi_stars[current['main']['aqi']]
-        
-        return {
-            'data': {
-                'current': current,
-                'forecast': forecast,
+        try:
+            for hour in range(len(air_pollution)):
+                air_pollution[hour]['dt'] = datetime.fromtimestamp(air_pollution[hour]['dt'])
+        except Exception as err:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Internal error',
+                    'description': 'Data processing failed.',
+                    'admin_details': [
+                        'Method: get_air_pollution(location)',
+                        'Timestamps to datetime conversion failed.',
+                        f'Exception: {pprint.pformat(err)}',
+                    ],
+                    'show_search_form': False,
+                }
             }
-        }
+
+        return {'data': air_pollution}
 
     def add_chart_data(weather):
         if 'minutely' in weather:
@@ -276,11 +228,6 @@ def dashboard(request):
         return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
 
     weather['data'] = add_chart_data(weather['data'])
-
-    print('+' * 80)
-    pprint.pprint(weather)
-    print('+' * 80)
-
 
     return render(request, 'weather_app/dashboard.html', {
         'location': location['data'],

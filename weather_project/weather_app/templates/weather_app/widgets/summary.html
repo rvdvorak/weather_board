@@ -13,9 +13,37 @@
         <br>
         <h3>Air quality:</h3>
         <h2>
-            {% for star in air_pollution.current.main.aqi_stars %}
-            <i class="{{ star }}"></i>
-            {% endfor %}
+            {% if air_pollution.0.main.aqi == 1 %}
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            {% elif air_pollution.0.main.aqi == 2 %}
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            {% elif air_pollution.0.main.aqi == 3 %}
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            {% elif air_pollution.0.main.aqi == 4 %}
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            {% elif air_pollution.0.main.aqi == 5 %}
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            {% endif %}
         </h2>
     </div>
 </div>
