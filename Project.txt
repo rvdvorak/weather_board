@@ -1,4 +1,6 @@
 #TODO Add exception details into error messages for admins only
+#TODO Add icon into messages
+#TODO Improve homepage
 #TODO Add OneCall forecast widgets https://openweathermap.org/api/one-call-api#hist_parameter
 #TODO Add AirPollution forecast widgets https://openweathermap.org/api/air-pollution#forecast
 #TODO Implement Leaflet map view https://openweathermap.org/api/weathermaps
@@ -8,3 +10,18 @@
         - admin password
         - production secret
         - readme.md
+
+
+
+===============================================================================
+
+VS Code settings: file://C:\Users\Roman\AppData\Roaming\Code\User\settings.json
+    "todo-tree.general.tags": [
+        "TODO",
+        "REFACTOR",
+        "NOTE",
+        "FIXME",
+        "FIXIT",
+        "FIX",
+        "BUG"
+    ],

@@ -75,8 +75,44 @@ def dashboard(request):
                         f'API endpoint: {url}',
                         f'HTTP status: {response.status_code}']}}
         weather = response.json()
+        return {'data': weather}
 
-        # TODO Refactor: Convert UTC timestamps to selected location's datetime
+    def get_air_pollution(location):
+        # API docs: https://openweathermap.org/api/air-pollution
+        url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
+        params = {
+            'lat': location['latitude'],
+            'lon': location['longitude'],
+            'appid': '6fe37effcfa866ecec5fd235699a402d'}
+        try:
+            response = requests.get(url, params=params, timeout=5)
+        except Exception as err:
+            return {
+                'message': {
+                    'style': 'warning',
+                    'headline': 'Air pollution service is not responding',
+                    'description': 'Please try it again later...',
+                    'show_search_form': True,
+                    'admin_details': [
+                        'Method: get_air_pollution(location)',
+                        f'API endpoint: {url}',
+                        f'Exception: {pprint.pformat(err)}']}}
+        if not response.status_code == 200:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Air pollution service error',
+                    'description': 'Request for data failed.',
+                    'admin_details': [
+                        'Method: get_air_pollution(location)',
+                        f'API endpoint: {url}',
+                        f'HTTP status: {response.status_code}']}}
+        #TODO Add try/except
+        air_pollution = response.json()['list']
+        return {'data': air_pollution}
+
+    def convert_UTC_timestamps_to_local_datetimes(weather):
+        # REFACTOR Convert UTC timestamps to selected location's datetime
         try:
             timezone = pytz.timezone(weather['timezone'])
             utc_offset = weather['timezone_offset']
@@ -106,7 +142,9 @@ def dashboard(request):
                         weather['alerts'][alert]['start'] + utc_offset, timezone)
                     weather['alerts'][alert]['end'] = datetime.fromtimestamp(
                         weather['alerts'][alert]['end'] + utc_offset, timezone)
-            return {'data': weather}
+            for hour in range(len(weather['air_pollution'])):
+                weather['air_pollution'][hour]['dt'] = datetime.fromtimestamp(
+                    weather['air_pollution'][hour]['dt'] + utc_offset, timezone)
         except Exception as err:
             return {
                 'message': {
@@ -114,81 +152,33 @@ def dashboard(request):
                     'headline': 'Internal error',
                     'description': 'Data processing failed.',
                     'admin_details': [
-                        'Timestamps to datetime conversion failed.',
-                        'Method: get_weather(location)',
+                        'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
                         f'Exception: {pprint.pformat(err)}']}}
-
-    # TODO Exceptions
-    def get_air_pollution(location):
-        # API docs: https://openweathermap.org/api/air-pollution
-        url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
-        params = {
-            'lat': location['latitude'],
-            'lon': location['longitude'],
-            'appid': '6fe37effcfa866ecec5fd235699a402d'}
-        try:
-            response = requests.get(url, params=params, timeout=5)
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Air pollution service is not responding',
-                    'description': 'Please try it again later...',
-                    'admin_details': [
-                        'Method: get_air_pollution(location))',
-                        f'API endpoint: {url}',
-                        f'Exception: {pprint.pformat(err)}',
-                    ],
-                    'show_search_form': True,
-                }
-            }
-        if not response.status_code == 200:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Air pollution service error',
-                    'description': 'Request for data failed.',
-                    'admin_details': [
-                        'Method: get_air_pollution(location)',
-                        f'API endpoint: {url}',
-                        f'HTTP status: {response.status_code}',
-                    ],
-                }
-            }
-        air_pollution = response.json()['list']
-
-        try:
-            for hour in range(len(air_pollution)):
-                air_pollution[hour]['dt'] = datetime.fromtimestamp(
-                    air_pollution[hour]['dt'] + utc_offset, timezone)
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Data processing failed.',
-                    'admin_details': [
-                        'Method: get_air_pollution(location)',
-                        'Timestamps to datetime conversion failed.',
-                        f'Exception: {pprint.pformat(err)}',
-                    ],
-                }
-            }
-
-        return {'data': air_pollution}
+        return {'data': weather}
 
     def add_chart_data(weather):
-        if 'minutely' in weather:
-            minutely_chart = {
-                'time': [],
-                'volume': [],
-            }
-            for minute in weather['minutely']:
-                minutely_chart['time'].append(minute['dt'].strftime("%H:%M"))
-                minutely_chart['volume'].append(
-                    round(minute['precipitation'], 1))
-            weather['minutely_chart'] = minutely_chart
-        return weather
+    #TODO Transform to "get_chart_data(weather)"
+        try:
+            if 'minutely' in weather:
+                minutely_chart = {
+                    'time': [],
+                    'volume': [],
+                }
+                for minute in weather['minutely']:
+                    minutely_chart['time'].append(minute['dt'].strftime("%H:%M"))
+                    minutely_chart['volume'].append(
+                        round(minute['precipitation'], 1))
+                weather['minutely_chart'] = minutely_chart
+        except Exception as err:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Internal error',
+                    'description': 'Data processing failed.',
+                    'admin_details': [
+                        'Method: add_chart_data(weather)',
+                        f'Exception: {pprint.pformat(err)}']}}
+        return {'data': weather}
 
     location = get_location(request)
     if not 'data' in location:
@@ -202,11 +192,16 @@ def dashboard(request):
     if not 'data' in air_pollution:
         return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
 
-    weather['data'] = add_chart_data(weather['data'])
+    weather['data']['air_pollution'] = air_pollution['data']
+
+    weather = convert_UTC_timestamps_to_local_datetimes(weather['data'])
+    if not 'data' in weather:
+        return render(request, 'weather_app/message.html', {'message': weather['message']})
+
+    weather = add_chart_data(weather['data'])
+    if not 'data' in weather:
+        return render(request, 'weather_app/message.html', {'message': weather['message']})
 
     return render(request, 'weather_app/dashboard.html', {
         'location': location['data'],
-        'weather': weather['data'],
-        'air_pollution': air_pollution['data'],
-    }
-    )
+        'weather': weather['data']})
