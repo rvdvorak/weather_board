@@ -9,15 +9,25 @@ import pprint
 
 def random_location(request):
     def get_random_location():
-        latitude = (random.random() * 180) - 90
-        longitude = (random.random() * 360) - 180
         # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
-        url = 'https://api.openrouteservice.org/geocode/reverse'
-        params = {
-            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
-            'point.lat': latitude,
-            'point.lon': longitude,
-            'size': 1}
+        try:
+            url = 'https://api.openrouteservice.org/geocode/reverse'
+            latitude = (random.random() * 180) - 90
+            longitude = (random.random() * 360) - 180
+            params = {
+                'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+                'point.lat': latitude,
+                'point.lon': longitude,
+                'size': 1}
+        except Exception as err:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Internal error',
+                    'description': 'Data processing failed.',
+                    'admin_details': [
+                        'Method: get_random_location()',
+                        f'Exception: {pprint.pformat(err)}']}}
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
@@ -39,6 +49,11 @@ def random_location(request):
             latitude = location['geometry']['coordinates'][1]
             longitude = location['geometry']['coordinates'][0]
             label = location['properties']['label']
+            return {
+                'data': {
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'label': label}}
         except Exception as err:
             return {
                 'message': {
@@ -51,11 +66,6 @@ def random_location(request):
                         f'Parameters: {pprint.pformat(params)}',
                         f'HTTP status: {response.status_code}',
                         f'Exception: {pprint.pformat(err)}']}}
-        return {
-            'data': {
-                'latitude': latitude,
-                'longitude': longitude,
-                'label': label}}
     
     try:
         location = get_random_location()
@@ -74,7 +84,7 @@ def random_location(request):
             'message': {
                 'style': 'danger',
                 'headline': 'Internal error',
-                'description': 'Random location failed.',
+                'description': 'Data processing failed.',
                 'admin_details': [
                     'Method: random_location(request)',
                     f'Exception: {pprint.pformat(err)}']}})

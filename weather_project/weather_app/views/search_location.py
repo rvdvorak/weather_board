@@ -13,25 +13,35 @@ def search_location(request):
             search_text = str(request.GET.get('search_text'))
             if search_text == '':
                 raise Exception('search_text is empty')
+            return {'data': search_text}
         except Exception as err:
             return {
                 'message': {
                     'style': 'warning',
-                    'headline': 'Search location',
+                    'headline': 'Nothing to search',
                     'description': 'First enter the name of the location to search.',
                     'show_search_form': True,
                     'admin_details': [
                         'Method: get_search_text(request)',
                         f'Exception: {pprint.pformat(err)}']}}
-        return {'data': search_text}
 
     def get_search_results(search_text):
         # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/search/get
-        url = 'https://api.openrouteservice.org/geocode/search'
-        params = {
-            'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
-            'size': 20,
-            'text': search_text}
+        try:
+            url = 'https://api.openrouteservice.org/geocode/search'
+            params = {
+                'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+                'size': 20,
+                'text': search_text}
+        except Exception as err:
+            return {
+                'message': {
+                    'style': 'danger',
+                    'headline': 'Internal error',
+                    'description': 'Data processing failed.',
+                    'admin_details': [
+                        'Method: get_search_results(search_text)',
+                        f'Exception: {pprint.pformat(err)}']}}
         try:
             response = requests.get(url, params=params, timeout=5)
         except Exception as err:
@@ -50,6 +60,7 @@ def search_location(request):
             if not response.status_code == 200:
                 raise Exception('HTTP response failed.')
             found_locations = response.json()['features']
+            return {'data': found_locations}
         except Exception as err:
             return {
                 'message': {
@@ -62,7 +73,6 @@ def search_location(request):
                         f'Parameters: {pprint.pformat(params)}',
                         f'HTTP status: {response.status_code}',
                         f'Exception: {pprint.pformat(err)}']}}
-        return {'data': found_locations}
 
     try:
         search_text = get_search_text(request)
@@ -93,10 +103,14 @@ def search_location(request):
                 'label': location['properties']['label']})
             uri = f'{base_url}?{query_string}'
             return redirect(uri)
+        message_description = None
+        if len(search_results['data']) == 20:
+            message_description = 'Showing only first 20 matching locations:'
         return render(request, 'weather_app/message.html', {
             'message': {
                 'style': 'success',
                 'headline': 'Select location',
+                'description': message_description,
                 'found_locations': search_results['data'],
                 'show_search_form': True}})
     except Exception as err:

@@ -1,4 +1,3 @@
-TODO Add exception details into error messages for admins only
 TODO Add icon into messages
 TODO Improve homepage
 TODO Add OneCall forecast widgets https://openweathermap.org/api/one-call-apihist_parameter
@@ -7,6 +6,7 @@ TODO Implement Leaflet map view https://openweathermap.org/api/weathermaps
 TODO Implement DB
 TODO Implement tests
 TODO Deploy app and publish repository
+        - Django SASS processor settings
         - admin password
         - production secret
         - API keys/appid
@@ -15,14 +15,14 @@ TODO HTML checker https://validator.w3.org/nu/
 
 
 ===============================================================================
-
-VS Code settings: file://C:\Users\Roman\AppData\Roaming\Code\User\settings.json
-    "todo-tree.general.tags": [
-        "TODO",
-        "REFACTOR",
-        "NOTE",
-        "FIXME",
-        "FIXIT",
-        "FIX",
-        "BUG"
-    ],
+VS Code settings:
+    file://C:\Users\Roman\AppData\Roaming\Code\User\settings.json
+        "todo-tree.general.tags": [
+            "TODO",
+            "REFACTOR",
+            "NOTE",
+            "FIXME",
+            "FIXIT",
+            "FIX",
+            "BUG"
+        ],
