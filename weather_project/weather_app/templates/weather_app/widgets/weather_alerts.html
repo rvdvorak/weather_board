@@ -3,7 +3,7 @@
 {% block widget_style %}warning{% endblock %}
 
 {% block widget_header_icon %}
-<i class="fas fa-exclamation-triangle" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-bolt" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
 
 {% block widget_header_text %}Local weather alerts{% endblock %}
@@ -26,8 +26,10 @@
                 {% if alert.sender %}
                 <h6>Issued by: {{ alert.sender }}</h6>
                 {% endif %}
-                <h3>Description</h3>
+                {% if alert.description %}
+                <h4>Description</h4>
                 <p>{{ alert.description }}</p>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
