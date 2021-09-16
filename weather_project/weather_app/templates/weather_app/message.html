@@ -33,7 +33,8 @@
                 {% endif %}
                 {% if user.is_superuser %}
                     {% if message.admin_details %}
-                        <h6>Details for admins</h6>
+                        <hr>
+                        <h6>Details for admins:</h6>
                         <ul>
                         {% for item in message.admin_details %}
                             <li>{{ item }}</li>

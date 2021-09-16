@@ -107,7 +107,7 @@ def dashboard(request):
                         'Method: get_air_pollution(location)',
                         f'API endpoint: {url}',
                         f'HTTP status: {response.status_code}']}}
-        #TODO Add try/except
+        #TODO Add try/except: Internal error - Unexpected data structure
         air_pollution = response.json()['list']
         return {'data': air_pollution}
 

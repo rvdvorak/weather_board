@@ -1,16 +1,16 @@
-#TODO Add exception details into error messages for admins only
-#TODO Add icon into messages
-#TODO Improve homepage
-#TODO Add OneCall forecast widgets https://openweathermap.org/api/one-call-api#hist_parameter
-#TODO Add AirPollution forecast widgets https://openweathermap.org/api/air-pollution#forecast
-#TODO Implement Leaflet map view https://openweathermap.org/api/weathermaps
-#TODO Implement DB
-#TODO Implement tests
-#TODO Deploy app and publish repository
+TODO Add exception details into error messages for admins only
+TODO Add icon into messages
+TODO Improve homepage
+TODO Add OneCall forecast widgets https://openweathermap.org/api/one-call-apihist_parameter
+TODO Add AirPollution forecast widgets https://openweathermap.org/api/air-pollutionforecast
+TODO Implement Leaflet map view https://openweathermap.org/api/weathermaps
+TODO Implement DB
+TODO Implement tests
+TODO Deploy app and publish repository
         - admin password
         - production secret
         - readme.md
-
+TODO HTML checker https://validator.w3.org/nu/
 
 
 ===============================================================================
