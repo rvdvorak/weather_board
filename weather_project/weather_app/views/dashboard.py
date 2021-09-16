@@ -13,6 +13,10 @@ def dashboard(request):
             latitude = float(request.GET.get('latitude'))
             longitude = float(request.GET.get('longitude'))
             label = str(request.GET.get('label'))
+            if not (-90 <= latitude <= 90) and (-180 <= longitude <= 180):
+                raise Exception('Coordinates out of range.')
+            if label == '':
+                raise Exception('Missing location label.')
         except Exception as err:
             return {
                 'message': {
@@ -23,20 +27,6 @@ def dashboard(request):
                     'admin_details': [
                         'Method: get_location(request)',
                         f'Exception: {pprint.pformat(err)}']}}
-        if not (-90 <= latitude <= 90) and (-180 <= longitude <= 180):
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Incorrect location',
-                    'description': 'Coordinates out of range. Try to search the location.',
-                    'show_search_form': True}}
-        if label == '':
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Missing location label',
-                    'description': 'Try to search the location.',
-                    'show_search_form': True}}
         return {
             'data': {
                 'latitude': latitude,
@@ -63,8 +53,13 @@ def dashboard(request):
                     'admin_details': [
                         'Method: get_weather(location)',
                         f'API endpoint: {url}',
+                        f'Parameters: {pprint.pformat(params)}',
                         f'Exception: {pprint.pformat(err)}']}}
-        if not response.status_code == 200:
+        try:
+            if not response.status_code == 200:
+                raise Exception('HTTP response failed')
+            weather = response.json()
+        except Exception as err:
             return {
                 'message': {
                     'style': 'danger',
@@ -73,8 +68,9 @@ def dashboard(request):
                     'admin_details': [
                         'Method: get_weather(location)',
                         f'API endpoint: {url}',
-                        f'HTTP status: {response.status_code}']}}
-        weather = response.json()
+                        f'Parameters: {pprint.pformat(params)}',
+                        f'HTTP status: {response.status_code}',
+                        f'Exception: {pprint.pformat(err)}']}}
         return {'data': weather}
 
     def get_air_pollution(location):
@@ -107,7 +103,6 @@ def dashboard(request):
                         'Method: get_air_pollution(location)',
                         f'API endpoint: {url}',
                         f'HTTP status: {response.status_code}']}}
-        #TODO Add try/except: Internal error - Unexpected data structure
         air_pollution = response.json()['list']
         return {'data': air_pollution}
 

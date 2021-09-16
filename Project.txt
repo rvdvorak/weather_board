@@ -9,6 +9,7 @@ TODO Implement tests
 TODO Deploy app and publish repository
         - admin password
         - production secret
+        - API keys/appid
         - readme.md
 TODO HTML checker https://validator.w3.org/nu/
 

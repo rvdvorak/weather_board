@@ -46,7 +46,11 @@ def search_location(request):
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
                         f'Exception: {pprint.pformat(err)}']}}
-        if not response.status_code == 200:
+        try:
+            if not response.status_code == 200:
+                raise Exception('HTTP response failed.')
+            found_locations = response.json()['features']
+        except Exception as err:
             return {
                 'message': {
                     'style': 'danger',
@@ -56,19 +60,7 @@ def search_location(request):
                         'Method: get_search_results(search_text)',
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
-            found_locations = response.json()['features']
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Unexpected data structure.',
-                    'admin_details': [
-                        'Method: get_search_results(search_text)',
-                        f'API endpoint: {url}',
-                        f'Parameters: {pprint.pformat(params)}',
+                        f'HTTP status: {response.status_code}',
                         f'Exception: {pprint.pformat(err)}']}}
         return {'data': found_locations}
 
@@ -86,7 +78,7 @@ def search_location(request):
                 'message': {
                     'style': 'warning',
                     'headline': 'No location found',
-                    'description': 'You probably entered the name of the location incorrectly. Please try again.',
+                    'description': 'You probably entered the name of the location incorrectly. Please try it again.',
                     'show_search_form': True,
                     'admin_details': [
                         'Method: search_location(request)',
