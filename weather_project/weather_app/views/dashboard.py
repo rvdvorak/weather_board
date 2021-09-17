@@ -133,7 +133,7 @@ def dashboard(request):
                         f'Exception: {pprint.pformat(err)}']}}
 
     def convert_UTC_timestamps_to_local_datetimes(weather):
-        # REFACTOR Convert UTC timestamps to selected location's datetime
+        # REFACTOR convert_UTC_timestamps_to_local_datetimes(weather)
         try:
             timezone = pytz.timezone(weather['timezone'])
             utc_offset = weather['timezone_offset']
@@ -177,20 +177,19 @@ def dashboard(request):
                         'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
                         f'Exception: {pprint.pformat(err)}']}}
 
-    def add_chart_data(weather):
-    #REFACTOR Transform to "get_chart_data(weather)"
+    def get_charts(weather):
         try:
+            charts = {}
             if 'minutely' in weather:
-                minutely_chart = {
-                    'time': [],
-                    'volume': [],
-                }
+                time = []
+                volume = []
                 for minute in weather['minutely']:
-                    minutely_chart['time'].append(minute['dt'].strftime("%H:%M"))
-                    minutely_chart['volume'].append(
-                        round(minute['precipitation'], 1))
-                weather['minutely_chart'] = minutely_chart
-            return {'data': weather}
+                    time.append(minute['dt'].strftime("%H:%M"))
+                    volume.append(round(minute['precipitation'], 1))
+                charts['minutely_precipitation'] = {
+                    'time': time,
+                    'volume': volume}
+            return {'data': charts}
         except Exception as err:
             return {
                 'message': {
@@ -198,32 +197,27 @@ def dashboard(request):
                     'headline': 'Internal error',
                     'description': 'Data processing failed.',
                     'admin_details': [
-                        'Method: add_chart_data(weather)',
+                        'Method: get_charts(weather)',
                         f'Exception: {pprint.pformat(err)}']}}
 
     try:
         location = get_location(request)
         if not 'data' in location:
             return render(request, 'weather_app/message.html', {'message': location['message']})
-
         weather = get_weather(location['data'])
         if not 'data' in weather:
             return render(request, 'weather_app/message.html', {'message': weather['message']})
-
         air_pollution = get_air_pollution(location['data'])
         if not 'data' in air_pollution:
             return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
-
         weather['data']['air_pollution'] = air_pollution['data']
-
         weather = convert_UTC_timestamps_to_local_datetimes(weather['data'])
         if not 'data' in weather:
             return render(request, 'weather_app/message.html', {'message': weather['message']})
-
-        weather = add_chart_data(weather['data'])
-        if not 'data' in weather:
-            return render(request, 'weather_app/message.html', {'message': weather['message']})
-
+        charts = get_charts(weather['data'])
+        if not 'data' in charts:
+            return render(request, 'weather_app/message.html', {'message': charts['message']})
+        weather['data']['charts'] = charts['data']
         return render(request, 'weather_app/dashboard.html', {
             'location': location['data'],
             'weather': weather['data']})

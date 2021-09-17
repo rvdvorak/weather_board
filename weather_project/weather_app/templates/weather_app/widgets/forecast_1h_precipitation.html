@@ -10,9 +10,9 @@
 
 {% block widget_content %}
 
-{% if weather.minutely_chart %}
+{% if weather.charts.minutely_precipitation %}
 
-    {{ weather.minutely_chart|json_script:"minutelyPrecipitation" }}
+    {{ weather.charts.minutely_precipitation|json_script:"minutelyPrecipitation" }}
 
     <div class="p-3">
         <div class="chart">
