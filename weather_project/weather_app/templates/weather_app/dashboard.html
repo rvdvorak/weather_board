@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card-columns">
 
-    {% include 'weather_app/widgets/summary.html' %}
+    {% include 'weather_app/widgets/current_summary.html' %}
     
     {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
     
@@ -12,6 +12,8 @@
     {% include 'weather_app/widgets/current_air_pollution.html' %}
 
     {% include 'weather_app/widgets/weather_alerts.html' %}
+
+    {% include 'weather_app/widgets/forecast_48h_summary.html' %}
     
 </div>
 {% endblock content %}

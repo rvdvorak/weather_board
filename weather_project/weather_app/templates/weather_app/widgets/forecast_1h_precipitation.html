@@ -6,7 +6,7 @@
 <i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
 
-{% block widget_header_text %}Precipitation 1 hour forecast{% endblock %}
+{% block widget_header_text %}1 h precipitation forecast{% endblock %}
 
 {% block widget_content %}
 
@@ -14,21 +14,19 @@
 
     {{ weather.charts.minutely_precipitation|json_script:"minutelyPrecipitation" }}
 
-    <div class="p-3">
-        <div class="chart">
-            <div class="chartjs-size-monitor">
-                <div class="chartjs-size-monitor-expand">
-                    <div class=""></div>
-                </div>
-                <div class="chartjs-size-monitor-shrink">
-                    <div class=""></div>
-                </div>
+    <div class="chart p-1">
+        <!-- <div class="chartjs-size-monitor">
+            <div class="chartjs-size-monitor-expand">
+                <div class=""></div>
             </div>
-            <canvas id="minutelyPrecipitationChart"
-                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
-                height="500" class="chartjs-render-monitor">
-            </canvas>
-        </div>
+            <div class="chartjs-size-monitor-shrink">
+                <div class=""></div>
+            </div>
+        </div> -->
+        <canvas id="minutelyPrecipitationChart"
+            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
+            height="500" class="chartjs-render-monitor">
+        </canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
@@ -38,19 +36,24 @@
         const minutelyPrecipitation = JSON.parse(document.getElementById('minutelyPrecipitation').textContent);
         const ctx = document.getElementById('minutelyPrecipitationChart').getContext('2d');
         const minutelyPrecipitationChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: minutelyPrecipitation.time,
                 datasets: [{
                     label: 'Precipitation [mm/h]',
                     data: minutelyPrecipitation.volume,
+                    cubicInterpolationMode: 'default',
                     backgroundColor: ['rgba(0, 0, 255, 1)'],
                     borderColor: ['rgba(0, 0, 0, 0)'],
-                    borderWidth: 1
-                }]
-            },
+                    fill: true,
+                    borderWidth: 1}]},
             options: {
+                radius: 0,
+                pointBackground: '#f00',
                 scales: {
+                    x: {
+                        display: true
+                    },
                     y: {
                         type: 'logarithmic',
                         min: 0.1,

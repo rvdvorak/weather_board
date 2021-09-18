@@ -185,7 +185,7 @@ def dashboard(request):
                 volume = []
                 for minute in weather['minutely']:
                     time.append(minute['dt'].strftime("%H:%M"))
-                    volume.append(round(minute['precipitation'], 1))
+                    volume.append(round(minute['precipitation'], 2))
                 charts['minutely_precipitation'] = {
                     'time': time,
                     'volume': volume}

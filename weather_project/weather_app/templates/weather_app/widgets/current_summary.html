@@ -9,7 +9,8 @@
             <span class="badge bg-white">Timezone: {{ weather.timezone }}</span>
         </div>
         <h2>
-            <img src="http://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png">
+            <img src="https://openweathermap.org/img/wn/{{ weather.current.weather.0.icon }}@2x.png"
+                alt="{{ weather.current.weather.0.description|capfirst }}">
             <b>{{ weather.current.temp|floatformat:1 }} °C</b>
         </h2>
         <h3>Feels like {{ weather.current.feels_like|floatformat:1 }} °C</h3>
