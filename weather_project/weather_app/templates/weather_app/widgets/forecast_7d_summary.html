@@ -1,0 +1,57 @@
+{% extends 'weather_app/widget.html' %}
+
+{% block widget_style %}lightblue{% endblock %}
+
+{% block widget_header_icon %}
+<i class="fas fa-forward" style="width: 1.5em;"></i>
+{% endblock %}
+
+{% block widget_header_text %}7 days summary forecast{% endblock %}
+
+{% block widget_content %}
+
+<table class="table table-sm table-hover;">
+    <tbody>
+        {% for day in weather.daily %}
+        
+        <tr>
+            <td colspan="4" style="text-align: center; vertical-align: middle;" >
+                <i class="far fa-calendar-alt"></i>
+                <b>
+                    {{ day.dt|date:"D, j. M Y" }}
+                </b>
+            </td>
+        </tr>
+            
+        <tr style="background-color: #3c8dbc54;">
+            <td style="text-align: left; vertical-align: middle;" >
+                MAX
+            </td>
+            <td style="text-align: right; vertical-align: middle; padding-right: 0.5em;">
+                {{ day.temp.max|floatformat:0 }} °C
+            </td>
+            <td rowspan="2" style="text-align: right; vertical-align: middle;" >
+                {% comment %}
+                Convert precipitation probability to percents (multiply by 100)
+                {% endcomment %}
+                {% widthratio day.pop 1 100 %} %
+                <i class="fas fa-cloud-showers-heavy"></i>
+            </td>
+            <td rowspan="2" style="text-align: right; vertical-align: middle; padding-top: 0em; padding-bottom: 0em;">
+                <img width="75px" height="75px" src="https://openweathermap.org/img/wn/{{ day.weather.0.icon }}@2x.png"
+                    alt="{{ hour.weather.0.description|capfirst }}">
+            </td>
+        </tr>
+        <tr style="background-color: #3c8dbc54;">
+            <td style="text-align: left; vertical-align: middle;" >
+                MIN
+            </td>
+            <td style="text-align: right; vertical-align: middle; padding-right: 0.5em;">
+                {{ day.temp.min|floatformat:0 }} °C
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock widget_content %}
