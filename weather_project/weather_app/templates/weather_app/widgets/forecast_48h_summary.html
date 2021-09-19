@@ -12,20 +12,9 @@
 
 <table class="table table-sm table-hover;">
     <tbody>
-        {% if weather.hourly.0.dt|date:"H:i" != '00:00' and weather.hourly.0.dt|date:"H:i" != '00:30' %}
-        <tr>
-            <td colspan="4" style="text-align: center; vertical-align: middle;" >
-                <i class="far fa-calendar-alt"></i>
-                <b>
-                    {{ weather.hourly.0.dt|date:"D, j. M Y" }}
-                </b>
-            </td>
-        </tr>
-        {% endif %}
-
         {% for hour in weather.hourly %}
         
-        {% if hour.dt|date:"H:i" == '00:00' or hour.dt|date:"H:i" == '00:30' %}
+        {% if forloop.counter == 1 or hour.dt|date:"H:i" == '00:00' or hour.dt|date:"H:i" == '00:30' %}
         <tr>
             <td colspan="4" style="text-align: center; vertical-align: middle;" >
                 <i class="far fa-calendar-alt"></i>
