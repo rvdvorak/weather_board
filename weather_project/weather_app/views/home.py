@@ -1,4 +1,5 @@
 from django.shortcuts import render
+import pprint
 
 def home(request):
     try:

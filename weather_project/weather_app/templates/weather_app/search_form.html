@@ -1,16 +1,11 @@
-<form action="{% url 'search_location' %}" method="GET">
+<form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET">
     <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" name="search_text" type="search"
-            placeholder="Search location" aria-label="Search location">
+        <input name="search_text" class="form-control form-control-navbar" type="search" placeholder="Search location"
+            aria-label="Search location">
         <div class="input-group-append">
-            <button class="btn btn-block btn-outline-secondary" type="submit">
-                <i class="fa fa-search"></i>
+            <button class="btn btn-navbar" type="submit">
+                <i class="fas fa-search"></i>
             </button>
-        </div>
-        <div class="input-group-append">
-            <a href="{% url 'random_location' %}" class="btn btn-block btn-outline-secondary btn-sm">
-                Random
-            </a>
         </div>
     </div>
 </form>

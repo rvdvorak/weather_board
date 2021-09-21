@@ -25,9 +25,9 @@ def dashboard(request):
         except Exception as err:
             return {
                 'message': {
-                    'style': 'warning',
-                    'headline': 'Missing or incorrect location data',
-                    'description': 'Try to search the location.',
+                    'style': 'lightblue',
+                    'headline': 'Select location',
+                    'description': 'Search location to get started.',
                     'show_search_form': True,
                     'admin_details': [
                         'Method: get_location(request)',
