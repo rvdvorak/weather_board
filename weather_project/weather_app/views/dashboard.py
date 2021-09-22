@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from datetime import datetime
+from weather_app.models import Location
 import requests
 import json
 import pprint
@@ -8,6 +9,18 @@ import pytz
 
 
 def dashboard(request):
+    # TODO Exceptions
+    def save_location(location, request):
+        new_location = Location(
+            label=location['label'],
+            latitude=location['latitude'],
+            longitude=location['longitude'],
+            favourite=False,
+            date_last_showed=datetime.now(),
+            user=request.user)
+        new_location.save()
+        return
+
     def get_location(request):
         try:
             latitude = float(request.GET.get('latitude'))
@@ -218,6 +231,8 @@ def dashboard(request):
         if not 'data' in charts:
             return render(request, 'weather_app/message.html', {'message': charts['message']})
         weather['data']['charts'] = charts['data']
+        if request.user.is_authenticated:
+            save_location(location['data'], request)
         return render(request, 'weather_app/dashboard.html', {
             'location': location['data'],
             'weather': weather['data']})
