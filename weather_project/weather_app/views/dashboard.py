@@ -9,32 +9,16 @@ import pytz
 
 
 def dashboard(request):
-    # TODO Exceptions
-    def save_location(location, request):
-        new_location = Location(
-            label=location['label'],
-            latitude=location['latitude'],
-            longitude=location['longitude'],
-            favourite=False,
-            date_last_showed=datetime.now(),
-            user=request.user)
-        new_location.save()
-        return
-
     def get_location(request):
         try:
-            latitude = float(request.GET.get('latitude'))
-            longitude = float(request.GET.get('longitude'))
-            label = str(request.GET.get('label'))
-            if not (-90 <= latitude <= 90) and (-180 <= longitude <= 180):
-                raise Exception('Coordinates out of range.')
-            if label == '':
-                raise Exception('Missing location label.')
-            return {
-                'data': {
-                    'latitude': latitude,
-                    'longitude': longitude,
-                    'label': label}}
+            location = Location(
+                latitude=request.GET.get('latitude'),
+                longitude=request.GET.get('longitude'),
+                label=request.GET.get('label'),
+                date_last_showed=datetime.now(),
+                favorite = False)
+            #TODO Validate: latitude, longitude and label            
+            return {'data': location}
         except Exception as err:
             return {
                 'message': {
@@ -51,8 +35,8 @@ def dashboard(request):
         try:
             url = 'https://api.openweathermap.org/data/2.5/onecall'
             params = {
-                'lat': location['latitude'],
-                'lon': location['longitude'],
+                'lat': location.latitude,
+                'lon': location.longitude,
                 'units': 'metric',
                 'appid': '6fe37effcfa866ecec5fd235699a402d'}
         except Exception as err:
@@ -101,8 +85,8 @@ def dashboard(request):
         try:
             url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
             params = {
-                'lat': location['latitude'],
-                'lon': location['longitude'],
+                'lat': location.latitude,
+                'lon': location.longitude,
                 'appid': '6fe37effcfa866ecec5fd235699a402d'}
         except Exception as err:
             return {
@@ -217,10 +201,11 @@ def dashboard(request):
         location = get_location(request)
         if not 'data' in location:
             return render(request, 'weather_app/message.html', {'message': location['message']})
-        weather = get_weather(location['data'])
+        location = location['data']
+        weather = get_weather(location)
         if not 'data' in weather:
             return render(request, 'weather_app/message.html', {'message': weather['message']})
-        air_pollution = get_air_pollution(location['data'])
+        air_pollution = get_air_pollution(location)
         if not 'data' in air_pollution:
             return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
         weather['data']['air_pollution'] = air_pollution['data']
@@ -232,9 +217,10 @@ def dashboard(request):
             return render(request, 'weather_app/message.html', {'message': charts['message']})
         weather['data']['charts'] = charts['data']
         if request.user.is_authenticated:
-            save_location(location['data'], request)
+            location.user = request.user
+            location.save()
         return render(request, 'weather_app/dashboard.html', {
-            'location': location['data'],
+            'location': location,
             'weather': weather['data']})
     except Exception as err:
         return render(request, 'weather_app/message.html', {
