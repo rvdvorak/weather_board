@@ -15,11 +15,24 @@
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <!-- Search form -->
             
-            {% if not request.resolver_match.url_name == 'home' %}
-            {% include 'weather_app/search_form.html' %}
+            {% if request.resolver_match.url_name == 'dashboard' %}
+
+            {# Search Form #}
+            <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET">
+                <div class="input-group input-group-sm">
+                    <input name="search_text" class="form-control form-control-navbar" type="search" placeholder="Search location"
+                        aria-label="Search location">
+                    <div class="input-group-append">
+                        <button class="btn btn-navbar" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
             {% endif %}
 
-            {# TODO Add to favorites BUTTON #}
+            {# TODO Add Un/Mark as Favorite BUTTON #}
 
             <!-- Right navbar links -->
             <ul class="navbar-nav">
