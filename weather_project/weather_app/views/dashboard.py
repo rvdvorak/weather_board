@@ -1,8 +1,11 @@
+from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.core.exceptions import ValidationError
 from datetime import datetime
 from weather_app.models import Location
 import requests
+from requests.exceptions import Timeout
 import json
 import pprint
 import pytz
@@ -14,21 +17,28 @@ def dashboard(request):
             location = Location(
                 latitude=request.GET.get('latitude'),
                 longitude=request.GET.get('longitude'),
-                label=request.GET.get('label'),
-                date_last_showed=datetime.now(),
-                favorite = False)
-            #TODO Validate: latitude, longitude and label            
-            return {'data': location}
+                label=request.GET.get('label'))
+            location.clean_fields(exclude=['favorite', 'date_last_showed', 'user'])
+            return location
+        except ValidationError as err:
+            messages.info(request, {
+                'headline': 'Select location',
+                'description': 'Search location to get started.',
+                'icon': 'bi bi-geo-alt-fill',
+                'show_search_form': True,
+                'admin_details': [
+                    'Method: get_location(request)',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
         except Exception as err:
-            return {
-                'message': {
-                    'style': 'lightblue',
-                    'headline': 'Select location',
-                    'description': 'Search location to get started.',
-                    'show_search_form': True,
-                    'admin_details': [
-                        'Method: get_location(request)',
-                        f'Exception: {pprint.pformat(err)}']}}
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Data processing failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: get_location(request)',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     def get_weather(location):
         # API docs: https://openweathermap.org/api/one-call-api
@@ -39,46 +49,43 @@ def dashboard(request):
                 'lon': location.longitude,
                 'units': 'metric',
                 'appid': '6fe37effcfa866ecec5fd235699a402d'}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Data processing failed.',
-                    'admin_details': [
-                        'Method: get_weather(location)',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             response = requests.get(url, params=params, timeout=5)
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Weather service is not responding',
-                    'description': 'Please try it again later...',
-                    'show_search_form': True,
-                    'admin_details': [
-                        'Method: get_weather(location)',
-                        f'API endpoint: {url}',
-                        f'Parameters: {pprint.pformat(params)}',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             if not response.status_code == 200:
-                raise Exception('HTTP response failed')
-            weather = response.json()
-            return {'data': weather}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
+                messages.error(request, {
                     'headline': 'Weather service error',
                     'description': 'Request for data failed.',
+                    'icon': 'fas fa-times-circle',
                     'admin_details': [
                         'Method: get_weather(location)',
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
-                        f'HTTP status: {response.status_code}',
-                        f'Exception: {pprint.pformat(err)}']}}
+                        f'HTTP status: {response.status_code}']})
+                return None
+            weather = response.json()
+            return weather
+        except Timeout as err:
+            messages.warning(request, {
+                'headline': 'Weather service time out',
+                'description': 'Please try it again later...',
+                'icon': 'fas fa-hourglass-end',
+                'show_search_form': True,
+                'admin_details': [
+                    'Method: get_weather(location)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {err}']})
+            return None
+        except Exception as err:
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Data processing failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: get_weather(location)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     def get_air_pollution(location):
         # API docs: https://openweathermap.org/api/air-pollution
@@ -88,49 +95,46 @@ def dashboard(request):
                 'lat': location.latitude,
                 'lon': location.longitude,
                 'appid': '6fe37effcfa866ecec5fd235699a402d'}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Data processing failed.',
-                    'admin_details': [
-                        'Method: get_air_pollution(location)',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             response = requests.get(url, params=params, timeout=5)
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Air pollution service is not responding',
-                    'description': 'Please try it again later...',
-                    'show_search_form': True,
-                    'admin_details': [
-                        'Method: get_air_pollution(location)',
-                        f'API endpoint: {url}',
-                        f'Parameters: {pprint.pformat(params)}',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             if not response.status_code == 200:
-                raise Exception('HTTP response failed')
-            air_pollution = response.json()['list']
-            return {'data': air_pollution}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
+                messages.error(request, {
                     'headline': 'Air pollution service error',
                     'description': 'Request for data failed.',
+                    'icon': 'fas fa-times-circle',
                     'admin_details': [
                         'Method: get_air_pollution(location)',
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
-                        f'HTTP status: {response.status_code}',
-                        f'Exception: {pprint.pformat(err)}']}}
+                        f'HTTP status: {response.status_code}']})
+                return None
+            air_pollution = response.json()['list']
+            return air_pollution
+        except Timeout as err:
+            messages.warning(request, {
+                'headline': 'Air pollution service time out',
+                'description': 'Please try it again later...',
+                'icon': 'fas fa-hourglass-end',
+                'show_search_form': True,
+                'admin_details': [
+                    'Method: get_air_pollution(location)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {err}']})
+            return None
+        except Exception as err:
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Data processing failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: get_air_pollution(location)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     def convert_UTC_timestamps_to_local_datetimes(weather):
-        # REFACTOR convert_UTC_timestamps_to_local_datetimes(weather)
+        # TODO REFACTOR convert_UTC_timestamps_to_local_datetimes(weather)
         try:
             timezone = pytz.timezone(weather['timezone'])
             utc_offset = weather['timezone_offset']
@@ -163,16 +167,16 @@ def dashboard(request):
             for hour in range(len(weather['air_pollution'])):
                 weather['air_pollution'][hour]['dt'] = datetime.fromtimestamp(
                     weather['air_pollution'][hour]['dt'] + utc_offset, timezone)
-            return {'data': weather}
+            return weather
         except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Data processing failed.',
-                    'admin_details': [
-                        'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
-                        f'Exception: {pprint.pformat(err)}']}}
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Data processing failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     def get_charts(weather):
         try:
@@ -186,48 +190,50 @@ def dashboard(request):
                 charts['minutely_precipitation'] = {
                     'time': time,
                     'volume': volume}
-            return {'data': charts}
+            return charts
         except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Data processing failed.',
-                    'admin_details': [
-                        'Method: get_charts(weather)',
-                        f'Exception: {pprint.pformat(err)}']}}
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Data processing failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: get_charts(weather)',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     try:
         location = get_location(request)
-        if not 'data' in location:
-            return render(request, 'weather_app/message.html', {'message': location['message']})
-        location = location['data']
+        if not location:
+            return render(request, 'weather_app/message.html')
         weather = get_weather(location)
-        if not 'data' in weather:
-            return render(request, 'weather_app/message.html', {'message': weather['message']})
+        if not weather:
+            return render(request, 'weather_app/message.html')
         air_pollution = get_air_pollution(location)
-        if not 'data' in air_pollution:
-            return render(request, 'weather_app/message.html', {'message': air_pollution['message']})
-        weather['data']['air_pollution'] = air_pollution['data']
-        weather = convert_UTC_timestamps_to_local_datetimes(weather['data'])
-        if not 'data' in weather:
-            return render(request, 'weather_app/message.html', {'message': weather['message']})
-        charts = get_charts(weather['data'])
-        if not 'data' in charts:
-            return render(request, 'weather_app/message.html', {'message': charts['message']})
-        weather['data']['charts'] = charts['data']
+        if not air_pollution:
+            return render(request, 'weather_app/message.html')
+        weather['air_pollution'] = air_pollution
+        weather = convert_UTC_timestamps_to_local_datetimes(weather)
+        if not weather:
+            return render(request, 'weather_app/message.html')
+        charts = get_charts(weather)
+        if not charts:
+            return render(request, 'weather_app/message.html')
+        weather['charts'] = charts
         if request.user.is_authenticated:
             location.user = request.user
+            location.date_last_showed = datetime.now()
+            #TODO Check whether the location is already saved/favorite
+            location.favorite = False
             location.save()
         return render(request, 'weather_app/dashboard.html', {
             'location': location,
-            'weather': weather['data']})
+            'weather': weather})
     except Exception as err:
-        return render(request, 'weather_app/message.html', {
-            'message': {
-                'style': 'danger',
-                'headline': 'Internal error',
-                'description': 'Data processing failed.',
-                'admin_details': [
-                    'Method: dashboard(request)',
-                    f'Exception: {pprint.pformat(err)}']}})
+        messages.error(request, {
+            'headline': 'Internal error',
+            'description': 'Data processing failed.',
+            'icon': 'fas fa-times-circle',
+            'admin_details': [
+                'Method: dashboard(request)',
+                f'Exception: {pprint.pformat(err)}']})
+        return render(request, 'weather_app/message.html')
