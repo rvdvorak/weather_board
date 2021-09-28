@@ -6,6 +6,7 @@ import requests
 import json
 import pprint
 
+#TODO Implement Django Messages
 
 def search_location(request):
     def get_search_text(request):

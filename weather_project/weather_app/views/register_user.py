@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 
+#TODO Implement Django Messages
+
 def register_user(request):
     if request.method == 'GET':
         return render(request, 'weather_app/register_user.html', {'form': UserCreationForm()})

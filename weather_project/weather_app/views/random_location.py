@@ -7,6 +7,8 @@ import json
 import random
 import pprint
 
+#TODO Implement Django Messages
+
 def random_location(request):
     def get_random_location():
         # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
