@@ -53,7 +53,7 @@ def dashboard(request):
             if not response.status_code == 200:
                 messages.error(request, {
                     'headline': 'Weather service error',
-                    'description': 'Request for data failed.',
+                    'description': 'Request for weather data failed.',
                     'icon': 'fas fa-times-circle',
                     'admin_details': [
                         'Method: get_weather(location)',

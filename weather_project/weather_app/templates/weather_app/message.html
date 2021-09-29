@@ -36,8 +36,8 @@
                     <div class="col-sm-9">
                         <form class="form-inline" action="{% url 'search_location' %}" method="GET">
                             <div class="input-group input-group-sm ml-auto">
-                                <input name="search_text" class="form-control" type="search" placeholder="Search location"
-                                    aria-label="Search location">
+                                <input name="search_text" class="form-control" type="search"
+                                    placeholder="Search location" aria-label="Search location">
                                 <div class="input-group-append">
                                     <button class="btn btn-block btn-secondary btn-sm mr-auto" type="submit">
                                         <i class="fas fa-search"></i>
@@ -49,19 +49,43 @@
                 </div>
                 {% endif %}
                 {% if user.is_superuser %}
-                    {% if message.message.admin_details %}
-                        <hr>
-                        <h6>Details for admins:</h6>
-                        <ul>
-                        {% for item in message.message.admin_details %}
-                            <li>{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+                {% if message.message.admin_details %}
+                <hr>
+                <h6>Details for admins:</h6>
+                <ul>
+                    {% for item in message.message.admin_details %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="card card-danger shadow">
+            <div class="card-header">
+                <h3 class="card-title" style="margin: 0px; font-weight: bold;">
+                    <i class="fas fa-times-circle"></i>
+                    Internal error
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
+                    <div class="col-sm-9" style="text-align: center;">
+                        Data processing failed.
+                    </div>
+                </div>
+                {% if user.is_superuser %}
+                <hr>
+                <h6>Details for admins:</h6>
+                <ul>
+                    <li>No informations available.</li>
+                    <li>Use debugger.</li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
 
 
@@ -97,8 +121,8 @@
                     <div class="col-sm-9">
                         <form class="form-inline" action="{% url 'search_location' %}" method="GET">
                             <div class="input-group input-group-sm ml-auto">
-                                <input name="search_text" class="form-control" type="search" placeholder="Search location"
-                                    aria-label="Search location">
+                                <input name="search_text" class="form-control" type="search"
+                                    placeholder="Search location" aria-label="Search location">
                                 <div class="input-group-append">
                                     <button class="btn btn-block btn-secondary btn-sm mr-auto" type="submit">
                                         <i class="fas fa-search"></i>
@@ -110,15 +134,15 @@
                 </div>
                 {% endif %}
                 {% if user.is_superuser %}
-                    {% if message.admin_details %}
-                        <hr>
-                        <h6>Details for admins:</h6>
-                        <ul>
-                        {% for item in message.admin_details %}
-                            <li>{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+                {% if message.admin_details %}
+                <hr>
+                <h6>Details for admins:</h6>
+                <ul>
+                    {% for item in message.admin_details %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
