@@ -8,7 +8,7 @@ def home(request):
     except Exception as err:
         messages.error(request, {
             'headline': 'Internal error',
-            'description': 'Data processing failed.',
+            'description': 'Homepage loading failed.',
             'icon': 'fas fa-times-circle',
             'admin_details': [
                 'Method: home(request)',

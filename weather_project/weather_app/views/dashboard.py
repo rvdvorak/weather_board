@@ -33,7 +33,7 @@ def dashboard(request):
         except Exception as err:
             messages.error(request, {
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Processing location data failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: get_location(request)',
@@ -78,7 +78,7 @@ def dashboard(request):
         except Exception as err:
             messages.error(request, {
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Processing weather data failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: get_weather(location)',
@@ -124,7 +124,7 @@ def dashboard(request):
         except Exception as err:
             messages.error(request, {
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Processing air pollution data failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: get_air_pollution(location)',
@@ -171,7 +171,7 @@ def dashboard(request):
         except Exception as err:
             messages.error(request, {
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Date/time processing failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
@@ -194,7 +194,7 @@ def dashboard(request):
         except Exception as err:
             messages.error(request, {
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Processing chart data failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: get_charts(weather)',
@@ -203,20 +203,20 @@ def dashboard(request):
 
     try:
         location = get_location(request)
-        if not location:
+        if location == None:
             return render(request, 'weather_app/message.html')
         weather = get_weather(location)
-        if not weather:
+        if weather == None:
             return render(request, 'weather_app/message.html')
         air_pollution = get_air_pollution(location)
-        if not air_pollution:
+        if air_pollution == None:
             return render(request, 'weather_app/message.html')
         weather['air_pollution'] = air_pollution
         weather = convert_UTC_timestamps_to_local_datetimes(weather)
-        if not weather:
+        if weather == None:
             return render(request, 'weather_app/message.html')
         charts = get_charts(weather)
-        if not charts:
+        if charts == None:
             return render(request, 'weather_app/message.html')
         weather['charts'] = charts
         if request.user.is_authenticated:
@@ -231,7 +231,7 @@ def dashboard(request):
     except Exception as err:
         messages.error(request, {
             'headline': 'Internal error',
-            'description': 'Data processing failed.',
+            'description': 'Processing dashboard data failed.',
             'icon': 'fas fa-times-circle',
             'admin_details': [
                 'Method: dashboard(request)',

@@ -26,7 +26,7 @@ def random_location(request):
                 'message': {
                     'style': 'danger',
                     'headline': 'Internal error',
-                    'description': 'Data processing failed.',
+                    'description': 'Obtaining random location failed.',
                     'admin_details': [
                         'Method: get_random_location()',
                         f'Exception: {pprint.pformat(err)}']}}
@@ -86,7 +86,7 @@ def random_location(request):
             'message': {
                 'style': 'danger',
                 'headline': 'Internal error',
-                'description': 'Data processing failed.',
+                'description': 'Processing random location failed.',
                 'admin_details': [
                     'Method: random_location(request)',
                     f'Exception: {pprint.pformat(err)}']}})

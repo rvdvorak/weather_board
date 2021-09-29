@@ -39,7 +39,7 @@ def search_location(request):
                 'message': {
                     'style': 'danger',
                     'headline': 'Internal error',
-                    'description': 'Data processing failed.',
+                    'description': 'Processing location search results failed.',
                     'admin_details': [
                         'Method: get_search_results(search_text)',
                         f'Exception: {pprint.pformat(err)}']}}
