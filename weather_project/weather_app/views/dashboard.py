@@ -201,6 +201,17 @@ def dashboard(request):
                     f'Exception: {pprint.pformat(err)}']})
             return None
 
+    def save_location(location):
+        match = Location.objects.filter(
+            longitude=location.longitude,
+            latitude=location.latitude)
+        if len(match) == 0:
+            location.user = request.user
+            location.save()
+        else:
+            match[0].save()
+        return
+            
     try:
         location = get_location(request)
         if location == None:
@@ -220,11 +231,7 @@ def dashboard(request):
             return render(request, 'weather_app/message.html')
         weather['charts'] = charts
         if request.user.is_authenticated:
-            location.user = request.user
-            location.date_last_showed = datetime.now()
-            #TODO Check whether the location is already saved/favorite
-            location.favorite = False
-            location.save()
+            save_location(location)
         return render(request, 'weather_app/dashboard.html', {
             'location': location,
             'weather': weather})
