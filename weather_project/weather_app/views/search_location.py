@@ -1,30 +1,40 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
 from urllib.parse import urlencode
+from requests.exceptions import Timeout
 import requests
 import json
 import pprint
 
-#TODO Implement Django Messages
 
 def search_location(request):
     def get_search_text(request):
         try:
-            search_text = str(request.GET.get('search_text'))
-            if search_text == '':
-                raise Exception('search_text is empty')
-            return {'data': search_text}
+            search_text = request.GET.get('search_text')
+            if (search_text == '') or (search_text == None):
+                messages.warning(
+                    request, {
+                        'headline': 'Nothing to search',
+                        'description': 'First enter the name of the location to search:',
+                        'icon': 'fas fa-exclamation-triangle',
+                        'show_search_form': True,
+                        'admin_details': [
+                            'Method: get_search_text(request)',
+                            f'search_text: {pprint.pformat(search_text)}']})
+                return None
+            return search_text
         except Exception as err:
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Nothing to search',
-                    'description': 'First enter the name of the location to search.',
-                    'show_search_form': True,
+            messages.error(
+                request, {
+                    'headline': 'Internal error',
+                    'description': 'Location search failed.',
+                    'icon': 'fas fa-times-circle',
                     'admin_details': [
                         'Method: get_search_text(request)',
-                        f'Exception: {pprint.pformat(err)}']}}
+                        f'Exception: {pprint.pformat(err)}']})
+            return None
 
     def get_search_results(search_text):
         # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/search/get
@@ -34,69 +44,64 @@ def search_location(request):
                 'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
                 'size': 20,
                 'text': search_text}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Internal error',
-                    'description': 'Processing location search results failed.',
-                    'admin_details': [
-                        'Method: get_search_results(search_text)',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             response = requests.get(url, params=params, timeout=5)
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'Location service is not responding',
-                    'description': 'Please try it again later...',
-                    'show_search_form': True,
-                    'admin_details': [
-                        'Method: get_search_results(search_text)',
-                        f'API endpoint: {url}',
-                        f'Parameters: {pprint.pformat(params)}',
-                        f'Exception: {pprint.pformat(err)}']}}
-        try:
             if not response.status_code == 200:
-                raise Exception('HTTP response failed.')
-            found_locations = response.json()['features']
-            return {'data': found_locations}
-        except Exception as err:
-            return {
-                'message': {
-                    'style': 'danger',
-                    'headline': 'Location search error',
+                messages.error(request, {
+                    'headline': 'Location service error',
                     'description': 'Request for location data failed.',
+                    'icon': 'fas fa-times-circle',
                     'admin_details': [
                         'Method: get_search_results(search_text)',
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
-                        f'HTTP status: {response.status_code}',
-                        f'Exception: {pprint.pformat(err)}']}}
+                        f'HTTP status: {response.status_code}']})
+                return None
+            found_locations = response.json()['features']
+            return found_locations
+        except Timeout as err:
+            messages.warning(request, {
+                'headline': 'Location service time out',
+                'description': 'Please try it again later...',
+                'icon': 'fas fa-hourglass-end',
+                'show_search_form': True,
+                'admin_details': [
+                    'Method: get_search_results(search_text)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {err}']})
+            return None
+        except Exception as err:
+            messages.error(request, {
+                'headline': 'Internal error',
+                'description': 'Location search failed.',
+                'icon': 'fas fa-times-circle',
+                'admin_details': [
+                    'Method: get_search_results(search_text)',
+                    f'API endpoint: {url}',
+                    f'Parameters: {pprint.pformat(params)}',
+                    f'Exception: {pprint.pformat(err)}']})
+            return None
 
     try:
         search_text = get_search_text(request)
-        if not 'data' in search_text:
-            return render(request, 'weather_app/message.html', {
-                'message': search_text['message']})
-        search_results = get_search_results(search_text['data'])
-        if not 'data' in search_results:
-            return render(request, 'weather_app/message.html', {
-                'message': search_results['message']})
-        if len(search_results['data']) == 0:
-            return render(request, 'weather_app/message.html', {
-                'message': {
-                    'style': 'warning',
-                    'headline': 'No location found',
+        if search_text == None:
+            return render(request, 'weather_app/message.html')
+        search_results = get_search_results(search_text)
+        if search_results == None:
+            return render(request, 'weather_app/message.html')
+        if len(search_results) == 0:
+            messages.warning(
+                request, {
+                'headline': 'No location found',
                     'description': 'You probably entered the name of the location incorrectly. Please try it again.',
+                    'icon': 'fas fa-exclamation-triangle',
                     'show_search_form': True,
                     'admin_details': [
                         'Method: search_location(request)',
-                        f'search_text: {pprint.pformat(search_text)}',
-                        f'search_results: {pprint.pformat(search_results)}']}})
-        if len(search_results['data']) == 1:
-            location = search_results['data'][0]
+                        f'search_text: {pprint.pformat(search_text)}']})
+            return render(request, 'weather_app/message.html')
+        if len(search_results) == 1:
+            location = search_results[0]
             base_url = reverse('dashboard')
             query_string = urlencode({
                 'latitude': location['geometry']['coordinates'][1],
@@ -104,22 +109,24 @@ def search_location(request):
                 'label': location['properties']['label']})
             uri = f'{base_url}?{query_string}'
             return redirect(uri)
-        message_description = None
-        if len(search_results['data']) == 20:
+        if len(search_results) == 20:
             message_description = 'Showing only first 20 matching locations:'
-        return render(request, 'weather_app/message.html', {
-            'message': {
-                'style': 'success',
+        else:
+            message_description = None
+        messages.success(
+            request, {
                 'headline': 'Select location',
                 'description': message_description,
-                'found_locations': search_results['data'],
-                'show_search_form': True}})
+                'icon': 'fas fa-check-circle',
+                'found_locations': search_results,
+                'show_search_form': True})
+        return render(request, 'weather_app/message.html')
     except Exception as err:
-        return render(request, 'weather_app/message.html', {
-            'message': {
-                'style': 'danger',
-                'headline': 'Internal error',
-                'description': 'Location search failed.',
-                'admin_details': [
-                    'Method: search_location(request)',
-                    f'Exception: {pprint.pformat(err)}']}})
+        messages.error(request, {
+            'headline': 'Internal error',
+            'description': 'Location search failed.',
+            'icon': 'fas fa-times-circle',
+            'admin_details': [
+                'Method: search_location(request)',
+                f'Exception: {pprint.pformat(err)}']})
+        return render(request, 'weather_app/message.html')

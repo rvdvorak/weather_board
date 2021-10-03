@@ -9,5 +9,11 @@
     {{ form.as_p }}
     <button type="submit">Sign Up</button>
 </form>
+<p></p>
+<h5>
+    <a href="{% url 'login_user' %}">
+        Login as an existing user
+    </a>
+</h5>
 
 {% endblock content %}

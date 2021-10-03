@@ -10,11 +10,10 @@
     <button type="submit">Login</button>
 </form>
 <p></p>
-<h5>Don't have an account yet?</h5>
-<div class="mr-auto">
-    <a href="{% url 'register_user' %}" class="btn btn-md btn-block btn-outline btn-secondary">
-        Register new user
+<h5>
+    <a href="{% url 'register_user' %}">
+        Register as a new user
     </a>
-</div>
+</h5>
 
 {% endblock content %}

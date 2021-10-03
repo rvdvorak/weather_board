@@ -1,4 +1,4 @@
-{% for location in message.found_locations %}
+{% for location in message.message.found_locations %}
 <form action="{% url 'dashboard' %}" method="GET" style="text-align: center; margin-bottom: 0.75em;">
     <input type="hidden" name="latitude" value="{{ location.geometry.coordinates.1 }}">
     <input type="hidden" name="longitude" value="{{ location.geometry.coordinates.0 }}">
