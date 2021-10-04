@@ -23,6 +23,7 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('location/search', views.search_location, name='search_location'),
     path('location/random', views.random_location, name='random_location'),
+    path('location/update', views.update_location, name='update_location'),
     path('register/', views.register_user, name='register_user'),
     path('login/', views.login_user, name='login_user'),
     path('logout/', views.logout_user, name='logout_user'),

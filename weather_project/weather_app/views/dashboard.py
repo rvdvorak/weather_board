@@ -14,11 +14,23 @@ import pytz
 def dashboard(request):
     def get_location(request):
         try:
-            location = Location(
-                latitude=request.GET.get('latitude'),
-                longitude=request.GET.get('longitude'),
-                label=request.GET.get('label'))
-            location.clean_fields(exclude=['favorite', 'date_last_showed', 'user'])
+            location_id = request.GET.get('id')
+            if location_id:
+                location = Location.objects.get(pk=location_id)
+                #TODO Exception
+            else:
+                location = Location(
+                    latitude=request.GET.get('latitude'),
+                    longitude=request.GET.get('longitude'),
+                    label=request.GET.get('label'))
+                location.clean_fields(exclude=['user'])
+                if request.user.is_authenticated:
+                    match = Location.objects.filter(
+                        user=request.user,
+                        latitude=location.latitude,
+                        longitude=location.longitude)
+                    if len(match) > 0:
+                        return match[0]
             return location
         except ValidationError as err:
             messages.info(request, {
@@ -202,13 +214,14 @@ def dashboard(request):
             return None
 
     def save_location(location):
+        #TODO Exceptions
         match = Location.objects.filter(
             longitude=location.longitude,
             latitude=location.latitude)
         if len(match) == 0:
-            location.user = request.user
             location.save()
         else:
+            match[0].favorite = location.favorite
             match[0].save()
         return
             
@@ -231,7 +244,9 @@ def dashboard(request):
             return render(request, 'weather_app/message.html')
         weather['charts'] = charts
         if request.user.is_authenticated:
+            location.user = request.user
             save_location(location)
+            print('Location ID:', location.id)
         return render(request, 'weather_app/dashboard.html', {
             'location': location,
             'weather': weather})

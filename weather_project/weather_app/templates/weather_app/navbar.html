@@ -13,11 +13,9 @@
         </button>
 
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-            <!-- Search form -->
             
             {% if request.resolver_match.url_name == 'dashboard' %}
-
-            {# Search Form #}
+            <!-- Search form -->
             <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
                     <input name="search_text" class="form-control form-control-navbar" type="search" placeholder="Search location"
@@ -29,19 +27,28 @@
                     </div>
                 </div>
             </form>
-
             {% endif %}
-
-            {# TODO Add Un/Mark as Favorite BUTTON #}
-
+            
             <!-- Right navbar links -->
             <ul class="navbar-nav">
+
+                {% if user.is_authenticated and request.resolver_match.url_name == 'dashboard' %}
+                <!-- Un/Mark as favorite button -->
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Favorite locations
-                    </a>
+                    <form action="{% url 'update_location' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ location.id }}">
+                        {% if location.favorite %}
+                        <input type="hidden" name="favorite" value="False">
+                        <button type="submit">Unmark as favorite {{location.id}}</button>
+                        {% else %}
+                        <input type="hidden" name="favorite" value="True">
+                        <button type="submit">Mark as favorite {{location.id}}</button>
+                        {% endif %}
+                    </form>
                 </li>
+                {% endif %}
+
                 <li class="nav-item">
                     <a href="{% url 'random_location' %}" class="nav-link">
                         <i class="fas fa-random"></i>
