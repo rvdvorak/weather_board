@@ -52,6 +52,16 @@ def dashboard(request):
                     f'Exception: {pprint.pformat(err)}']})
             return None
 
+    def get_location_history(request):
+        #TODO Exceptions
+        location_history = Location.objects.filter(favorite=False).order_by('-date_last_showed')[0:20]
+        return location_history
+        
+    def get_favorite_locations(request):
+        #TODO Exceptions
+        favorite_locations = Location.objects.filter(favorite=True).order_by('-date_last_showed')
+        return favorite_locations
+
     def get_weather(location):
         # API docs: https://openweathermap.org/api/one-call-api
         try:
@@ -216,9 +226,11 @@ def dashboard(request):
     def save_location(location):
         #TODO Exceptions
         match = Location.objects.filter(
+            user=request.user,
             longitude=location.longitude,
             latitude=location.latitude)
         if len(match) == 0:
+            location.user = request.user
             location.save()
         else:
             match[0].favorite = location.favorite
@@ -244,9 +256,14 @@ def dashboard(request):
             return render(request, 'weather_app/message.html')
         weather['charts'] = charts
         if request.user.is_authenticated:
-            location.user = request.user
             save_location(location)
-            print('Location ID:', location.id)
+            location_history = get_location_history(request) #TODO Exceptions
+            favorite_locations = get_favorite_locations(request) #TODO Exceptions
+            return render(request, 'weather_app/dashboard.html', {
+                'location': location,
+                'weather': weather,
+                'location_history': location_history,
+                'favorite_locations': favorite_locations})
         return render(request, 'weather_app/dashboard.html', {
             'location': location,
             'weather': weather})

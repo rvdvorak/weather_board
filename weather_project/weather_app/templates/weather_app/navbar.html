@@ -13,13 +13,14 @@
         </button>
 
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-            
+
             {% if request.resolver_match.url_name == 'dashboard' %}
             <!-- Search form -->
-            <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET">
+            <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET"
+                autocomplete="off">
                 <div class="input-group input-group-sm">
-                    <input name="search_text" class="form-control form-control-navbar" type="search" placeholder="Search location"
-                        aria-label="Search location">
+                    <input name="search_text" class="form-control form-control-navbar" type="search"
+                        placeholder="Search location" aria-label="Search location">
                     <div class="input-group-append">
                         <button class="btn btn-navbar" type="submit">
                             <i class="fas fa-search"></i>
@@ -28,27 +29,84 @@
                 </div>
             </form>
             {% endif %}
-            
+
             <!-- Right navbar links -->
             <ul class="navbar-nav">
 
-                {% if user.is_authenticated and request.resolver_match.url_name == 'dashboard' %}
-                <!-- Un/Mark as favorite button -->
-                <li class="nav-item">
-                    <form action="{% url 'update_location' %}" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="id" value="{{ location.id }}">
-                        {% if location.favorite %}
-                        <input type="hidden" name="favorite" value="False">
-                        <button type="submit">Unmark as favorite {{location.id}}</button>
+                <!-- Favorites -->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">
+                        <i class="fas fa-heart"></i>
+                        Favorites
+                    </a>
+                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
+                        {% if request.resolver_match.url_name == 'dashboard' %}
+                        {% if not location.favorite %}
+                        <li class="dropdown-item">
+                            <a href="{% url 'update_location' %}?id={{location.id}}&favorite=True"
+                                class="btn btn-block btn-secondary btn-sm">
+                                <i class="fas fa-plus"></i>
+                                Add favorite
+                            </a>
+                        </li>
                         {% else %}
-                        <input type="hidden" name="favorite" value="True">
-                        <button type="submit">Mark as favorite {{location.id}}</button>
+                        <li class="dropdown-item">
+                            <a href="{% url 'update_location' %}?id={{location.id}}&favorite=False"
+                                class="btn btn-block btn-secondary btn-sm">
+                                <i class="fas fa-times"></i>
+                                Remove favorite
+                            </a>
+                        </li>
                         {% endif %}
-                    </form>
+                        {% endif %}
+                        {% for location in favorite_locations %}
+                        <a href="{% url 'dashboard' %}?id={{location.id}}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ location.label }}
+                            </li>
+                        </a>
+                        {% endfor %}
+                    </ul>
                 </li>
                 {% endif %}
 
+                <!-- History -->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a id="history" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">
+                        <i class="fas fa-history"></i>
+                        History
+                    </a>
+                    <ul aria-labelledby="history" class="dropdown-menu border-0 shadow">
+                        {% if location_history %}
+                        <h6 style="text-align: center;">
+                            Favorites not listed
+                        </h6>
+                        <li class="dropdown-item">
+                            <a href="#"
+                                class="btn btn-block btn-secondary btn-sm">
+                                <i class="fas fa-trash"></i>
+                                Clear history {# TODO Clear history#}
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for location in location_history %}
+                        <a href="{% url 'dashboard' %}?id={{location.id}}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ location.label }}
+                            </li>
+                        </a>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
+
+                <!-- Random location -->
                 <li class="nav-item">
                     <a href="{% url 'random_location' %}" class="nav-link">
                         <i class="fas fa-random"></i>
@@ -56,49 +114,61 @@
                     </a>
                 </li>
 
+                <!-- User account menu -->
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
-                    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
                         <i class="fas fa-user"></i>
                         {{ user.username }}
                     </a>
-                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li class="dropdown-item">
-                            <form action="{% url 'logout_user' %}" method="POST">
-                                {% csrf_token %}
-                                <button class="btn btn-link p-0" type="submit">Log Out</button>
-                            </form>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Location history
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
+                    <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
+                        <a href="{% url 'logout_user' %}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Log Out
+                            </li>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <li>
+                                <i class="fas fa-address-card"></i>
                                 User profile
-                            </a>
-                        </li>
+                            </li>
+                        </a>
                     </ul>
                 </li>
                 {% else %}
-                <li class="nav-item">
-                    <a href="{% url 'login_user' %}" class="nav-link">
+                <li class="nav-item dropdown">
+                    <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">
                         <i class="fas fa-sign-in-alt"></i>
-                        Sign In
+                        Sign in
                     </a>
+                    <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
+                        <a href="{% url 'login_user' %}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Log In
+                            </li>
+                        </a>
+                        <a href="{% url 'register_user' %}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-user-plus"></i>
+                                Register
+                            </li>
+                        </a>
+                    </ul>
                 </li>
                 {% endif %}
 
-                
+
             </ul>
 
 
         </div>
 
-        
-    {% comment %}
+
+        {% comment %}
         <!-- Right navbar links -->
         <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
             <!-- Messages Dropdown Menu -->
@@ -195,7 +265,7 @@
                 </a>
             </li>
         </ul>
-    {% endcomment %}
+        {% endcomment %}
     </div>
 </nav>
 

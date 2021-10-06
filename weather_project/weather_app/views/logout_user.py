@@ -6,10 +6,9 @@ import pprint
 
 def logout_user(request):
     try:
-        if request.method == 'POST':
-            # TODO Is the POST method necessary?
+        if request.user.is_authenticated:
             logout(request)
-            return redirect('home')
+        return redirect('home')
     except Exception as err:
         messages.error(
             request, {

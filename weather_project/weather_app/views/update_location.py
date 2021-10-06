@@ -9,10 +9,10 @@ import pprint
 
 def update_location(request):
     #TODO Exceptions
-    if request.method == 'POST':
-        location_id = int(request.POST.get('id'))
+    if request.user.is_authenticated and request.GET.get('id'):
+        location_id = int(request.GET.get('id'))
         location = Location.objects.get(pk=location_id)
-        location.favorite = request.POST.get('favorite')
+        location.favorite = request.GET.get('favorite')
         location.save()
         base_url = reverse('dashboard')
         query_string = urlencode({'id': location_id})
