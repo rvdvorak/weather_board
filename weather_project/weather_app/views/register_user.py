@@ -18,7 +18,7 @@ def register_user(request):
                     user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                     user.save()
                     login(request, user)
-                    return redirect('home')
+                    return redirect('dashboard')
                 except IntegrityError:
                     return render(request, 'weather_app/register_user.html',
                         {'form': UserCreationForm(), 'error': 'User already exists. Please choose different username.'})

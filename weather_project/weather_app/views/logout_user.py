@@ -8,7 +8,7 @@ def logout_user(request):
     try:
         if request.user.is_authenticated:
             logout(request)
-        return redirect('home')
+        return redirect('dashboard')
     except Exception as err:
         messages.error(
             request, {

@@ -1,4 +1,3 @@
-from .home import *
 from .search_location import *
 from .random_location import *
 from .update_location import *

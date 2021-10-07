@@ -28,7 +28,7 @@ class Location(models.Model):
     label = models.CharField(max_length=100, validators=[validate_label])
     latitude = models.FloatField(validators=[validate_latitude])
     longitude = models.FloatField(validators=[validate_longitude])
-    favorite = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
     date_last_showed = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

@@ -27,7 +27,7 @@ def login_user(request):
                         'error': 'Username and/or password do not match.'})
             else:
                 login(request, user)
-                return redirect('home')
+                return redirect('dashboard')
     except Exception as err:
         messages.error(
             request, {

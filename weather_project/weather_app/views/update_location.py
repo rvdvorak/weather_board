@@ -12,7 +12,7 @@ def update_location(request):
     if request.user.is_authenticated and request.GET.get('id'):
         location_id = int(request.GET.get('id'))
         location = Location.objects.get(pk=location_id)
-        location.favorite = request.GET.get('favorite')
+        location.is_favorite = request.GET.get('is_favorite')
         location.save()
         base_url = reverse('dashboard')
         query_string = urlencode({'id': location_id})

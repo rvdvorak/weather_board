@@ -2,7 +2,7 @@
 
 <nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
-        <a href="{% url 'home' %}" class="navbar-brand">
+        <a href="{% url 'dashboard' %}" class="navbar-brand">
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
         </a>
@@ -14,7 +14,6 @@
 
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
 
-            {% if request.resolver_match.url_name == 'dashboard' %}
             <!-- Search form -->
             <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET"
                 autocomplete="off">
@@ -28,13 +27,12 @@
                     </div>
                 </div>
             </form>
-            {% endif %}
 
             <!-- Right navbar links -->
             <ul class="navbar-nav">
 
-                <!-- Favorites -->
                 {% if user.is_authenticated %}
+                <!-- Favorites -->
                 <li class="nav-item dropdown">
                     <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -42,10 +40,11 @@
                         Favorites
                     </a>
                     <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
-                        {% if request.resolver_match.url_name == 'dashboard' %}
-                        {% if not location.favorite %}
+                        
+                        {% if location %}
+                        {% if not location.is_favorite %}
                         <li class="dropdown-item">
-                            <a href="{% url 'update_location' %}?id={{location.id}}&favorite=True"
+                            <a href="{% url 'update_location' %}?id={{location.id}}&is_favorite=True"
                                 class="btn btn-block btn-secondary btn-sm">
                                 <i class="fas fa-plus"></i>
                                 Add favorite
@@ -53,7 +52,7 @@
                         </li>
                         {% else %}
                         <li class="dropdown-item">
-                            <a href="{% url 'update_location' %}?id={{location.id}}&favorite=False"
+                            <a href="{% url 'update_location' %}?id={{location.id}}&is_favorite=False"
                                 class="btn btn-block btn-secondary btn-sm">
                                 <i class="fas fa-times"></i>
                                 Remove favorite
@@ -61,6 +60,8 @@
                         </li>
                         {% endif %}
                         {% endif %}
+
+                        {% if favorite_locations %}
                         {% for location in favorite_locations %}
                         <a href="{% url 'dashboard' %}?id={{location.id}}">
                             <li class="dropdown-item">
@@ -69,17 +70,20 @@
                             </li>
                         </a>
                         {% endfor %}
+                        {% else %}
+                        <li class="dropdown-item">
+                            No favorites yet...
+                        </li>
+                        {% endif %}
                     </ul>
                 </li>
-                {% endif %}
 
                 <!-- History -->
-                {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a id="history" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
                         <i class="fas fa-history"></i>
-                        History
+                        History {# TODO History page instead of dropdown menu #}
                     </a>
                     <ul aria-labelledby="history" class="dropdown-menu border-0 shadow">
                         {% if location_history %}
@@ -93,7 +97,6 @@
                                 Clear history {# TODO Clear history#}
                             </a>
                         </li>
-                        {% endif %}
                         {% for location in location_history %}
                         <a href="{% url 'dashboard' %}?id={{location.id}}">
                             <li class="dropdown-item">
@@ -102,6 +105,11 @@
                             </li>
                         </a>
                         {% endfor %}
+                        {% else %}
+                        <li class="dropdown-item">
+                            No history yet...
+                        </li>
+                        {% endif %}
                     </ul>
                 </li>
                 {% endif %}
@@ -132,7 +140,7 @@
                         <a href="#" class="dropdown-item">
                             <li>
                                 <i class="fas fa-address-card"></i>
-                                User profile
+                                User profile {# TODO User profile page #}
                             </li>
                         </a>
                     </ul>
@@ -268,34 +276,3 @@
         {% endcomment %}
     </div>
 </nav>
-
-{% comment %}
-<nav class="main-header navbar navbar-expand-sm navbar-light navbar-white">
-    <div class="container" style="padding-left: 0rem; padding-right: 0rem;">
-        <div class="mr-auto">
-            <a href="{% url 'home' %}" class="navbar-brand">
-                <img src="{% static 'umbrella.svg' %}" alt="AdminLTE Logo" class="brand-image">
-                <span class="brand-text font-weight-light">WeatherBoard</span>
-            </a>
-        </div>
-        <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse order-2" id="navbarCollapse">
-            <div class="ml-auto mr-auto form-inline">
-                {% include 'weather_app/search_form.html' %}
-            </div>
-            <div class="ml-auto">
-                {% if user.is_authenticated %}
-                <i class="fas fa-user"></i>
-                {{ user.username }}
-                {% else %}
-                <i class="fas fa-sign-in-alt"></i>
-                Sign In
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</nav>
-{% endcomment %}

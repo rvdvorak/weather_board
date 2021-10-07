@@ -16,7 +16,9 @@ def dashboard(request):
         try:
             location_id = request.GET.get('id')
             if location_id:
-                location = Location.objects.get(pk=location_id)
+                location = Location.objects.filter(
+                    id=location_id,
+                    user=request.user)[0]
                 #TODO Exception
             else:
                 location = Location(
@@ -54,12 +56,16 @@ def dashboard(request):
 
     def get_location_history(request):
         #TODO Exceptions
-        location_history = Location.objects.filter(favorite=False).order_by('-date_last_showed')[0:20]
+        location_history = Location.objects.filter(
+            user=request.user,
+            is_favorite=False).order_by('-date_last_showed')[0:20]
         return location_history
         
     def get_favorite_locations(request):
         #TODO Exceptions
-        favorite_locations = Location.objects.filter(favorite=True).order_by('-date_last_showed')
+        favorite_locations = Location.objects.filter(
+            user=request.user,
+            is_favorite=True).order_by('-date_last_showed')
         return favorite_locations
 
     def get_weather(location):
@@ -233,7 +239,7 @@ def dashboard(request):
             location.user = request.user
             location.save()
         else:
-            match[0].favorite = location.favorite
+            match[0].is_favorite = location.is_favorite
             match[0].save()
         return
             
