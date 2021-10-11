@@ -1,21 +1,20 @@
 {% extends 'weather_app/base.html' %}
-
 {% block content %}
+{% if messages %}
+{% include 'weather_app/messages.html' %}
+{% elif location and weather %}
+<!-- Weather dashboard widgets -->
 <div class="card-columns">
-
     {% include 'weather_app/widgets/current_summary.html' %}
-    
     {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
-    
     {% include 'weather_app/widgets/current_weather_details.html' %}
-    
     {% include 'weather_app/widgets/current_air_pollution.html' %}
-
     {% include 'weather_app/widgets/weather_alerts.html' %}
-
     {% include 'weather_app/widgets/forecast_48h_summary.html' %}
-
     {% include 'weather_app/widgets/forecast_7d_summary.html' %}
-    
 </div>
+{% else %}
+<h1>Detailed 7 days weather forecast</h1>
+{# TODO Homepage #}
+{% endif %}
 {% endblock content %}

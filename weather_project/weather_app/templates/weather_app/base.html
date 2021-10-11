@@ -1,70 +1,46 @@
-{% load sass_tags %}
-
+{% load sass_tags %} {# django-sass-processor #}
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Weather Board</title>
-
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
         integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous">
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
-
     <!-- Custom styles -->
-    <link href="{% sass_src 'main.scss' %}" rel="stylesheet" type="text/css" />
+    <link href="{% sass_src 'main.scss' %}" rel="stylesheet" type="text/css"/>
 </head>
-
-<body class="layout-navbar-fixed layout-top-nav">
+<body class="{# layout-navbar-fixed #} layout-top-nav">
     <div class="wrapper">
-
         {% include 'weather_app/navbar.html' %}
-
-        <!-- Content Wrapper. Contains page content -->
+        <!-- AdminLTE Content Wrapper. Contains page content -->
         <div class="content-wrapper">
-
-            <!-- Main content -->
+            <!-- AdminLTE Main content -->
             <div class="content">
                 <div class="container" style="padding-top: 1rem; padding-left: 0rem; padding-right: 0rem;">
                     {% block content %}{% endblock content %}
                 </div>
             </div>
-            <!-- /.content -->
         </div>
-        <!-- /.content-wrapper -->
-
         {% include 'weather_app/footer.html' %}
-
     </div>
-    <!-- ./wrapper -->
-
-    <!-- REQUIRED SCRIPTS -->
-
     <!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
     <!-- Bootstrap 4 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
         crossorigin="anonymous"></script>
-
-    <!-- AdminLTE App -->
+    <!-- AdminLTE -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1.0/dist/js/adminlte.min.js"
         integrity="sha256-dVs7YxkIJMdWKIx+E4Z7KGIrsH2P7MHj4WDNvzTzsQU=" crossorigin="anonymous"></script>
-
 </body>
-
 </html>

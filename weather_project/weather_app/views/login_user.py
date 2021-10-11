@@ -31,7 +31,7 @@ def login_user(request):
     except Exception as err:
         messages.error(
             request, {
-                'headline': 'Internal error',
+                'header': 'Internal error',
                 'description': 'Log-in failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [

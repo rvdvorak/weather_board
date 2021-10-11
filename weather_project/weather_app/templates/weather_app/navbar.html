@@ -1,25 +1,26 @@
-{% load static %}
 
+<!-- Navbar -->
+{% load static %}
 <nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
+        <!-- Brand -->
         <a href="{% url 'dashboard' %}" class="navbar-brand">
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
         </a>
-
+        <!-- Expand/collapse button -->
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        <!-- Collapsible items -->
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-
             <!-- Search form -->
-            <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'search_location' %}" method="GET"
+            <form class="form-inline ml-0 ml-lg-3 mr-0 mr-lg-3" action="{% url 'dashboard' %}" method="GET"
                 autocomplete="off">
                 <div class="input-group input-group-sm">
                     <input name="search_text" class="form-control form-control-navbar" type="search"
-                        placeholder="Search location" aria-label="Search location">
+                        placeholder="Search location" aria-label="Search location" required>
                     <div class="input-group-append">
                         <button class="btn btn-navbar" type="submit">
                             <i class="fas fa-search"></i>
@@ -27,10 +28,8 @@
                     </div>
                 </div>
             </form>
-
-            <!-- Right navbar links -->
+            <!-- Main menu -->
             <ul class="navbar-nav">
-
                 {% if user.is_authenticated %}
                 <!-- Favorites -->
                 <li class="nav-item dropdown">
@@ -40,33 +39,35 @@
                         Favorites
                     </a>
                     <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
-                        
                         {% if location %}
-                        {% if not location.is_favorite %}
+                        {% if location.is_favorite %}
                         <li class="dropdown-item">
-                            <a href="{% url 'update_location' %}?id={{location.id}}&is_favorite=True"
-                                class="btn btn-block btn-secondary btn-sm">
-                                <i class="fas fa-plus"></i>
-                                Add favorite
-                            </a>
+                            <!-- Remove favorite -->
+                            <div>
+                                <a href="{% url 'dashboard' %}?update_location={{location.id}}&is_favorite=no"
+                                    class="btn btn-block btn-secondary btn-sm">
+                                    <i class="fas fa-times"></i>
+                                    Remove current location
+                                </a>
+                            </div>
                         </li>
                         {% else %}
                         <li class="dropdown-item">
-                            <a href="{% url 'update_location' %}?id={{location.id}}&is_favorite=False"
+                            <!-- Add favorite -->
+                            <a href="{% url 'dashboard' %}?update_location={{location.id}}&is_favorite=yes"
                                 class="btn btn-block btn-secondary btn-sm">
-                                <i class="fas fa-times"></i>
-                                Remove favorite
+                                <i class="fas fa-plus"></i>
+                                Add current location
                             </a>
                         </li>
                         {% endif %}
                         {% endif %}
-
                         {% if favorite_locations %}
                         {% for location in favorite_locations %}
-                        <a href="{% url 'dashboard' %}?id={{location.id}}">
+                        <a href="{% url 'dashboard' %}?location_id={{location.id}}">
                             <li class="dropdown-item">
                                 <i class="fas fa-map-marker-alt"></i>
-                                {{ location.label }}
+                                {{ location.label|truncatechars:28 }}
                             </li>
                         </a>
                         {% endfor %}
@@ -77,7 +78,6 @@
                         {% endif %}
                     </ul>
                 </li>
-
                 <!-- History -->
                 <li class="nav-item dropdown">
                     <a id="history" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -87,21 +87,11 @@
                     </a>
                     <ul aria-labelledby="history" class="dropdown-menu border-0 shadow">
                         {% if location_history %}
-                        <h6 style="text-align: center;">
-                            Favorites not listed
-                        </h6>
-                        <li class="dropdown-item">
-                            <a href="#"
-                                class="btn btn-block btn-secondary btn-sm">
-                                <i class="fas fa-trash"></i>
-                                Clear history {# TODO Clear history#}
-                            </a>
-                        </li>
                         {% for location in location_history %}
-                        <a href="{% url 'dashboard' %}?id={{location.id}}">
+                        <a href="{% url 'dashboard' %}?location_id={{location.id}}">
                             <li class="dropdown-item">
                                 <i class="fas fa-map-marker-alt"></i>
-                                {{ location.label }}
+                                {{ location.label|truncatechars:28 }}
                             </li>
                         </a>
                         {% endfor %}
@@ -113,17 +103,15 @@
                     </ul>
                 </li>
                 {% endif %}
-
                 <!-- Random location -->
                 <li class="nav-item">
-                    <a href="{% url 'random_location' %}" class="nav-link">
+                    <a href="{% url 'dashboard' %}?random_location=True" class="nav-link">
                         <i class="fas fa-random"></i>
                         Random location
                     </a>
                 </li>
-
-                <!-- User account menu -->
                 {% if user.is_authenticated %}
+                <!-- User account menu -->
                 <li class="nav-item dropdown">
                     <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -131,12 +119,14 @@
                         {{ user.username }}
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
+                        <!-- Log Out -->
                         <a href="{% url 'logout_user' %}">
                             <li class="dropdown-item">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Log Out
                             </li>
                         </a>
+                        <!-- User profile -->
                         <a href="#" class="dropdown-item">
                             <li>
                                 <i class="fas fa-address-card"></i>
@@ -146,6 +136,7 @@
                     </ul>
                 </li>
                 {% else %}
+                <!-- Sign in menu -->
                 <li class="nav-item dropdown">
                     <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -153,12 +144,14 @@
                         Sign in
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
+                        <!-- Log In -->
                         <a href="{% url 'login_user' %}">
                             <li class="dropdown-item">
                                 <i class="fas fa-sign-in-alt"></i>
                                 Log In
                             </li>
                         </a>
+                        <!-- Register -->
                         <a href="{% url 'register_user' %}">
                             <li class="dropdown-item">
                                 <i class="fas fa-user-plus"></i>
@@ -168,111 +161,7 @@
                     </ul>
                 </li>
                 {% endif %}
-
-
             </ul>
-
-
         </div>
-
-
-        {% comment %}
-        <!-- Right navbar links -->
-        <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
-            <!-- Messages Dropdown Menu -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#" style="" aria-expanded="false">
-                    <i class="fas fa-comments"></i>
-                    <span class="badge badge-danger navbar-badge">3</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                            <img src="../../dist/img/user1-128x128.jpg" alt="User Avatar"
-                                class="img-size-50 mr-3 img-circle">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title">
-                                    Brad Diesel
-                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                </h3>
-                                <p class="text-sm">Call me whenever you can...</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                            <img src="../../dist/img/user8-128x128.jpg" alt="User Avatar"
-                                class="img-size-50 img-circle mr-3">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title">
-                                    John Pierce
-                                    <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                                </h3>
-                                <p class="text-sm">I got your message bro</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                            <img src="../../dist/img/user3-128x128.jpg" alt="User Avatar"
-                                class="img-size-50 img-circle mr-3">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title">
-                                    Nora Silvester
-                                    <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                                </h3>
-                                <p class="text-sm">The subject goes here</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                </div>
-            </li>
-            <!-- Notifications Dropdown Menu -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#" style="" aria-expanded="false">
-                    <i class="far fa-bell"></i>
-                    <span class="badge badge-warning navbar-badge">15</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
-                    <span class="dropdown-header">15 Notifications</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-envelope mr-2"></i> 4 new messages
-                        <span class="float-right text-muted text-sm">3 mins</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-users mr-2"></i> 8 friend requests
-                        <span class="float-right text-muted text-sm">12 hours</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-file mr-2"></i> 3 new reports
-                        <span class="float-right text-muted text-sm">2 days</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button" style="">
-                    <i class="fas fa-th-large"></i>
-                </a>
-            </li>
-        </ul>
-        {% endcomment %}
     </div>
 </nav>
