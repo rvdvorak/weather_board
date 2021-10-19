@@ -43,7 +43,7 @@
                 {% endif %}
                 {% if message.message.show_search_form %}
                 <!-- Search form -->
-                    <form action="{% url 'dashboard' %}" method="GET" autocomplete="off">
+                    <form action="{% url 'dashboard' %}" method="GET">
                         <div class="input-group input-group-sm">
                             <input name="search_text" class="form-control" type="search"
                                 placeholder="Search location" aria-label="Search location" required>

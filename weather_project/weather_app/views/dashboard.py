@@ -13,6 +13,8 @@ import pprint
 import pytz
 import random
 
+# FIX Sunrise not available
+
 
 def dashboard(request):
     def show_random_location(request):
@@ -37,8 +39,8 @@ def dashboard(request):
                     'longitude': longitude,
                     'label': label})
                 uri = f'{base_url}?{params}'
-                return redirect(uri) # SUCCESS
-            else: # FAIL
+                return redirect(uri)  # SUCCESS
+            else:  # FAIL
                 messages.error(request, {
                     'header': 'Location service error',
                     'description': 'Request for location data failed.',
@@ -48,6 +50,7 @@ def dashboard(request):
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
                         f'HTTP status: {response.status_code}']})
+                return render(request, 'weather_app/dashboard.html')
         except Timeout as err:
             messages.warning(
                 request, {
@@ -60,6 +63,7 @@ def dashboard(request):
                         f'API endpoint: {url}',
                         f'Parameters: {pprint.pformat(params)}',
                         f'Exception: {err}']})
+            return render(request, 'weather_app/dashboard.html')
         except Exception as err:
             messages.error(request, {
                 'header': 'Internal error',
@@ -70,11 +74,7 @@ def dashboard(request):
                     f'API endpoint: {url}',
                     f'Parameters: {pprint.pformat(params)}',
                     f'Exception: {pprint.pformat(err)}']})
-        return render(
-            request,
-            'weather_app/dashboard.html', {
-                'location_history': get_location_history(request),
-                'favorite_locations': get_favorite_locations(request)})
+            return render(request, 'weather_app/dashboard.html')
 
     def search_location(request):
         def get_search_results(search_text):
@@ -88,8 +88,8 @@ def dashboard(request):
                 response = requests.get(url, params=params, timeout=5)
                 if response.status_code == 200:
                     search_results = response.json()['features']
-                    return search_results # SUCCESS
-                else: # FAIL
+                    return search_results  # SUCCESS
+                else:  # FAIL
                     messages.error(request, {
                         'header': 'Location service error',
                         'description': 'Request for location data failed.',
@@ -117,6 +117,8 @@ def dashboard(request):
         try:
             search_text = request.GET.get('search_text')
             search_results = get_search_results(search_text)
+            if not search_results:
+                return render(request, 'weather_app/dashboard.html')
             if len(search_results) == 0:
                 messages.warning(
                     request, {
@@ -124,6 +126,7 @@ def dashboard(request):
                         'description': 'You probably entered the name of the location incorrectly. Please try it again.',
                         'icon': 'bi bi-geo-alt-fill',
                         'show_search_form': True})
+                return render(request, 'weather_app/dashboard.html')
             elif len(search_results) == 1:
                 location = search_results[0]
                 base_url = reverse('dashboard')
@@ -132,8 +135,8 @@ def dashboard(request):
                     'longitude': location['geometry']['coordinates'][0],
                     'label': location['properties']['label']})
                 uri = f'{base_url}?{params}'
-                return redirect(uri) # SUCCESS => rerdirect to Dashboard
-            elif len(search_results) > 1: # SUCCESS => show search results
+                return redirect(uri)  # SUCCESS => rerdirect to Dashboard
+            elif len(search_results) > 1:  # SUCCESS => show search results
                 if len(search_results) == 20:
                     description = 'Showing only first 20 matching locations:'
                 else:
@@ -145,6 +148,7 @@ def dashboard(request):
                         'icon': 'bi bi-geo-alt-fill',
                         'search_results': search_results,
                         'show_search_form': True})
+                return render(request, 'weather_app/dashboard.html')
         except Exception as err:
             messages.error(request, {
                 'header': 'Internal error',
@@ -153,33 +157,14 @@ def dashboard(request):
                 'admin_details': [
                     'Method: search_location(request)',
                     f'Exception: {pprint.pformat(err)}']})
-        return render(
-            request,
-            'weather_app/dashboard.html', {
-                'location_history': get_location_history(request),
-                'favorite_locations': get_favorite_locations(request)})
+            return render(request, 'weather_app/dashboard.html')
 
     def get_location(request):
         try:
-            location_id = request.GET.get('location_id')
             latitude = request.GET.get('latitude')
             longitude = request.GET.get('longitude')
             label = request.GET.get('label')
-            if location_id and request.user.is_authenticated:
-                match = Location.objects.filter(
-                    user=request.user,
-                    id=location_id)
-                if len(match) != 0:
-                    return match[0]
-                else:
-                    messages.warning(
-                        request, {
-                            'header': 'Location record not found',
-                            'description': 'Try to search the location by its name.',
-                            'icon': 'bi bi-geo-alt-fill',
-                            'show_search_form': True})
-                    return None
-            elif latitude and longitude and label:
+            if latitude and longitude and label:
                 location = Location(
                     latitude=latitude,
                     longitude=longitude,
@@ -228,7 +213,6 @@ def dashboard(request):
             return None
 
     def get_location_history(request):
-        # Docs: https://docs.djangoproject.com/en/3.2/topics/db/queries
         try:
             location_history = Location.objects.filter(
                 user=request.user).order_by('-date_last_showed')
@@ -245,7 +229,6 @@ def dashboard(request):
             return None
 
     def get_favorite_locations(request):
-        # Docs: https://docs.djangoproject.com/en/3.2/topics/db/queries
         try:
             favorite_locations = Location.objects.filter(
                 user=request.user,
@@ -362,7 +345,7 @@ def dashboard(request):
             return None
 
     def convert_UTC_timestamps_to_local_datetimes(weather):
-        # TODO REFACTOR convert_UTC_timestamps_to_local_datetimes(weather)
+        # TODO Refactor
         try:
             timezone = pytz.timezone(weather['timezone'])
             utc_offset = weather['timezone_offset']
@@ -457,69 +440,77 @@ def dashboard(request):
             return
 
     def update_location(request):
-        location = Location.objects.filter(
-            user=request.user,
-            id=int(request.GET.get('update_location')))[0]
-        if request.GET.get('is_favorite') == 'yes':
-            location.is_favorite = True
-        elif request.GET.get('is_favorite') == 'no':
-            location.is_favorite = False
-        location.save()
-        base_url = reverse('dashboard')
-        params = urlencode({
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-            'label': location.label})
-        uri = f'{base_url}?{params}'
-        return redirect(uri)
+        try:
+            location = Location.objects.filter(
+                user=request.user,
+                id=int(request.GET.get('update_location')))[0]
+            if request.GET.get('is_favorite') == 'yes':
+                location.is_favorite = True
+            elif request.GET.get('is_favorite') == 'no':
+                location.is_favorite = False
+            location.save()
+            base_url = reverse('dashboard')
+            params = urlencode({
+                'latitude': location.latitude,
+                'longitude': location.longitude,
+                'label': location.label})
+            uri = f'{base_url}?{params}'
+            return redirect(uri)
+        except Exception as err:
+            messages.error(
+                request, {
+                    'header': 'Internal error',
+                    'description': 'Location update failed.',
+                    'icon': 'fas fa-times-circle',
+                    'admin_details': [
+                        'Method: update_location(request)',
+                        f'Exception: {pprint.pformat(err)}']})
+            return render(request, 'weather_app/dashboard.html')
 
     try:
         if request.GET.get('update_location'):
             return(update_location(request))
         if request.GET.get('random_location'):
             return(show_random_location(request))
-        if request.user.is_authenticated:
-            location_history = get_location_history(request)
-            favorite_locations = get_favorite_locations(request)
-        else:
-            location_history = None
-            favorite_locations = None
         if request.GET.get('search_text'):
             return(search_location(request))
         location_id = request.GET.get('location_id')
         latitude = request.GET.get('latitude')
         longitude = request.GET.get('longitude')
         label = request.GET.get('label')
-        location = None
-        weather = None
         if location_id or (latitude and longitude and label):
             location = get_location(request)
             if location:
                 weather = get_weather(location)
-                if weather:
-                    air_pollution = get_air_pollution(location)
-                    if air_pollution:
-                        weather['air_pollution'] = air_pollution
-                        weather = convert_UTC_timestamps_to_local_datetimes(
-                            weather)
-                        if weather:
-                            charts = get_charts(weather)
-                            if charts:
-                                weather['charts'] = charts
-                                if request.user.is_authenticated:
-                                    save_location(location)
+                air_pollution = get_air_pollution(location)
+                if weather and air_pollution:
+                    weather['air_pollution'] = air_pollution
+                    weather = convert_UTC_timestamps_to_local_datetimes(
+                        weather)
+                    weather['charts'] = get_charts(weather)
+                    if request.user.is_authenticated:
+                        save_location(location)
+        else:
+            location = None
+            weather = None
+        if request.user.is_authenticated:
+            location_history = get_location_history(request)
+            favorite_locations = get_favorite_locations(request)
+        else:
+            location_history = None
+            favorite_locations = None
         return render(
             request,
             'weather_app/dashboard.html', {
-                'weather': weather,
                 'location': location,
+                'weather': weather,
                 'location_history': location_history,
                 'favorite_locations': favorite_locations})
     except Exception as err:
         messages.error(
             request, {
                 'header': 'Internal error',
-                'description': 'Processing dashboard data failed.',
+                'description': 'Dashboard processing failed.',
                 'icon': 'fas fa-times-circle',
                 'admin_details': [
                     'Method: dashboard(request)',

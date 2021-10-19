@@ -1,19 +1,56 @@
+<!-- Register -->
 {% extends 'weather_app/base.html' %}
-
 {% block content %}
-
-<h1>Register new user</h1>
-<h2>{{ error }}</h2>
-<form method="POST" action="{% url 'register_user' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign Up</button>
-</form>
-<p></p>
-<h5>
-    <a href="{% url 'login_user' %}">
-        Login as an existing user
-    </a>
-</h5>
-
+<div class="row justify-content-sm-center">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card card-lightblue shadow">
+            <div class="card-header">
+                <h3 class="card-title" style="margin: 0px; font-weight: bold;">
+                    <i class="fas fa-user-plus"></i>
+                    Register new user
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
+                    <div class="col-sm-9" style="text-align: center;">
+                        {% if alert %}
+                        <div class="alert bg-warning">
+                            <b>
+                                <i class="icon fas fa-exclamation-triangle"></i>
+                                {{ alert }}
+                            </b>
+                        </div>
+                        {% endif %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password1">Password</label>
+                                <input type="password" name="password1" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password2">Confirm password</label>
+                                <input type="password" name="password2" class="form-control" required>
+                            </div>
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <button type="submit" class="btn btn-secondary">Register</button>
+                        </form>
+                        <div class="mt-4">
+                            Already registered?
+                            <br>
+                            <a href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                                Login existing user
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

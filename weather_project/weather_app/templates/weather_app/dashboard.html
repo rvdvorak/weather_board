@@ -5,6 +5,8 @@
 {% elif location and weather %}
 <!-- Weather dashboard widgets -->
 <div class="card-columns">
+    {# TODO 48h Chart widgets #}
+    {# TODO 7d Chart widgets #}
     {% include 'weather_app/widgets/current_summary.html' %}
     {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
     {% include 'weather_app/widgets/current_weather_details.html' %}
