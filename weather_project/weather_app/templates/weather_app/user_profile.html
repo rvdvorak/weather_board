@@ -1,0 +1,153 @@
+<!-- User profile -->
+{% extends 'weather_app/base.html' %}
+{% block content %}
+<div class="row justify-content-sm-center">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card card-lightblue shadow">
+            <div class="card-header">
+                <h3 class="card-title" style="margin: 0px; font-weight: bold;">
+                    <i class="fas fa-address-card"></i>
+                    User profile options
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
+                    <div class="col-sm-9" style="text-align: center;">
+                        {% if alert %}
+                        <div class="alert bg-warning">
+                            <b>
+                                <i class="icon fas fa-exclamation-triangle"></i>
+                                {{ alert }}
+                            </b>
+                        </div>
+                        {% endif %}
+                        <!-- Change password -->
+                        <h3>
+                            Change my password
+                        </h3>
+                        <form method="POST" autocomplete="False" style="text-align: left;">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="username">
+                                    Username
+                                </label>
+                                <input type="text" name="username" value="{{ user.username }}" class="form-control"
+                                    readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">
+                                    Password
+                                </label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password1">
+                                    New password
+                                </label>
+                                <input type="password" name="new_password1" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password2">
+                                    Repeat new password
+                                </label>
+                                <input type="password" name="new_password2" class="form-control" required>
+                            </div>
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <button type="submit" class="btn btn-secondary mt-3">
+                                <i class="fas fa-key"></i>
+                                Set new password
+                            </button>
+                        </form>
+                        <hr>
+                        <!-- Clear history -->
+                        <h3 class="mt-5">
+                            Clear my history
+                        </h3>
+                        <form method="POST" autocomplete="False" style="text-align: left;">
+                            {% csrf_token %}
+                            <div class="custom-control custom-checkbox mt-3">
+                                <input class="custom-control-input" type="checkbox" id="clear_history" required
+                                    name="clear_history" value="True">
+                                <label for="clear_history" class="custom-control-label">
+                                    Clear my location history
+                                </label>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-3">
+                                <input class="custom-control-input" type="checkbox" id="preserve_favorites" checked
+                                    name="preserve_favorites" value="True">
+                                <label for="preserve_favorites" class="custom-control-label">
+                                    Preserve my favorites
+                                </label>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="username">
+                                    Username
+                                </label>
+                                <input type="text" name="username" value="{{ user.username }}" class="form-control"
+                                    readonly>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="password">
+                                    Password
+                                </label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <button type="submit" class="btn btn-warning mt-3">
+                                <i class="fas fa-history"></i>
+                                Clear my history
+                            </button>
+                        </form>
+                        <hr>
+                        <!-- Delete user account -->
+                        <h3 class="mt-5">
+                            Delete my account
+                        </h3>
+                        <form method="POST" autocomplete="False" style="text-align: left;">
+                            {% csrf_token %}
+                            <div class="custom-control custom-checkbox mt-3">
+                                <input class="custom-control-input" type="checkbox" id="delete_account" required
+                                    name="delete_account" value="True">
+                                <label for="delete_account" class="custom-control-label">
+                                    Completely delete my user account
+                                </label>
+                            </div>
+                            <div class="custom-control custom-checkbox mt-3">
+                                <input class="custom-control-input" type="checkbox" id="i_am_sure" required
+                                    name="i_am_sure" value="True">
+                                <label for="i_am_sure" class="custom-control-label">
+                                    Yes, I am sure!
+                                </label>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="username">
+                                    Username
+                                </label>
+                                <input type="text" name="username" value="{{ user.username }}" class="form-control"
+                                    readonly>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="password">
+                                    Password
+                                </label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <button type="submit" class="btn btn-danger mt-3">
+                                <i class="fas fa-user-alt-slash"></i>
+                                Delete my account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -128,10 +128,9 @@
                             </li>
                         </a>
                         <!-- User profile -->
-                        <a href="#" class="dropdown-item">
-                            <li>
+                        <a href="{% url 'user_profile' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                            <li class="dropdown-item">
                                 <i class="fas fa-address-card"></i>
-                                User profile {# TODO User profile page #}
                             </li>
                         </a>
                     </ul>
