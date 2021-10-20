@@ -5,14 +5,10 @@ from urllib.parse import urlencode
 from django.urls import reverse
 import pprint
 
-#TODO Styles
 
 def logout_user(request):
     try:
-        location = {
-            'latitude': '',
-            'longitude': '',
-            'label': ''}
+        location = {}
         latitude = request.GET.get('latitude')
         longitude = request.GET.get('longitude')
         label = request.GET.get('label')

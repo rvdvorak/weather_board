@@ -8,14 +8,10 @@ from django.urls import reverse
 
 import pprint
 
-#TODO Styles
 
 def register_user(request):
     try:
-        location = {
-            'latitude': '',
-            'longitude': '',
-            'label': ''}
+        location = {}
         if request.method == 'GET':
             latitude = request.GET.get('latitude')
             longitude = request.GET.get('longitude')

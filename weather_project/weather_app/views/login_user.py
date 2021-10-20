@@ -10,10 +10,7 @@ import pprint
 
 def login_user(request):
     try:
-        location = {
-            'latitude': '',
-            'longitude': '',
-            'label': ''}
+        location = {}
         if request.method == 'GET':
             latitude = request.GET.get('latitude')
             longitude = request.GET.get('longitude')

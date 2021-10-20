@@ -39,7 +39,7 @@
                         <i class="fas fa-heart"></i>
                         Favorites
                     </a>
-                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
+                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow" style="max-height: 320px; overflow-y: auto;">
                         {% if location %}
                         {% if location.is_favorite %}
                         <li class="dropdown-item">
@@ -84,9 +84,9 @@
                     <a id="history" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
                         <i class="fas fa-history"></i>
-                        History {# TODO History page instead of dropdown menu #}
+                        History
                     </a>
-                    <ul aria-labelledby="history" class="dropdown-menu border-0 shadow">
+                    <ul aria-labelledby="history" class="dropdown-menu border-0 shadow" style="max-height: 320px; overflow-y: auto;">
                         {% if location_history %}
                         {% for location in location_history %}
                         <a href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
