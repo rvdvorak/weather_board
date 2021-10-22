@@ -13,8 +13,7 @@ import pprint
 import pytz
 import random
 
-# FIX Sunrise not available
-
+# TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
 
 def dashboard(request):
     def show_random_location(request):
@@ -350,11 +349,12 @@ def dashboard(request):
             timezone = pytz.timezone(weather['timezone'])
             weather['current']['dt'] = datetime.fromtimestamp(
                 weather['current']['dt'], timezone)
-            pprint.pprint(weather['current']['dt']) #TODO Delete me
-            weather['current']['sunrise'] = datetime.fromtimestamp(
-                weather['current']['sunrise'], timezone)
-            weather['current']['sunset'] = datetime.fromtimestamp(
-                weather['current']['sunset'], timezone)
+            if 'sunrise' in weather['current']:
+                weather['current']['sunrise'] = datetime.fromtimestamp(
+                    weather['current']['sunrise'], timezone)
+            if 'sunset' in weather['current']:
+                weather['current']['sunset'] = datetime.fromtimestamp(
+                    weather['current']['sunset'], timezone)
             if 'minutely' in weather:
                 for minute in range(len(weather['minutely'])):
                     weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
