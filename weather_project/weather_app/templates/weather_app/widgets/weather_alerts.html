@@ -1,16 +1,11 @@
+<!-- Weather alerts widget -->
 {% extends 'weather_app/widget.html' %}
-
 {% block widget_style %}warning{% endblock %}
-
 {% block widget_header_icon %}
 <i class="fas fa-exclamation-triangle" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-
 {% block widget_header_text %}Local weather alerts{% endblock %}
-
 {% block widget_content %}
-
-
 {% if weather.alerts %}
 <table class="table table-hover">
     <tbody>
@@ -40,6 +35,4 @@
     No alert found for {{ location.label }}.
 </div>
 {% endif %}
-    
-
 {% endblock widget_content %}

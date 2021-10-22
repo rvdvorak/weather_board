@@ -117,20 +117,21 @@
                     <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
                         <i class="fas fa-user"></i>
-                        {{ user.username }}
+                        {{ user.username|title }}
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log Out -->
                         <a href="{% url 'logout_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-sign-out-alt"></i>
-                                Log Out
+                                Log out
                             </li>
                         </a>
                         <!-- User profile -->
                         <a href="{% url 'user_profile' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-address-card"></i>
+                                User profile
                             </li>
                         </a>
                     </ul>
@@ -148,7 +149,7 @@
                         <a href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-key"></i>
-                                Log In
+                                Log in
                             </li>
                         </a>
                         <!-- Register -->

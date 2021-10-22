@@ -1,0 +1,78 @@
+<!-- 48h temperature forecast widget -->
+{% extends 'weather_app/widget.html' %}
+{% block widget_style %}lightblue{% endblock %}
+{% block widget_header_icon %}
+<i class="fas fa-temperature-low" style="width: 1.5em; text-align: left"></i>
+{% endblock %}
+{% block widget_header_text %}48 h temperature{% endblock %}
+{% block widget_content %}
+{% if weather.charts.hourly.temp %}
+<div class="chart p-2">
+    <div class="chartjs-size-monitor">
+        <div class="chartjs-size-monitor-expand">
+            <div class=""></div>
+        </div>
+        <div class="chartjs-size-monitor-shrink">
+            <div class=""></div>
+        </div>
+    </div>
+    <canvas id="hourlyTemperatureChart"
+        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
+        height="500" class="chartjs-render-monitor">
+    </canvas>
+</div>
+<script>
+    {
+        const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
+        const ctx = document.getElementById('hourlyTemperatureChart').getContext('2d');
+        const hourlyTemperatureChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: hourly.timeline,
+                datasets: [{
+                    label: 'Temperature feels like [°C]',
+                    data: hourly.feels_like,
+                    cubicInterpolationMode: 'default',
+                    backgroundColor: ['rgba(0, 0, 0, 0)'],
+                    borderColor: ['rgba(255, 0, 0, 1)'],
+                    fill: false,
+                    borderWidth: 2
+                }, {
+                    label: 'Dew point [°C]',
+                    data: hourly.dew_point,
+                    cubicInterpolationMode: 'default',
+                    backgroundColor: ['rgba(0, 0, 0, 0)'],
+                    borderColor: ['rgba(0, 0, 255, 1)'],
+                    fill: false,
+                    borderWidth: 2
+                }, {
+                    label: 'Temperature [°C]',
+                    data: hourly.temp,
+                    cubicInterpolationMode: 'default',
+                    backgroundColor: ['rgba(255, 190, 0, 0.5)'],
+                    borderColor: ['rgba(255, 190, 0, 1)'],
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                radius: 1.5,
+                pointBackground: '#f00',
+                scales: {
+                    x: {
+                        display: true
+                    },
+                    y: {
+                        type: 'linear',
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% else %}
+<div style="padding: 1em; text-align: center;">
+    Currently not available for {{ location.label }}.
+</div>
+{% endif %}
+{% endblock widget_content %}

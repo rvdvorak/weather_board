@@ -5,6 +5,9 @@
 {% include 'weather_app/messages.html' %}
 {% elif location and weather %}
 <!-- Weather dashboard widgets -->
+{{ weather.charts|json_script:"charts" }}
+{% load tz %}
+{% timezone weather.timezone %}
 <div class="card-columns">
     {# TODO 48h Chart widgets #}
     {# TODO 7d Chart widgets #}
@@ -14,8 +17,17 @@
     {% include 'weather_app/widgets/current_air_pollution.html' %}
     {% include 'weather_app/widgets/weather_alerts.html' %}
     {% include 'weather_app/widgets/forecast_48h_summary.html' %}
+    {% include 'weather_app/widgets/forecast_48h_precipitation.html' %}
+    {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
+    {% include 'weather_app/widgets/forecast_48h_clouds.html' %}
+    {% include 'weather_app/widgets/forecast_48h_humidity.html' %}
+    {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
+    {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
+    {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
+    {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
     {% include 'weather_app/widgets/forecast_7d_summary.html' %}
 </div>
+{% endtimezone %}
 {% else %}
 <!-- Homepage -->
 <div>

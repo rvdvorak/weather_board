@@ -1,12 +1,12 @@
-<!-- 1h precipitation forecast widget -->
+<!-- 48h cloudiness forecast widget -->
 {% extends 'weather_app/widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-cloud" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}1 h precipitation volume{% endblock %}
+{% block widget_header_text %}48 h cloudiness{% endblock %}
 {% block widget_content %}
-{% if weather.charts.minutely.precipitation %}
+{% if weather.charts.hourly.temp %}
 <div class="chart p-2">
     <div class="chartjs-size-monitor">
         <div class="chartjs-size-monitor-expand">
@@ -16,25 +16,25 @@
             <div class=""></div>
         </div>
     </div>
-    <canvas id="minutelyPrecipitationChart"
+    <canvas id="hourlyCloudsChart"
         style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
         height="500" class="chartjs-render-monitor">
     </canvas>
 </div>
 <script>
     {
-        const minutely = JSON.parse(document.getElementById('charts').textContent).minutely;
-        const ctx = document.getElementById('minutelyPrecipitationChart').getContext('2d');
-        const minutelyPrecipitationChart = new Chart(ctx, {
+        const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
+        const ctx = document.getElementById('hourlyCloudsChart').getContext('2d');
+        const hourlyCloudsChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: minutely.timeline,
+                labels: hourly.timeline,
                 datasets: [{
-                    label: 'Precipitation volume [mm/h]',
-                    data: minutely.precipitation,
+                    label: 'Cloudiness [%]',
+                    data: hourly.clouds,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 0, 255, 0.5)'],
-                    borderColor: ['rgba(0, 0, 255, 1)'],
+                    backgroundColor: ['rgba(127, 127, 127, 0.5)'],
+                    borderColor: ['rgba(127, 127, 127, 1)'],
                     fill: true,
                     borderWidth: 2
                 }]
@@ -47,8 +47,8 @@
                         display: true
                     },
                     y: {
-                        type: 'logarithmic',
-                        min: 0.1,
+                        type: 'linear',
+                        min: 0,
                         max: 100
                     }
                 }

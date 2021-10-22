@@ -1,22 +1,17 @@
+<!-- 48h summary forecast widget -->
 {% extends 'weather_app/widget.html' %}
-
 {% block widget_style %}lightblue{% endblock %}
-
 {% block widget_header_icon %}
 <i class="fas fa-forward" style="width: 1.5em;"></i>
 {% endblock %}
-
 {% block widget_header_text %}48 h summary forecast{% endblock %}
-
 {% block widget_content %}
-
 <table class="table table-sm table-hover;">
     <tbody>
         {% for hour in weather.hourly %}
-        
         {% if forloop.counter == 1 or hour.dt|date:"H:i" == '00:00' or hour.dt|date:"H:i" == '00:30' %}
         <tr>
-            <td colspan="4" style="text-align: center; vertical-align: middle;" >
+            <td colspan="4" style="text-align: center; vertical-align: middle;">
                 <i class="far fa-calendar-alt"></i>
                 <b>
                     {{ hour.dt|date:"D, j. M Y" }}
@@ -24,19 +19,16 @@
             </td>
         </tr>
         {% endif %}
-            
         <tr style="background-color: #3c8dbc54;">
-            <td style="text-align: left; vertical-align: middle;" >
+            <td style="text-align: left; vertical-align: middle;">
                 <i class="fas fa-clock"></i>
                 {{ hour.dt|date:"H:i" }}
             </td>
             <td style="text-align: right; vertical-align: middle;">
                 {{ hour.temp|floatformat:0 }} °C
             </td>
-            <td style="text-align: right; vertical-align: middle;" >
-                {% comment %}
-                Convert precipitation probability to percents (multiply by 100)
-                {% endcomment %}
+            <td style="text-align: right; vertical-align: middle;">
+                {# Convert precipitation probability to percents (multiply by 100) #}
                 {% widthratio hour.pop 1 100 %} %
                 <i class="fas fa-cloud-showers-heavy"></i>
             </td>
@@ -48,5 +40,4 @@
         {% endfor %}
     </tbody>
 </table>
-
 {% endblock widget_content %}

@@ -344,40 +344,40 @@ def dashboard(request):
                         f'Exception: {pprint.pformat(err)}']})
             return None
 
-    def convert_UTC_timestamps_to_local_datetimes(weather):
+    def convert_timestamps_to_datetimes(weather):
         # TODO Refactor
         try:
             timezone = pytz.timezone(weather['timezone'])
-            utc_offset = weather['timezone_offset']
             weather['current']['dt'] = datetime.fromtimestamp(
-                weather['current']['dt'] + utc_offset, timezone)
+                weather['current']['dt'], timezone)
+            pprint.pprint(weather['current']['dt']) #TODO Delete me
             weather['current']['sunrise'] = datetime.fromtimestamp(
-                weather['current']['sunrise'] + utc_offset, timezone)
+                weather['current']['sunrise'], timezone)
             weather['current']['sunset'] = datetime.fromtimestamp(
-                weather['current']['sunset'] + utc_offset, timezone)
+                weather['current']['sunset'], timezone)
             if 'minutely' in weather:
                 for minute in range(len(weather['minutely'])):
                     weather['minutely'][minute]['dt'] = datetime.fromtimestamp(
-                        weather['minutely'][minute]['dt'] + utc_offset, timezone)
+                        weather['minutely'][minute]['dt'], timezone)
             for hour in range(len(weather['hourly'])):
                 weather['hourly'][hour]['dt'] = datetime.fromtimestamp(
-                    weather['hourly'][hour]['dt'] + utc_offset, timezone)
+                    weather['hourly'][hour]['dt'], timezone)
             for day in range(len(weather['daily'])):
                 weather['daily'][day]['dt'] = datetime.fromtimestamp(
-                    weather['daily'][day]['dt'] + utc_offset, timezone)
+                    weather['daily'][day]['dt'], timezone)
                 weather['daily'][day]['sunrise'] = datetime.fromtimestamp(
-                    weather['daily'][day]['sunrise'] + utc_offset, timezone)
+                    weather['daily'][day]['sunrise'], timezone)
                 weather['daily'][day]['sunset'] = datetime.fromtimestamp(
-                    weather['daily'][day]['sunset'] + utc_offset, timezone)
+                    weather['daily'][day]['sunset'], timezone)
             if 'alerts' in weather:
                 for alert in range(len(weather['alerts'])):
                     weather['alerts'][alert]['start'] = datetime.fromtimestamp(
-                        weather['alerts'][alert]['start'] + utc_offset, timezone)
+                        weather['alerts'][alert]['start'], timezone)
                     weather['alerts'][alert]['end'] = datetime.fromtimestamp(
-                        weather['alerts'][alert]['end'] + utc_offset, timezone)
+                        weather['alerts'][alert]['end'], timezone)
             for hour in range(len(weather['air_pollution'])):
                 weather['air_pollution'][hour]['dt'] = datetime.fromtimestamp(
-                    weather['air_pollution'][hour]['dt'] + utc_offset, timezone)
+                    weather['air_pollution'][hour]['dt'], timezone)
             return weather
         except Exception as err:
             messages.error(
@@ -386,22 +386,63 @@ def dashboard(request):
                     'description': 'Date/time processing failed.',
                     'icon': 'fas fa-times-circle',
                     'admin_details': [
-                        'Method: convert_UTC_timestamps_to_local_datetimes(weather)',
+                        'Method: convert_timestamps_to_datetimes(weather)',
                         f'Exception: {pprint.pformat(err)}']})
             return None
 
     def get_charts(weather):
         try:
-            charts = {}
+            charts = {
+                'minutely': {
+                    'timeline': [],
+                    'precipitation': []},
+                'hourly': {
+                    'timeline': [],
+                    'pop': [],
+                    'temp': [],
+                    'feels_like': [],
+                    'dew_point': [],
+                    'clouds': [],
+                    'humidity': [],
+                    'pressure': [],
+                    'wind_speed': [],
+                    'wind_gust': [],
+                    'uvi': [],
+                    'visibility': []},
+                'daily': {
+                    'timeline': []}}
             if 'minutely' in weather:
-                time = []
-                volume = []
                 for minute in weather['minutely']:
-                    time.append(minute['dt'].strftime("%H:%M"))
-                    volume.append(round(minute['precipitation'], 2))
-                charts['minutely_precipitation'] = {
-                    'time': time,
-                    'volume': volume}
+                    charts['minutely']['timeline'].append(
+                        minute['dt'].strftime("%H:%M"))
+                    charts['minutely']['precipitation'].append(
+                        round(minute['precipitation'], 2))
+            if 'hourly' in weather:
+                for hour in weather['hourly']:
+                    charts['hourly']['timeline'].append(
+                        hour['dt'].strftime("%a %H:%M"))
+                    charts['hourly']['pop'].append(
+                        hour['pop']*100)
+                    charts['hourly']['temp'].append(
+                        round(hour['temp'], 1))
+                    charts['hourly']['feels_like'].append(
+                        round(hour['feels_like'], 1))
+                    charts['hourly']['dew_point'].append(
+                        round(hour['dew_point'], 1))
+                    charts['hourly']['clouds'].append(
+                        hour['clouds'])
+                    charts['hourly']['humidity'].append(
+                        hour['humidity'])
+                    charts['hourly']['pressure'].append(
+                        hour['pressure'])
+                    charts['hourly']['wind_speed'].append(
+                        hour['wind_speed'])
+                    charts['hourly']['wind_gust'].append(
+                        hour['wind_gust'])
+                    charts['hourly']['uvi'].append(
+                        hour['uvi'])
+                    charts['hourly']['visibility'].append(
+                        hour['visibility'])
             return charts
         except Exception as err:
             messages.error(
@@ -485,7 +526,7 @@ def dashboard(request):
                 air_pollution = get_air_pollution(location)
                 if weather and air_pollution:
                     weather['air_pollution'] = air_pollution
-                    weather = convert_UTC_timestamps_to_local_datetimes(
+                    weather = convert_timestamps_to_datetimes(
                         weather)
                     weather['charts'] = get_charts(weather)
                     if request.user.is_authenticated:
