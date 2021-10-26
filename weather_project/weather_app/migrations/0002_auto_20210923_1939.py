@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='location',
             name='label',
-            field=models.CharField(max_length=100, validators=[weather_app.models.validate_label]),
+            field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
             model_name='location',

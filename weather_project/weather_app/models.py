@@ -17,15 +17,9 @@ def validate_longitude(longitude):
             code='invalid',
             params={'longitude': longitude})
 
-def validate_label(label):
-    if label == '' or label == 'None':
-        raise ValidationError(
-            'Missing location label.',
-            code='missing',
-            params={'label': label})
 
 class Location(models.Model):
-    label = models.CharField(max_length=100, validators=[validate_label])
+    label = models.CharField(max_length=100)
     latitude = models.FloatField(validators=[validate_latitude])
     longitude = models.FloatField(validators=[validate_longitude])
     is_favorite = models.BooleanField(default=False)
