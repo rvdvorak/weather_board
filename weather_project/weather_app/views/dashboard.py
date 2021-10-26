@@ -481,6 +481,7 @@ def dashboard(request):
             return
 
     def update_location(request):
+        # TODO Transform to POST
         try:
             location = Location.objects.filter(
                 user=request.user,

@@ -25,9 +25,7 @@
                 {{ day.temp.max|floatformat:0 }} °C
             </td>
             <td rowspan="2" style="text-align: right; vertical-align: middle;">
-                {% comment %}
-                Convert precipitation probability to percents (multiply by 100)
-                {% endcomment %}
+                {# Convert precipitation probability to percents (multiply by 100) #}
                 {% widthratio day.pop 1 100 %} %
                 <i class="fas fa-cloud-showers-heavy"></i>
             </td>

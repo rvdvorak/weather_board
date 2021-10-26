@@ -1,0 +1,26 @@
+<!-- No location selected -->
+{% load static %}
+<div>
+    <h2 style="font-weight: 400; text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+        Detailed 7&nbsp;days weather forecast
+    </h2>
+    <div class="row justify-content-sm-center">
+        <div class="col-sm-9 col-md-7 col-lg-5 col-xl-4">
+            <!-- Search form -->
+            <form action="{% url 'dashboard' %}" method="GET">
+                <div class="input-group input-group-md">
+                    <input name="search_text" class="form-control" type="search" placeholder="Search location"
+                        aria-label="Search location" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-block btn-secondary btn-md" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <img src="{% static 'earth.svg' %}" alt="Image of the planet Earth"
+                style="margin-left: 3rem; margin-right: 3rem; margin-top: 2rem; aspect-ratio: 1;">
+            <br>
+        </div>
+    </div>
+</div>

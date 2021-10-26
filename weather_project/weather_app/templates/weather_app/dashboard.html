@@ -1,22 +1,22 @@
 {% extends 'weather_app/base.html' %}
-{% load static %}
+{% comment %}
+TODO toasts:
+-Login
+-Logout
+-Register
+-Delete locations
+-Delete account
+{% endcomment %}
 {% block content %}
 {% if messages %}
-{% comment %}
-TODO Dissmissable modal success message:
-    -Login
-    -Logout
-    -Register
-    -Delete locations
-    -Delete account
-{% endcomment %}
 {% include 'weather_app/messages.html' %}
-{% elif location and weather %}
+{% endif %}
+{% if location and weather %}
 <!-- Weather dashboard widgets -->
-{{ weather.charts|json_script:"charts" }}
-{% load tz %}
-{% timezone weather.timezone %}
 <div class="card-columns">
+    {% load tz %}
+    {% timezone weather.timezone %}
+    {{ weather.charts|json_script:"charts" }}
     {# TODO Air pollution forecast widgets #}
     {# TODO 7d Chart widgets #}
     {# TODO Wind direction #}
@@ -35,33 +35,9 @@ TODO Dissmissable modal success message:
     {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
     {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
     {% include 'weather_app/widgets/forecast_7d_summary.html' %}
+    {% endtimezone %}
 </div>
-{% endtimezone %}
 {% else %}
-<!-- Homepage -->
-<div>
-    <h2 style="font-weight: 400; text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
-        Detailed 7&nbsp;days weather forecast
-    </h2>
-    <div class="row justify-content-sm-center">
-        <div class="col-sm-9 col-md-7 col-lg-5 col-xl-4">
-            <!-- Search form -->
-            <form action="{% url 'dashboard' %}" method="GET">
-                <div class="input-group input-group-md">
-                    <input name="search_text" class="form-control" type="search" placeholder="Search location"
-                        aria-label="Search location" required>
-                    <div class="input-group-append">
-                        <button class="btn btn-block btn-secondary btn-md" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <img src="{% static 'earth.svg' %}" alt="Image of the planet Earth"
-                style="margin-left: 3rem; margin-right: 3rem; margin-top: 2rem; aspect-ratio: 1;">
-            <br>
-        </div>
-    </div>
-</div>
+{% include 'weather_app/no_location.html' %}
 {% endif %}
 {% endblock content %}

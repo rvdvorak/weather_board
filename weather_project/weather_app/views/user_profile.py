@@ -10,8 +10,8 @@ import pprint
 
 
 def user_profile(request):
-    def get_location(request):
-        location = {}
+    def get_location_query(request):
+        # TODO Move to utils.py
         if request.method == 'GET':
             latitude = request.GET.get('latitude')
             longitude = request.GET.get('longitude')
@@ -21,12 +21,15 @@ def user_profile(request):
             longitude = request.POST.get('longitude')
             label = request.POST.get('label')
         if latitude and longitude and label:
-            location['latitude'] = latitude
-            location['longitude'] = longitude
-            location['label'] = label
-        return location
+            return {
+                'latitude': latitude,
+                'longitude': longitude,
+                'label': label}
+        else:
+            return {}
 
-    def go_to_dashboard(location):
+    def redirect_to_dashboard(location):
+        # TODO Move to utils.py
         base_url = reverse('dashboard')
         params = urlencode(location)
         uri = f'{base_url}?{params}'
@@ -37,7 +40,7 @@ def user_profile(request):
             return render(
                 request,
                 'weather_app/user_profile.html', {
-                    'location': get_location(request)})
+                    'location': get_location_query(request)})
         elif request.method == 'POST':
             user = authenticate(
                 username=request.POST.get('username'),
@@ -47,7 +50,7 @@ def user_profile(request):
                     request,
                     'weather_app/user_profile.html', {
                         'alert': 'Username and password do not match.',
-                        'location': get_location(request)})
+                        'location': get_location_query(request)})
             new_password1 = request.POST.get('new_password1')
             new_password2 = request.POST.get('new_password2')
             clear_history = request.POST.get('clear_history')
@@ -60,19 +63,19 @@ def user_profile(request):
                     user.set_password(new_password1)
                     user.save()
                     login(request, user)
-                    return go_to_dashboard(get_location(request)) # Success
+                    return redirect_to_dashboard(get_location_query(request)) # Success
                 elif password == new_password1 == new_password2:
                     return render(
                         request,
                         'weather_app/user_profile.html', {
                             'alert': 'New password must be different from the old one.',
-                            'location': get_location(request)})
+                            'location': get_location_query(request)})
                 elif new_password1 != new_password2:
                     return render(
                         request,
                         'weather_app/user_profile.html', {
                             'alert': 'New passwords do not match.',
-                            'location': get_location(request)})
+                            'location': get_location_query(request)})
             elif clear_history:
                 # Clear history
                 if preserve_favorites:
@@ -82,16 +85,16 @@ def user_profile(request):
                 else:
                     Location.objects.filter(
                         user=user).delete()
-                return go_to_dashboard(get_location(request))
+                return redirect_to_dashboard(get_location_query(request))
             elif delete_account and i_am_sure:
                 user.delete()
-                return go_to_dashboard(get_location(request))
+                return redirect_to_dashboard(get_location_query(request))
             else:
                 return render(
                     request,
                     'weather_app/user_profile.html', {
                         'alert': 'Invalid options.',
-                        'location': get_location(request)})
+                        'location': get_location_query(request)})
     except Exception as err:
         messages.error(
             request, {
