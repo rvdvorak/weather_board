@@ -9,9 +9,10 @@ TODO toasts:
 {% endcomment %}
 {% block content %}
 {% if messages %}
-{% include 'weather_app/messages.html' %}
-{% endif %}
-{% if location and weather %}
+<div>
+    {% include 'weather_app/messages.html' %}
+</div>
+{% elif location and weather %}
 <!-- Weather dashboard widgets -->
 <div class="card-columns">
     {% load tz %}
@@ -38,6 +39,8 @@ TODO toasts:
     {% endtimezone %}
 </div>
 {% else %}
-{% include 'weather_app/no_location.html' %}
+<div>
+    {% include 'weather_app/no_location.html' %}
+</div>
 {% endif %}
 {% endblock content %}

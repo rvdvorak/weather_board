@@ -17,10 +17,10 @@
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             {% if location %}
             <!-- Search form -->
-            <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'dashboard' %}" method="GET">
+            <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
-                    <input name="search_text" class="form-control form-control-navbar" type="search"
-                    placeholder="Search location" aria-label="Search location" required>
+                    <input name="search_query" class="form-control form-control-navbar" type="search"
+                        placeholder="Search location" aria-label="Search location" required>
                     <div class="input-group-append">
                         <button class="btn btn-navbar" type="submit">
                             <i class="fas fa-search"></i>
@@ -39,33 +39,41 @@
                         <i class="fas fa-heart"></i>
                         Favorites
                     </a>
-                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow" style="max-height: 320px; overflow-y: auto;">
+                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow"
+                        style="max-height: 320px; overflow-y: auto;">
                         {% if location %}
                         {% if location.is_favorite %}
+                        <!-- Remove favorite -->
                         <li class="dropdown-item">
-                            <!-- Remove favorite -->
-                            <div>
-                                <a href="{% url 'dashboard' %}?update_location={{ location.id|urlencode }}&is_favorite=no"
-                                    class="btn btn-block btn-secondary btn-sm">
-                                    <i class="fas fa-times"></i>
+                            <form action="{% url 'update_location' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="location_id" value="{{ location.id }}">
+                                <input type="hidden" name="is_favorite" value="no">
+                                <button class="btn btn-block btn-secondary btn-sm" type="submit">
+                                    <i class="fas fa-trash-alt"></i>
                                     Remove current location
-                                </a>
-                            </div>
+                                </button>
+                            </form>
                         </li>
                         {% else %}
+                        <!-- Add favorite -->
                         <li class="dropdown-item">
-                            <!-- Add favorite -->
-                            <a href="{% url 'dashboard' %}?update_location={{ location.id|urlencode }}&is_favorite=yes"
-                                class="btn btn-block btn-secondary btn-sm">
-                                <i class="fas fa-plus"></i>
-                                Add current location
-                            </a>
+                            <form action="{% url 'update_location' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="location_id" value="{{ location.id }}">
+                                <input type="hidden" name="is_favorite" value="yes">
+                                <button class="btn btn-block btn-secondary btn-sm" type="submit">
+                                    <i class="fas fa-heart"></i>
+                                    Add current location
+                                </button>
+                            </form>
                         </li>
                         {% endif %}
                         {% endif %}
                         {% if favorite_locations %}
                         {% for location in favorite_locations %}
-                        <a href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ location.label|truncatechars:28 }}
@@ -86,10 +94,12 @@
                         <i class="fas fa-history"></i>
                         History
                     </a>
-                    <ul aria-labelledby="history" class="dropdown-menu border-0 shadow" style="max-height: 320px; overflow-y: auto;">
+                    <ul aria-labelledby="history" class="dropdown-menu border-0 shadow"
+                        style="max-height: 320px; overflow-y: auto;">
                         {% if location_history %}
                         {% for location in location_history %}
-                        <a href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ location.label|truncatechars:28 }}
@@ -106,7 +116,7 @@
                 {% endif %}
                 <!-- Random location -->
                 <li class="nav-item">
-                    <a href="{% url 'dashboard' %}?random_location=True" class="nav-link">
+                    <a href="{% url 'random_location' %}" class="nav-link">
                         <i class="fas fa-random"></i>
                         Random location
                     </a>
@@ -121,14 +131,16 @@
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log Out -->
-                        <a href="{% url 'logout_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'logout_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Log out
                             </li>
                         </a>
                         <!-- User profile -->
-                        <a href="{% url 'user_profile' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'user_profile' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-address-card"></i>
                                 User profile
@@ -146,14 +158,16 @@
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log In -->
-                        <a href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-key"></i>
                                 Log in
                             </li>
                         </a>
                         <!-- Register -->
-                        <a href="{% url 'register_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
+                        <a
+                            href="{% url 'register_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
                             <li class="dropdown-item">
                                 <i class="fas fa-user-plus"></i>
                                 Register

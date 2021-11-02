@@ -24,4 +24,7 @@ urlpatterns = [
     path('login/', views.login_user, name='login_user'),
     path('logout/', views.logout_user, name='logout_user'),
     path('profile/', views.user_profile, name='user_profile'),
+    path('random/', views.random_location, name='random_location'),
+    path('search/', views.search_location, name='search_location'),
+    path('update/', views.update_location, name='update_location'),
 ]
