@@ -17,7 +17,7 @@ TODO toasts:
 <div class="card-columns">
     {% load tz %}
     {% timezone weather.timezone %}
-    {{ weather.charts|json_script:"charts" }}
+    {{ charts|json_script:"charts" }}
     {# TODO Air pollution forecast widgets #}
     {# TODO 7d Chart widgets #}
     {# TODO Wind direction #}

@@ -19,31 +19,31 @@
         <br>
         <h3>Air quality:</h3>
         <h2>
-            {% if weather.air_pollution.0.main.aqi == 1 %}
+            {% if air_pollution.0.main.aqi == 1 %}
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
-            {% elif weather.air_pollution.0.main.aqi == 2 %}
+            {% elif air_pollution.0.main.aqi == 2 %}
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
-            {% elif weather.air_pollution.0.main.aqi == 3 %}
+            {% elif air_pollution.0.main.aqi == 3 %}
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
-            {% elif weather.air_pollution.0.main.aqi == 4 %}
+            {% elif air_pollution.0.main.aqi == 4 %}
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
-            {% elif weather.air_pollution.0.main.aqi == 5 %}
+            {% elif air_pollution.0.main.aqi == 5 %}
             <i class="fas fa-star" style="color: gold;"></i>
             <i class="far fa-star" style="color: darkslategray"></i>
             <i class="far fa-star" style="color: darkslategray"></i>

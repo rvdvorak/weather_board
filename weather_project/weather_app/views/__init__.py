@@ -6,3 +6,4 @@ from .user_profile import *
 from .random_location import *
 from .search_location import *
 from .update_location import *
+from .utils import *

@@ -1,0 +1,180 @@
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from urllib.parse import urlencode
+from django.http import HttpResponse
+from django.core.exceptions import ValidationError
+from datetime import datetime
+from weather_app.models import Location
+import requests
+from requests.exceptions import Timeout
+import json
+import pprint
+import pytz
+import random
+
+
+def redirect_to_dashboard(location_query):
+    base_url = reverse('dashboard')
+    params = urlencode(location_query)
+    uri = f'{base_url}?{params}'
+    return redirect(uri)
+
+
+def get_location_query(request):
+    if request.method == 'GET':
+        latitude = request.GET.get('latitude')
+        longitude = request.GET.get('longitude')
+        label = request.GET.get('label')
+    elif request.method == 'POST':
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        label = request.POST.get('label')
+    if latitude and longitude and label:
+        return {
+            'latitude': latitude,
+            'longitude': longitude,
+            'label': label}
+    else:
+        return {}
+
+
+def get_location_instance(location_query, user):
+    if location_query:
+        location_instance = Location(
+            latitude=location_query['latitude'],
+            longitude=location_query['longitude'],
+            label=location_query['label'])
+        location_instance.clean_fields(exclude=['user'])
+        if user.is_authenticated:
+            location_instance.user = user
+            match = Location.objects.filter(
+                user=user,
+                latitude=location_instance.latitude,
+                longitude=location_instance.longitude,
+                label=location_instance.label)
+            if len(match) != 0:
+                # Location is already saved in DB
+                location_instance = match[0]
+        return location_instance
+    else:
+        return None
+
+
+def get_location_history(user):
+    if user.is_authenticated:
+        return Location.objects.filter(
+            user=user).order_by('-date_last_showed')
+    else:
+        return None
+
+
+def get_favorite_locations(user):
+    if user.is_authenticated:
+        return Location.objects.filter(
+            user=user,
+            is_favorite=True).order_by('-date_last_showed')
+    else:
+        return None
+
+
+def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key in keys_to_convert:
+                data[key] = datetime.fromtimestamp(value, timezone)
+            elif isinstance(value, dict) or isinstance(value, list):
+                data[key] = convert_timestamps_to_datetimes(value, keys_to_convert, timezone)
+    elif isinstance(data, list):
+        for index in range(len(data)):
+            data[index] = convert_timestamps_to_datetimes(data[index], keys_to_convert, timezone)
+    return data
+
+
+def get_weather(location):
+    # API docs: https://openweathermap.org/api/one-call-api
+    base_url = 'https://api.openweathermap.org/data/2.5/onecall'
+    params = {
+        'lat': location.latitude,
+        'lon': location.longitude,
+        'units': 'metric',
+        'appid': '6fe37effcfa866ecec5fd235699a402d'}
+    response = requests.get(base_url, params=params, timeout=5)
+    if response.status_code != 200:
+        raise Exception(
+            f'Weather API error. HTTP status: {response.status_code}')
+    weather = response.json()
+    timezone = pytz.timezone(weather['timezone'])
+    keys_to_convert = ['dt', 'sunrise', 'sunset', 'start', 'end']
+    weather = convert_timestamps_to_datetimes(weather, keys_to_convert, timezone)
+    return weather
+
+
+def get_air_pollution(location, timezone):
+    # API docs: https://openweathermap.org/api/air-pollution
+    url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
+    params = {
+        'lat': location.latitude,
+        'lon': location.longitude,
+        'appid': '6fe37effcfa866ecec5fd235699a402d'}
+    response = requests.get(url, params=params, timeout=5)
+    if response.status_code != 200:
+        raise Exception(
+            f'Air pollution API error. HTTP status: {response.status_code}')
+    air_pollution = response.json()['list']
+    air_pollution = convert_timestamps_to_datetimes(air_pollution, ['dt'], timezone)
+    return air_pollution
+
+
+def get_charts(weather):
+    charts = {
+        'minutely': {
+            'timeline': [],
+            'precipitation': []},
+        'hourly': {
+            'timeline': [],
+            'pop': [],
+            'temp': [],
+            'feels_like': [],
+            'dew_point': [],
+            'clouds': [],
+            'humidity': [],
+            'pressure': [],
+            'wind_speed': [],
+            'wind_gust': [],
+            'uvi': [],
+            'visibility': []},
+        'daily': {
+            'timeline': []}}
+    if 'minutely' in weather:
+        for minute in weather['minutely']:
+            charts['minutely']['timeline'].append(
+                minute['dt'].strftime("%H:%M"))
+            charts['minutely']['precipitation'].append(
+                round(minute['precipitation'], 2))
+    if 'hourly' in weather:
+        for hour in weather['hourly']:
+            charts['hourly']['timeline'].append(
+                hour['dt'].strftime("%a %H:%M"))
+            charts['hourly']['pop'].append(
+                hour['pop']*100)
+            charts['hourly']['temp'].append(
+                round(hour['temp'], 1))
+            charts['hourly']['feels_like'].append(
+                round(hour['feels_like'], 1))
+            charts['hourly']['dew_point'].append(
+                round(hour['dew_point'], 1))
+            charts['hourly']['clouds'].append(
+                hour['clouds'])
+            charts['hourly']['humidity'].append(
+                hour['humidity'])
+            charts['hourly']['pressure'].append(
+                hour['pressure'])
+            charts['hourly']['wind_speed'].append(
+                hour['wind_speed'])
+            charts['hourly']['wind_gust'].append(
+                hour['wind_gust'])
+            charts['hourly']['uvi'].append(
+                hour['uvi'])
+            charts['hourly']['visibility'].append(
+                hour['visibility'])
+    return charts
