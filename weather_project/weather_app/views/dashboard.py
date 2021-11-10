@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.contrib import messages
 from django.http import HttpResponse
+from requests.exceptions import Timeout, HTTPError
+from django.core.exceptions import ValidationError
 import pprint
 from .utils import *
 
@@ -11,13 +13,69 @@ def dashboard(request):
     weather = None
     air_pollution = None
     charts = None
-    location_history = None
-    favorite_locations = None
-    location = get_location_instance(get_location_query(request), user)
+    location = get_location_instance(get_location_params(request), user)
     if location:
-        weather = get_weather(location)
+        try:
+            weather = get_weather(location)
+        except Timeout as err:
+            messages.warning(
+                request, {
+                    'header': 'Weather service time out',
+                    'description': 'Please try it again later...',
+                    'icon': 'fas fa-hourglass-end',
+                    'show_search_form': True,
+                    'admin_details': [
+                        f'Exception: {pprint.pformat(err)}']})
+            return render(
+                request,
+                'weather_app/dashboard.html', {
+                    'location_history': get_location_history(user),
+                    'favorite_locations': get_favorite_locations(user)})
+        except HTTPError as err:
+            messages.error(
+                request, {
+                    'header': 'Weather service error',
+                    'description': 'Communication with weather service failed.',
+                    'icon': 'fas fa-times-circle',
+                    'show_search_form': True,
+                    'admin_details': [
+                        f'Exception: {pprint.pformat(err)}']})
+            return render(
+                request,
+                'weather_app/dashboard.html', {
+                    'location_history': get_location_history(user),
+                    'favorite_locations': get_favorite_locations(user)})
         timezone = pytz.timezone(weather['timezone'])
-        air_pollution = get_air_pollution(location, timezone)
+        try:
+            air_pollution = get_air_pollution(location, timezone)
+        except Timeout as err:
+            messages.warning(
+                request, {
+                    'header': 'Air pollution service time out',
+                    'description': 'Please try it again later...',
+                    'icon': 'fas fa-hourglass-end',
+                    'show_search_form': True,
+                    'admin_details': [
+                        f'Exception: {pprint.pformat(err)}']})
+            return render(
+                request,
+                'weather_app/dashboard.html', {
+                    'location_history': get_location_history(user),
+                    'favorite_locations': get_favorite_locations(user)})
+        except HTTPError as err:
+            messages.error(
+                request, {
+                    'header': 'Air pollution service error',
+                    'description': 'Communication with Air pollution service failed.',
+                    'icon': 'fas fa-times-circle',
+                    'show_search_form': True,
+                    'admin_details': [
+                        f'Exception: {pprint.pformat(err)}']})
+            return render(
+                request,
+                'weather_app/dashboard.html', {
+                    'location_history': get_location_history(user),
+                    'favorite_locations': get_favorite_locations(user)})
         charts = get_charts(weather)
         if user.is_authenticated:
             location.save()
@@ -31,5 +89,5 @@ def dashboard(request):
             'weather': weather,
             'air_pollution': air_pollution,
             'charts': charts,
-            'location_history': location_history,
-            'favorite_locations': favorite_locations})
+            'location_history': get_location_history(user),
+            'favorite_locations': get_favorite_locations(user)})

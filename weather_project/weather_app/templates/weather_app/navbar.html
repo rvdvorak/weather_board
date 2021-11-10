@@ -7,7 +7,6 @@
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
         </a>
-        {% if request.resolver_match.url_name == 'dashboard' %}
         <!-- Expand/collapse button -->
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -178,6 +177,5 @@
                 {% endif %}
             </ul>
         </div>
-        {% endif %}
     </div>
 </nav>

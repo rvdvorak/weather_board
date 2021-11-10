@@ -44,7 +44,7 @@
                 {% endif %}
                 {% if message.message.show_search_form %}
                 <!-- Search form -->
-                    <form action="{% url 'dashboard' %}" method="GET">
+                    <form action="{% url 'search_location' %}" method="GET">
                         <div class="input-group input-group-sm">
                             <input name="search_query" class="form-control" type="search"
                                 placeholder="Search location" aria-label="Search location" required>
@@ -60,6 +60,7 @@
                 <!-- Details for administrators -->
                 <hr>
                 <h6>Details for admins:</h6>
+                {# TODO: Source code-like styling #}
                 <ul>
                     {% for item in message.message.admin_details %}
                     <li>{{ item }}</li>

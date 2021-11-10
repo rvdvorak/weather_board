@@ -2,25 +2,31 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.http import HttpResponse
-from django.core.exceptions import ValidationError
 from datetime import datetime
 from weather_app.models import Location
 import requests
-from requests.exceptions import Timeout
 import json
 import pprint
 import pytz
 import random
 
 
-def redirect_to_dashboard(location_query):
+def redirect_to_dashboard(location_params):
     base_url = reverse('dashboard')
-    params = urlencode(location_query)
+    params = urlencode(location_params)
     uri = f'{base_url}?{params}'
     return redirect(uri)
 
 
-def get_location_query(request):
+def render_empty_dashboard(request):
+    return render(
+        request,
+        'weather_app/dashboard.html', {
+            'location_history': get_location_history(request.user),
+            'favorite_locations': get_favorite_locations(request.user)})
+
+
+def get_location_params(request):
     if request.method == 'GET':
         latitude = request.GET.get('latitude')
         longitude = request.GET.get('longitude')
@@ -38,12 +44,46 @@ def get_location_query(request):
         return {}
 
 
-def get_location_instance(location_query, user):
-    if location_query:
+def get_random_location_params(timeout=5):
+    # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
+    url = 'https://api.openrouteservice.org/geocode/reverse'
+    latitude = round(
+        random.random() * 180 - 90,
+        6)
+    longitude = round(
+        random.random() * 360 - 180,
+        6)
+    params = {
+        'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+        'point.lat': latitude,
+        'point.lon': longitude,
+        'size': 1}
+    response = requests.get(url, params=params, timeout=timeout)
+    response.raise_for_status()
+    return {
+        'latitude': latitude,
+        'longitude': longitude,
+        'label': response.json()['features'][0]['properties']['label']}
+
+
+def get_search_results(search_query, timeout=5, max_count=20):
+    # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/search/get
+    url = 'https://api.openrouteservice.org/geocode/search'
+    params = {
+        'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+        'size': max_count,
+        'text': search_query}
+    response = requests.get(url, params=params, timeout=timeout)
+    response.raise_for_status()
+    return response.json()['features']
+
+
+def get_location_instance(location_params, user):
+    if location_params:
         location_instance = Location(
-            latitude=location_query['latitude'],
-            longitude=location_query['longitude'],
-            label=location_query['label'])
+            latitude=location_params['latitude'],
+            longitude=location_params['longitude'],
+            label=location_params['label'])
         location_instance.clean_fields(exclude=['user'])
         if user.is_authenticated:
             location_instance.user = user
@@ -83,14 +123,16 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
             if key in keys_to_convert:
                 data[key] = datetime.fromtimestamp(value, timezone)
             elif isinstance(value, dict) or isinstance(value, list):
-                data[key] = convert_timestamps_to_datetimes(value, keys_to_convert, timezone)
+                data[key] = convert_timestamps_to_datetimes(
+                    value, keys_to_convert, timezone)
     elif isinstance(data, list):
         for index in range(len(data)):
-            data[index] = convert_timestamps_to_datetimes(data[index], keys_to_convert, timezone)
+            data[index] = convert_timestamps_to_datetimes(
+                data[index], keys_to_convert, timezone)
     return data
 
 
-def get_weather(location):
+def get_weather(location, timeout=5):
     # API docs: https://openweathermap.org/api/one-call-api
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
@@ -98,30 +140,28 @@ def get_weather(location):
         'lon': location.longitude,
         'units': 'metric',
         'appid': '6fe37effcfa866ecec5fd235699a402d'}
-    response = requests.get(base_url, params=params, timeout=5)
-    if response.status_code != 200:
-        raise Exception(
-            f'Weather API error. HTTP status: {response.status_code}')
+    response = requests.get(base_url, params=params, timeout=timeout)
+    response.raise_for_status()
     weather = response.json()
     timezone = pytz.timezone(weather['timezone'])
     keys_to_convert = ['dt', 'sunrise', 'sunset', 'start', 'end']
-    weather = convert_timestamps_to_datetimes(weather, keys_to_convert, timezone)
+    weather = convert_timestamps_to_datetimes(
+        weather, keys_to_convert, timezone)
     return weather
 
 
-def get_air_pollution(location, timezone):
+def get_air_pollution(location, timezone, timeout=5):
     # API docs: https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
         'appid': '6fe37effcfa866ecec5fd235699a402d'}
-    response = requests.get(url, params=params, timeout=5)
-    if response.status_code != 200:
-        raise Exception(
-            f'Air pollution API error. HTTP status: {response.status_code}')
+    response = requests.get(url, params=params, timeout=timeout)
+    response.raise_for_status()
     air_pollution = response.json()['list']
-    air_pollution = convert_timestamps_to_datetimes(air_pollution, ['dt'], timezone)
+    air_pollution = convert_timestamps_to_datetimes(
+        air_pollution, ['dt'], timezone)
     return air_pollution
 
 
