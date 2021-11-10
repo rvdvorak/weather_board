@@ -19,7 +19,7 @@ def random_location(request):
         messages.warning(
             request, {
                 'header': 'Location service time out',
-                'description': 'Please try it again later...',
+                'description': 'Please try it again or later.',
                 'icon': 'fas fa-hourglass-end',
                 'show_search_form': True,
                 'admin_details': [

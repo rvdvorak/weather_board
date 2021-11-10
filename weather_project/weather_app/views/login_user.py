@@ -1,59 +1,27 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.shortcuts import render
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth import login
-from urllib.parse import urlencode
-from django.urls import reverse
-import pprint
+from .utils import get_location_params, redirect_to_dashboard
 
 
 def login_user(request):
-    try:
-        location = {}
-        if request.method == 'GET':
-            latitude = request.GET.get('latitude')
-            longitude = request.GET.get('longitude')
-            label = request.GET.get('label')
-            if latitude and longitude and label:
-                location['latitude'] = latitude
-                location['longitude'] = longitude
-                location['label'] = label
+    location_params = get_location_params(request)
+    if request.method == 'GET':
+        return render(
+            request,
+            'weather_app/login_user.html', {
+                'location_params': location_params})
+    elif request.method == 'POST':
+        user = authenticate(
+            request,
+            username=request.POST.get('username'),
+            password=request.POST.get('password'))
+        if user:
+            login(request, user)
+            return redirect_to_dashboard(location_params)
+        else:
             return render(
                 request,
                 'weather_app/login_user.html', {
-                    'location': location})
-        elif request.method == 'POST':
-            latitude = request.POST.get('latitude')
-            longitude = request.POST.get('longitude')
-            label = request.POST.get('label')
-            if latitude and longitude and label:
-                location['latitude'] = latitude
-                location['longitude'] = longitude
-                location['label'] = label
-            user = authenticate(
-                request,
-                username=request.POST['username'],
-                password=request.POST['password'])
-            if user:
-                login(request, user)
-                base_url = reverse('dashboard')
-                params = urlencode(location)
-                uri = f'{base_url}?{params}'
-                return redirect(uri)
-            else:
-                return render(
-                    request,
-                    'weather_app/login_user.html', {
-                        'alert': 'Username and password do not match.',
-                        'location': location})
-    except Exception as err:
-        messages.error(
-            request, {
-                'header': 'Internal error',
-                'description': 'Log-in failed.',
-                'icon': 'fas fa-times-circle',
-                'admin_details': [
-                    'Method: login_user(request)',
-                    f'Exception: {pprint.pformat(err)}']})
-        return render(request, 'weather_app/dashboard.html')
+                    'alert': 'Username and password do not match.',
+                    'location_params': location_params})

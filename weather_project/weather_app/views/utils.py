@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.http import HttpResponse
 from datetime import datetime
 from weather_app.models import Location
+from django.contrib.auth.models import User
 import requests
 import json
 import pprint
@@ -22,6 +23,17 @@ def render_empty_dashboard(request):
     return render(
         request,
         'weather_app/dashboard.html', {
+            'location_history': get_location_history(request.user),
+            'favorite_locations': get_favorite_locations(request.user)})
+
+
+def render_user_profile(request, error_message=None, success_message=None):
+    return render(
+        request,
+        'weather_app/user_profile.html', {
+            'success_message': success_message,
+            'error_message': error_message,
+            'location_params': get_location_params(request),
             'location_history': get_location_history(request.user),
             'favorite_locations': get_favorite_locations(request.user)})
 

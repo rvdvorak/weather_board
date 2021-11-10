@@ -13,15 +13,15 @@
             <div class="card-body">
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9" style="text-align: center;">
-                        {% if alert %}
-                        <div class="alert bg-warning">
+                        {% if error_message %}
+                        <div class="alert bg-danger">
                             <b>
                                 <i class="icon fas fa-exclamation-triangle"></i>
-                                {{ alert }}
+                                {{ error_message }}
                             </b>
                         </div>
                         {% endif %}
-                        <form method="POST">
+                        <form method="POST" style="text-align: left;">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="username">Username</label>
@@ -35,18 +35,24 @@
                                 <label for="password2">Confirm password</label>
                                 <input type="password" name="password2" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <button type="submit" class="btn btn-secondary">Register</button>
+                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
+                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <div style="text-align: center;">
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-user-plus"></i>
+                                    Register
+                                </button>
+                            </div>
                         </form>
-                        <div class="mt-4">
-                            Already registered?
-                            <br>
-                            <a href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                                Login existing user
-                            </a>
-                        </div>
+                        <hr>
+                        Already registered?
+                        <form action="{% url 'login_user' %}" method="GET">
+                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
+                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <button type="submit" class="btn btn-link">Login existing user</button>
+                        </form>
                     </div>
                 </div>
             </div>

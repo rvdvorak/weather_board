@@ -30,7 +30,7 @@ def search_location(request):
         messages.warning(
             request, {
                 'header': 'Location service time out',
-                'description': 'Please try it again later...',
+                'description': 'Please try it again or later.',
                 'icon': 'fas fa-hourglass-end',
                 'show_search_form': True,
                 'admin_details': [
@@ -62,7 +62,7 @@ def search_location(request):
             'latitude': search_results[0]['geometry']['coordinates'][1],
             'longitude': search_results[0]['geometry']['coordinates'][0],
             'label': search_results[0]['properties']['label']}
-        return redirect_to_dashboard(location_params) 
+        return redirect_to_dashboard(location_params)
     elif len(search_results) > 1:
         # Multiple matches => show search results as message
         if len(search_results) == max_count:

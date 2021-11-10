@@ -14,7 +14,6 @@
         </button>
         <!-- Collapsible menu -->
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-            {% if location %}
             <!-- Search form -->
             <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
@@ -27,7 +26,6 @@
                     </div>
                 </div>
             </form>
-            {% endif %}
             <!-- Main menu -->
             <ul class="navbar-nav ml-lg-auto">
                 {% if user.is_authenticated %}

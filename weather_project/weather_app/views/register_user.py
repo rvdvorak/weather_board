@@ -1,65 +1,35 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from django.contrib.auth import login, logout, authenticate
-from urllib.parse import urlencode
-from django.urls import reverse
-
-import pprint
+from django.contrib.auth import login
+from .utils import redirect_to_dashboard, get_location_params
 
 
 def register_user(request):
-    try:
-        location = {}
-        if request.method == 'GET':
-            latitude = request.GET.get('latitude')
-            longitude = request.GET.get('longitude')
-            label = request.GET.get('label')
-            if latitude and longitude and label:
-                location['latitude'] = latitude
-                location['longitude'] = longitude
-                location['label'] = label
-            return render(
-                request,
-                'weather_app/register_user.html', {
-                    'location': location})
-        elif request.method == 'POST':
-            latitude = request.POST.get('latitude')
-            longitude = request.POST.get('longitude')
-            label = request.POST.get('label')
-            if latitude and longitude and label:
-                location['latitude'] = latitude
-                location['longitude'] = longitude
-                location['label'] = label
-            if request.POST['password1'] == request.POST['password2']:
-                try:
-                    user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
-                    user.save()
-                    login(request, user)
-                    base_url = reverse('dashboard')
-                    params = urlencode(location)
-                    uri = f'{base_url}?{params}'
-                    return redirect(uri)
-                except IntegrityError:
-                    return render(
-                        request,
-                        'weather_app/register_user.html', {
-                            'alert': 'User already exists. Please choose different username.',
-                            'location': location})
-            else:
+    if request.method == 'GET':
+        return render(
+            request,
+            'weather_app/register_user.html', {
+                'location_params': get_location_params(request)})
+    elif request.method == 'POST':
+        username = request.POST['username']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        if password1 == password2:
+            user = User.objects.create_user(username, password=password1)
+            try:
+                user.save()
+            except IntegrityError:
                 return render(
                     request,
                     'weather_app/register_user.html', {
-                        'alert': 'Passwords do not match.',
-                        'location': location})
-    except Exception as err:
-        messages.error(
-            request, {
-                'header': 'Internal error',
-                'description': 'User registration failed.',
-                'icon': 'fas fa-times-circle',
-                'admin_details': [
-                    'Method: register_user(request)',
-                    f'Exception: {pprint.pformat(err)}']})
-        return render(request, 'weather_app/dashboard.html')
+                        'error_message': 'User already exists. Please choose different username.',
+                        'location_params': get_location_params(request)})
+                login(request, user)
+                return redirect_to_dashboard(get_location_params(request))
+        else:
+            return render(
+                request,
+                'weather_app/register_user.html', {
+                    'error_message': 'Passwords do not match.',
+                    'location_params': get_location_params(request)})

@@ -21,7 +21,7 @@
                             </b>
                         </div>
                         {% endif %}
-                        <form method="POST">
+                        <form method="POST" style="text-align: left;">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="username">Username</label>
@@ -31,18 +31,24 @@
                                 <label for="password">Password</label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <button type="submit" class="btn btn-secondary">Login</button>
+                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
+                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <div style="text-align: center;">
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-key"></i>
+                                    Login
+                                </button>
+                            </div>
                         </form>
-                        <div class="mt-4">
-                            Don't have an account yet?
-                            <br>
-                            <a href="{% url 'register_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                                Register new user
-                            </a>
-                        </div>
+                        <hr>
+                        Don't have an account yet?
+                        <form action="{% url 'register_user' %}" method="GET">
+                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
+                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <button type="submit" class="btn btn-link">Register new user</button>
+                        </form>
                     </div>
                 </div>
             </div>
