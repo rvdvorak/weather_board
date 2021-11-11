@@ -1,7 +1,7 @@
+from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
 from .utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_dashboard
-
 
 def random_location(request):
     user = request.user

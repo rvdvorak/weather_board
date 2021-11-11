@@ -1,5 +1,5 @@
+from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
-from requests.exceptions import Timeout
 import pprint
 from .utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
 
