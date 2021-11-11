@@ -1,14 +1,6 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from urllib.parse import urlencode
-from django.http import HttpResponse
-import requests
-from requests.exceptions import Timeout, HTTPError
-import json
 import pprint
-import random
-from .utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_empty_dashboard
+from .utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_dashboard
 
 
 def random_location(request):
@@ -22,9 +14,8 @@ def random_location(request):
                 'description': 'Please try it again or later.',
                 'icon': 'fas fa-hourglass-end',
                 'show_search_form': True,
-                'admin_details': [
-                    f'Exception: {pprint.pformat(err)}']})
-        return render_empty_dashboard(request)
+                'admin_details': f'Exception: {pprint.pformat(err)}'})
+        return render_dashboard(request)
     except HTTPError as err:
         messages.error(
             request, {
@@ -32,7 +23,6 @@ def random_location(request):
                 'description': 'Communication with location service failed.',
                 'icon': 'fas fa-times-circle',
                 'show_search_form': True,
-                'admin_details': [
-                    f'Exception: {pprint.pformat(err)}']})
-        return render_empty_dashboard(request)
+                'admin_details': f'Exception: {pprint.pformat(err)}'})
+        return render_dashboard(request)
     return redirect_to_dashboard(location_params)

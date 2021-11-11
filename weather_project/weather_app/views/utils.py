@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from urllib.parse import urlencode
-from django.http import HttpResponse
 from datetime import datetime
 from weather_app.models import Location
 from django.contrib.auth.models import User
 import requests
 import json
-import pprint
 import pytz
 import random
 
@@ -19,10 +17,14 @@ def redirect_to_dashboard(location_params):
     return redirect(uri)
 
 
-def render_empty_dashboard(request):
+def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
     return render(
         request,
         'weather_app/dashboard.html', {
+            'location': location,
+            'weather': weather,
+            'air_pollution': air_pollution,
+            'charts': charts,
             'location_history': get_location_history(request.user),
             'favorite_locations': get_favorite_locations(request.user)})
 

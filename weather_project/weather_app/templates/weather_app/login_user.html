@@ -13,11 +13,11 @@
             <div class="card-body">
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9" style="text-align: center;">
-                        {% if alert %}
-                        <div class="alert bg-warning">
+                        {% if error_message %}
+                        <div class="alert bg-danger">
                             <b>
                                 <i class="icon fas fa-exclamation-triangle"></i>
-                                {{ alert }}
+                                {{ error_message }}
                             </b>
                         </div>
                         {% endif %}

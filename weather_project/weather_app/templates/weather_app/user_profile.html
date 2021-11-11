@@ -5,10 +5,10 @@
     <div class="col-md-8 col-lg-6 col-xl-5">
         <div class="card card-lightblue shadow">
             <div class="card-header">
-                <h3 class="card-title" style="margin: 0px; font-weight: bold;">
+                <h4 class="card-title" style="margin: 0px; font-weight: bold;">
                     <i class="fas fa-address-card"></i>
                     User profile options
-                </h3>
+                </h4>
             </div>
             <div class="card-body">
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
@@ -28,10 +28,10 @@
                             </b>
                         </div>
                         {% endif %}
-                        <!-- Change password -->
-                        <h3>
+                        <!-- Change password form -->
+                        <h4>
                             Change my password
-                        </h3>
+                        </h4>
                         <form method="POST" autocomplete="False" style="text-align: left;">
                             {% csrf_token %}
                             <div class="form-group">
@@ -70,10 +70,10 @@
                             </div>
                         </form>
                         <hr>
-                        <!-- Clear history -->
-                        <h3 class="mt-5">
+                        <!-- Clear history form -->
+                        <h4 class="mt-4">
                             Clear my history
-                        </h3>
+                        </h4>
                         <form method="POST" autocomplete="False" style="text-align: left;">
                             {% csrf_token %}
                             <div class="custom-control custom-checkbox mt-3">
@@ -114,17 +114,17 @@
                             </div>
                         </form>
                         <hr>
-                        <!-- Delete user account -->
-                        <h3 class="mt-5">
+                        <!-- Delete user account form -->
+                        <h4 class="mt-4">
                             Delete my account
-                        </h3>
+                        </h4>
                         <form method="POST" autocomplete="False" style="text-align: left;">
                             {% csrf_token %}
                             <div class="custom-control custom-checkbox mt-3">
                                 <input class="custom-control-input" type="checkbox" id="delete_account" required
                                     name="delete_account" value="True">
                                 <label for="delete_account" class="custom-control-label">
-                                    Completely delete my user account
+                                    Completely delete my account
                                 </label>
                             </div>
                             <div class="custom-control custom-checkbox mt-3">

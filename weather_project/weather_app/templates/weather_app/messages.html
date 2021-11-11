@@ -44,28 +44,31 @@
                 {% endif %}
                 {% if message.message.show_search_form %}
                 <!-- Search form -->
-                    <form action="{% url 'search_location' %}" method="GET">
-                        <div class="input-group input-group-sm">
-                            <input name="search_query" class="form-control" type="search"
-                                placeholder="Search location" aria-label="Search location" required>
-                            <div class="input-group-append">
-                                <button class="btn btn-block btn-secondary btn-sm" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
+                <form action="{% url 'search_location' %}" method="GET">
+                    <div class="input-group input-group-sm">
+                        <input name="search_query" class="form-control" type="search" placeholder="Search location"
+                            aria-label="Search location" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-block btn-secondary btn-sm" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
-                    </form>
+                    </div>
+                </form>
                 {% endif %}
                 {% if message.message.admin_details %}
                 <!-- Details for administrators -->
                 <hr>
-                <h6>Details for admins:</h6>
-                {# TODO: Source code-like styling #}
-                <ul>
-                    {% for item in message.message.admin_details %}
-                    <li>{{ item }}</li>
-                    {% endfor %}
-                </ul>
+                <a data-toggle="collapse" href="#admin_details" aria-expanded="false" aria-controls="admin_details">
+                    Details for system administrators
+                </a>
+                <div id="admin_details" class="collapse">
+                    <div class="card card-body mt-3 mb-0" style="background-color: #6c757d;">
+                        <code style="color: #fff;">
+                            {{ message.message.admin_details }}
+                        </code>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>

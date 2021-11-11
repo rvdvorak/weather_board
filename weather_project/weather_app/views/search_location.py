@@ -1,13 +1,7 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from urllib.parse import urlencode
-from django.http import HttpResponse
-import requests
 from requests.exceptions import Timeout
-import json
 import pprint
-from .utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_empty_dashboard
+from .utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
 
 
 def search_location(request):
@@ -22,7 +16,7 @@ def search_location(request):
                 'description': 'First enter the name of the location to search.',
                 'icon': 'bi bi-geo-alt-fill',
                 'show_search_form': True})
-        return render_empty_dashboard(request)
+        return render_dashboard(request)
     try:
         search_results = get_search_results(search_query, max_count=max_count)
     except Timeout as err:
@@ -33,9 +27,8 @@ def search_location(request):
                 'description': 'Please try it again or later.',
                 'icon': 'fas fa-hourglass-end',
                 'show_search_form': True,
-                'admin_details': [
-                    f'Exception: {pprint.pformat(err)}']})
-        return render_empty_dashboard(request)
+                'admin_details': f'Exception: {pprint.pformat(err)}'})
+        return render_dashboard(request)
     except HTTPError as err:
         # API request failed
         messages.error(
@@ -44,27 +37,25 @@ def search_location(request):
                 'description': 'Communication with location service failed.',
                 'icon': 'fas fa-times-circle',
                 'show_search_form': True,
-                'admin_details': [
-                    f'Exception: {pprint.pformat(err)}']})
-        return render_empty_dashboard(request)
+                'admin_details': f'Exception: {pprint.pformat(err)}'})
+        return render_dashboard(request)
     if len(search_results) == 0:
         # Location not found
         messages.warning(
             request, {
                 'header': 'Location not found',
-                'description': f'"{search_query}" is probably incorrect. Please try something else.',
+                'description': f'"{search_query}" may not be the correct location name. Please type something else.',
                 'icon': 'bi bi-geo-alt-fill',
                 'show_search_form': True})
-        return render_empty_dashboard(request)
+        return render_dashboard(request)
     elif len(search_results) == 1:
         # Single match => rerdirect to Dashboard
-        location_params = {
+        return redirect_to_dashboard({
             'latitude': search_results[0]['geometry']['coordinates'][1],
             'longitude': search_results[0]['geometry']['coordinates'][0],
-            'label': search_results[0]['properties']['label']}
-        return redirect_to_dashboard(location_params)
+            'label': search_results[0]['properties']['label']})
     elif len(search_results) > 1:
-        # Multiple matches => show search results as message
+        # Multiple matches => show search results in message
         if len(search_results) == max_count:
             # Too many matches
             message_description = f'Showing only first {max_count} matching locations:'
@@ -77,4 +68,4 @@ def search_location(request):
                 'icon': 'bi bi-geo-alt-fill',
                 'search_results': search_results,
                 'show_search_form': True})
-        return render_empty_dashboard(request)
+        return render_dashboard(request)

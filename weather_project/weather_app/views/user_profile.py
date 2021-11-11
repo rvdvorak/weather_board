@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from .utils import get_location_params, redirect_to_dashboard, render_user_profile
-from django.contrib import messages
+from .utils import get_location_params, render_user_profile
 
 
 def user_profile(request):
@@ -59,9 +57,9 @@ def user_profile(request):
             user.delete()
             return render_user_profile(
                 request,
-                success_message='Your user account has been completely deleted.')
+                success_message='Your user account has been deleted completely.')
         else:
-            # Invalid request
+            # Invalid options
             return render_user_profile(
                 request,
-                error_message='Invalid request.')
+                error_message='Invalid options.')

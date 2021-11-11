@@ -23,5 +23,5 @@ def login_user(request):
             return render(
                 request,
                 'weather_app/login_user.html', {
-                    'alert': 'Username and password do not match.',
+                    'error_message': 'Username and password do not match.',
                     'location_params': location_params})
