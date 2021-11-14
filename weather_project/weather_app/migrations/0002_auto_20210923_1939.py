@@ -24,11 +24,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='location',
             name='latitude',
-            field=models.FloatField(validators=[weather_app.models.validate_latitude]),
+            field=models.FloatField(),
         ),
         migrations.AlterField(
             model_name='location',
             name='longitude',
-            field=models.FloatField(validators=[weather_app.models.validate_longitude]),
+            field=models.FloatField(),
         ),
     ]
