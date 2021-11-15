@@ -1,5 +1,5 @@
 from django.contrib.auth import logout
-from .utils import redirect_to_dashboard, get_location_params
+from weather_app.views.utils import redirect_to_dashboard, get_location_params
 
 
 def logout_user(request):

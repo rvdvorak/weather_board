@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login
-from .utils import redirect_to_dashboard, get_location_params
+from weather_app.views.utils import redirect_to_dashboard, get_location_params
 
 
 def register_user(request):

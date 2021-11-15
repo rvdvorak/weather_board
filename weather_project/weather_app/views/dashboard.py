@@ -4,8 +4,8 @@ from requests.exceptions import Timeout, HTTPError
 from django.core.exceptions import ValidationError
 import pprint
 import pytz
-from .utils import get_location_params, get_location_instance, get_weather, get_air_pollution, get_charts, render_dashboard
-from .API_keys import OWM_key
+from weather_app.views.utils import get_location_params, get_location_instance, get_weather, get_air_pollution, get_charts, render_dashboard
+from weather_app.views.API_keys import OWM_key
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean

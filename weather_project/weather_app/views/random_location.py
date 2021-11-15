@@ -1,8 +1,8 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from .utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_dashboard
-from .API_keys import ORS_key
+from weather_app.views.utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_dashboard
+from weather_app.views.API_keys import ORS_key
 
 
 def random_location(request):

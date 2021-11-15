@@ -1,6 +1,6 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from .utils import get_location_params, render_user_profile
+from weather_app.views.utils import get_location_params, render_user_profile
 
 
 def user_profile(request):

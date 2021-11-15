@@ -1,17 +1,12 @@
-from django.test import TestCase, Client
+from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase, Client, RequestFactory
 from weather_app.views import *
 from datetime import datetime
 import pytz
 import copy
-
-
-class TestHomePage(TestCase):
-    def setUp(self):
-        client = Client()
-
-    def test_home_page_status(self):
-        response = self.client.get('/')
-        assert response.status_code == 200
+from django.urls import reverse
+from urllib.parse import urlencode
+from django.test import RequestFactory
 
 
 class TestUtils(TestCase):
@@ -68,3 +63,30 @@ class TestUtils(TestCase):
             copy.deepcopy([[[input_data]]]),
             keys_to_convert,
             timezone) == [[[output_data]]]
+
+    def test_redirect_to_dashboard_without_params(self):
+        # https://docs.djangoproject.com/en/3.2/ref/request-response/
+        response = redirect_to_dashboard()
+        assert response.status_code == 302
+        assert response.url == reverse('dashboard')
+
+    def test_redirect_to_dashboard_with_location_params(self):
+        url = reverse('dashboard')
+        location_params = {
+            'latitude': 30,
+            'longitude': 40,
+            'label': 'Test Location'}
+        query_string = urlencode(location_params)
+        uri = f'{url}?{query_string}'
+        response = redirect_to_dashboard(location_params)
+        assert response.status_code == 302
+        assert response.url == uri
+
+    def test_render_dashboard_without_params(self):
+        # https://docs.djangoproject.com/en/3.2/ref/request-response/
+        # https://docs.djangoproject.com/en/3.2/topics/testing/advanced/#the-request-factory
+        factory = RequestFactory()
+        request = factory.get('URL_does_not_matter')
+        request.user = AnonymousUser()
+        response = render_dashboard(request)
+        assert response.status_code == 200

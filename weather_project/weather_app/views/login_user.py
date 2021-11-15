@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from .utils import get_location_params, redirect_to_dashboard
+from weather_app.views.utils import get_location_params, redirect_to_dashboard
 
 
 def login_user(request):

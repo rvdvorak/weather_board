@@ -10,10 +10,10 @@ import pytz
 import random
 
 
-def redirect_to_dashboard(location_params):
-    base_url = reverse('dashboard')
-    params = urlencode(location_params)
-    uri = f'{base_url}?{params}'
+def redirect_to_dashboard(location_params=None):
+    uri = reverse('dashboard')
+    if location_params:
+        uri += f'?{urlencode(location_params)}'
     return redirect(uri)
 
 

@@ -1,5 +1,5 @@
 from weather_app.models import Location
-from .utils import redirect_to_dashboard
+from weather_app.views.utils import redirect_to_dashboard
 
 
 def update_location(request):

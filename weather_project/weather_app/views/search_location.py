@@ -1,8 +1,8 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from .utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
-from .API_keys import ORS_key
+from weather_app.views.utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
+from weather_app.views.API_keys import ORS_key
 
 
 def search_location(request):
