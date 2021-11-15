@@ -58,7 +58,7 @@ def get_location_params(request):
         return {}
 
 
-def get_random_location_params(timeout=5):
+def get_random_location_params(ORS_key, timeout=5):
     # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
     url = 'https://api.openrouteservice.org/geocode/reverse'
     latitude = round(
@@ -68,7 +68,7 @@ def get_random_location_params(timeout=5):
         random.random() * 360 - 180,
         6)
     params = {
-        'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+        'api_key': ORS_key,
         'point.lat': latitude,
         'point.lon': longitude,
         'size': 1}
@@ -80,11 +80,11 @@ def get_random_location_params(timeout=5):
         'label': response.json()['features'][0]['properties']['label']}
 
 
-def get_search_results(search_query, timeout=5, max_count=20):
+def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
     # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
-        'api_key': '5b3ce3597851110001cf624830716a6e069742efa48b8fffc0f8fe71',
+        'api_key': ORS_key,
         'size': max_count,
         'text': search_query}
     response = requests.get(url, params=params, timeout=timeout)
@@ -146,14 +146,14 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
     return data
 
 
-def get_weather(location, timeout=5):
+def get_weather(location, OWM_key, timeout=5):
     # API docs: https://openweathermap.org/api/one-call-api
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
         'units': 'metric',
-        'appid': '6fe37effcfa866ecec5fd235699a402d'}
+        'appid': OWM_key}
     response = requests.get(base_url, params=params, timeout=timeout)
     response.raise_for_status()
     weather = response.json()
@@ -164,13 +164,13 @@ def get_weather(location, timeout=5):
     return weather
 
 
-def get_air_pollution(location, timezone, timeout=5):
+def get_air_pollution(location, timezone, OWM_key, timeout=5):
     # API docs: https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
-        'appid': '6fe37effcfa866ecec5fd235699a402d'}
+        'appid': OWM_key}
     response = requests.get(url, params=params, timeout=timeout)
     response.raise_for_status()
     air_pollution = response.json()['list']

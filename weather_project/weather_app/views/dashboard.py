@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 import pprint
 import pytz
 from .utils import get_location_params, get_location_instance, get_weather, get_air_pollution, get_charts, render_dashboard
+from .API_keys import OWM_key
+
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
 
@@ -26,7 +28,7 @@ def dashboard(request):
     if not location:
         return render_dashboard(request)
     try:
-        weather = get_weather(location)
+        weather = get_weather(location, OWM_key)
     except Timeout as err:
         messages.warning(
             request, {
@@ -47,7 +49,7 @@ def dashboard(request):
         return render_dashboard(request)
     timezone = pytz.timezone(weather['timezone'])
     try:
-        air_pollution = get_air_pollution(location, timezone)
+        air_pollution = get_air_pollution(location, timezone, OWM_key)
     except Timeout as err:
         messages.warning(
             request, {

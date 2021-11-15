@@ -2,6 +2,7 @@ from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
 from .utils import get_search_results, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
+from .API_keys import ORS_key
 
 
 def search_location(request):
@@ -18,7 +19,7 @@ def search_location(request):
                 'show_search_form': True})
         return render_dashboard(request)
     try:
-        search_results = get_search_results(search_query, max_count=max_count)
+        search_results = get_search_results(search_query, ORS_key, max_count=20)
     except Timeout as err:
         # API request time out
         messages.warning(
