@@ -59,7 +59,7 @@ def get_location_params(request):
 
 
 def get_random_location_params(ORS_key, timeout=5):
-    # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
+    # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
     url = 'https://api.openrouteservice.org/geocode/reverse'
     latitude = round(
         random.random() * 180 - 90,
@@ -81,7 +81,7 @@ def get_random_location_params(ORS_key, timeout=5):
 
 
 def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
-    # API docs: https://openrouteservice.org/dev/#/api-docs/geocode/search/get
+    # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
         'api_key': ORS_key,
@@ -147,7 +147,7 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
 
 
 def get_weather(location, OWM_key, timeout=5):
-    # API docs: https://openweathermap.org/api/one-call-api
+    # https://openweathermap.org/api/one-call-api
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
         'lat': location.latitude,
@@ -165,7 +165,7 @@ def get_weather(location, OWM_key, timeout=5):
 
 
 def get_air_pollution(location, timezone, OWM_key, timeout=5):
-    # API docs: https://openweathermap.org/api/air-pollution
+    # https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,

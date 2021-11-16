@@ -7,11 +7,31 @@ import copy
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.test import RequestFactory
+import json
+from weather_app.models import User, Location
 
 
 class TestUtils(TestCase):
     def setUp(self):
         pass
+        self.sample_user = User.objects.create_user(
+            username='John',
+            password='123456')
+        self.sample_location = Location(
+            latitude=-6.532008,
+            longitude=-64.39027,
+            label= 'Canutama, AM, Brazil',
+            user=self.sample_user)
+        self.sample_location.save()
+        self.sample_timezone = pytz.timezone('America/Manaus')
+        with open('weather_app/tests/sample_weather.json', 'r') as file:
+            self.sample_weather = json.load(file)
+        with open('weather_app/tests/sample_air_pollution.json', 'r') as file:
+            self.sample_air_pollution = json.load(file)
+        with open('weather_app/tests/sample_location_history.json', 'r') as file:
+            self.sample_location_history = json.load(file)
+        with open('weather_app/tests/sample_favorite_locations.json', 'r') as file:
+            self.sample_favorite_locations = json.load(file)
 
     def test_convert_timestamps_to_datetimes(self):
         # TODO Test timestamps just before/after DST begin/end
@@ -36,7 +56,6 @@ class TestUtils(TestCase):
                             'dt': utc_timestamp,
                             'sunrise': utc_timestamp,
                             'sunset': utc_timestamp}}]}]}
-
         output_data = {
             'abc': 123456789,
             'jkl': [{
@@ -86,7 +105,7 @@ class TestUtils(TestCase):
         # https://docs.djangoproject.com/en/3.2/ref/request-response/
         # https://docs.djangoproject.com/en/3.2/topics/testing/advanced/#the-request-factory
         factory = RequestFactory()
-        request = factory.get('URL_does_not_matter')
+        request = factory.get('this_URL_does_not_matter')
         request.user = AnonymousUser()
         response = render_dashboard(request)
-        assert response.status_code == 200
+        assert response.status_code == 200        
