@@ -6,6 +6,8 @@ import pprint
 import pytz
 from weather_app.views.utils import get_location_params, get_location_instance, get_weather, get_air_pollution, get_charts, render_dashboard
 from weather_app.views.API_keys import OWM_key
+# Persist sample data for testing
+import pickle
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
@@ -29,6 +31,9 @@ def dashboard(request):
         return render_dashboard(request)
     try:
         weather = get_weather(location, OWM_key)
+        # Persist sample data for testing
+        # with open('weather_app/tests/sample_data/weather.pkl', 'wb') as file:
+        #     pickle.dump(weather, file)
     except Timeout as err:
         messages.warning(
             request, {
@@ -50,6 +55,9 @@ def dashboard(request):
     timezone = pytz.timezone(weather['timezone'])
     try:
         air_pollution = get_air_pollution(location, timezone, OWM_key)
+        # Persist sample data for testing
+        # with open('weather_app/tests/sample_data/air_pollution.pkl', 'wb') as file:
+        #     pickle.dump(air_pollution, file)
     except Timeout as err:
         messages.warning(
             request, {
@@ -69,6 +77,9 @@ def dashboard(request):
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     charts = get_charts(weather)
+    # Persist sample data for testing
+    # with open('weather_app/tests/sample_data/charts.pkl', 'wb') as file:
+    #     pickle.dump(charts, file)
     if user.is_authenticated:
         location.save()
     return render_dashboard(

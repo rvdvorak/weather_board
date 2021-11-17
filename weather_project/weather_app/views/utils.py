@@ -8,6 +8,7 @@ import requests
 import json
 import pytz
 import random
+import pickle
 
 
 def redirect_to_dashboard(location_params=None):
@@ -29,6 +30,7 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
             'favorite_locations': get_favorite_locations(request.user)})
 
 
+# TODO Tests
 def render_user_profile(request, error_message=None, success_message=None):
     return render(
         request,
@@ -40,6 +42,7 @@ def render_user_profile(request, error_message=None, success_message=None):
             'favorite_locations': get_favorite_locations(request.user)})
 
 
+# TODO Tests
 def get_location_params(request):
     if request.method == 'GET':
         latitude = request.GET.get('latitude')
@@ -58,6 +61,7 @@ def get_location_params(request):
         return {}
 
 
+# TODO Tests
 def get_random_location_params(ORS_key, timeout=5):
     # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
     url = 'https://api.openrouteservice.org/geocode/reverse'
@@ -80,6 +84,7 @@ def get_random_location_params(ORS_key, timeout=5):
         'label': response.json()['features'][0]['properties']['label']}
 
 
+# TODO Tests
 def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
@@ -92,6 +97,7 @@ def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
     return response.json()['features']
 
 
+# TODO Tests
 def get_location_instance(location_params, user):
     if location_params:
         location_instance = Location(
@@ -114,19 +120,33 @@ def get_location_instance(location_params, user):
         return None
 
 
+# TODO Tests
 def get_location_history(user):
     if user.is_authenticated:
-        return Location.objects.filter(
+        location_history = Location.objects.filter(
             user=user).order_by('-date_last_showed')
+
+        # Persist sample data for testing
+        # with open('weather_app/tests/sample_data/location_history.pkl', 'wb') as file:
+        #     pickle.dump(location_history, file)
+
+        return location_history
     else:
         return None
 
 
+# TODO Tests
 def get_favorite_locations(user):
     if user.is_authenticated:
-        return Location.objects.filter(
+        favorite_locations = Location.objects.filter(
             user=user,
             is_favorite=True).order_by('-date_last_showed')
+
+        # Persist sample data for testing
+        # with open('weather_app/tests/sample_data/favorite_locations.pkl', 'wb') as file:
+        #     pickle.dump(favorite_locations, file)
+
+        return favorite_locations
     else:
         return None
 
@@ -146,6 +166,7 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
     return data
 
 
+# TODO Tests
 def get_weather(location, OWM_key, timeout=5):
     # https://openweathermap.org/api/one-call-api
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
@@ -164,6 +185,7 @@ def get_weather(location, OWM_key, timeout=5):
     return weather
 
 
+# TODO Tests
 def get_air_pollution(location, timezone, OWM_key, timeout=5):
     # https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'

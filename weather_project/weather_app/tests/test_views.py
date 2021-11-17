@@ -8,30 +8,32 @@ from django.urls import reverse
 from urllib.parse import urlencode
 from django.test import RequestFactory
 import json
+import pickle
 from weather_app.models import User, Location
 
 
 class TestUtils(TestCase):
     def setUp(self):
-        pass
+        with open('weather_app/tests/sample_data/weather.pkl', 'rb') as file:
+            self.sample_weather = pickle.load(file)
+        with open('weather_app/tests/sample_data/air_pollution.pkl', 'rb') as file:
+            self.sample_air_pollution = pickle.load(file)
+        with open('weather_app/tests/sample_data/charts.pkl', 'rb') as file:
+            self.sample_charts = pickle.load(file)
+        with open('weather_app/tests/sample_data/location_history.pkl', 'rb') as file:
+            self.sample_location_history = pickle.load(file)
+        with open('weather_app/tests/sample_data/favorite_locations.pkl', 'rb') as file:
+            self.sample_favorite_locations = pickle.load(file)
         self.sample_user = User.objects.create_user(
             username='John',
             password='123456')
         self.sample_location = Location(
-            latitude=-6.532008,
-            longitude=-64.39027,
-            label= 'Canutama, AM, Brazil',
+            latitude=-16.36667,
+            longitude=-58.4,
+            label='San Matías, SC, Bolivia',
             user=self.sample_user)
         self.sample_location.save()
-        self.sample_timezone = pytz.timezone('America/Manaus')
-        with open('weather_app/tests/sample_weather.json', 'r') as file:
-            self.sample_weather = json.load(file)
-        with open('weather_app/tests/sample_air_pollution.json', 'r') as file:
-            self.sample_air_pollution = json.load(file)
-        with open('weather_app/tests/sample_location_history.json', 'r') as file:
-            self.sample_location_history = json.load(file)
-        with open('weather_app/tests/sample_favorite_locations.json', 'r') as file:
-            self.sample_favorite_locations = json.load(file)
+        self.sample_timezone = pytz.timezone('America/La_Paz')
 
     def test_convert_timestamps_to_datetimes(self):
         # TODO Test timestamps just before/after DST begin/end
@@ -73,7 +75,6 @@ class TestUtils(TestCase):
                             'dt': local_datetime,
                             'sunrise': local_datetime,
                             'sunset': local_datetime}}]}]}
-
         assert convert_timestamps_to_datetimes(
             copy.deepcopy(input_data),
             keys_to_convert,
@@ -108,4 +109,19 @@ class TestUtils(TestCase):
         request = factory.get('this_URL_does_not_matter')
         request.user = AnonymousUser()
         response = render_dashboard(request)
-        assert response.status_code == 200        
+        assert response.status_code == 200
+
+    def test_render_dashboard_with_params(self):
+        factory = RequestFactory()
+        request = factory.get('this_URL_does_not_matter')
+        request.user = AnonymousUser()
+        response = render_dashboard(
+            request,
+            location=self.sample_location,
+            weather=self.sample_weather,
+            air_pollution=self.sample_air_pollution,
+            charts=self.sample_charts)
+        assert response.status_code == 200
+
+    def test_get_charts(self):
+        assert get_charts(self.sample_weather) == self.sample_charts
