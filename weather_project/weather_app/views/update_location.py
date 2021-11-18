@@ -2,6 +2,7 @@ from weather_app.models import Location
 from weather_app.views.utils import redirect_to_dashboard
 
 
+# TODO Tests
 def update_location(request):
     location = Location.objects.filter(
         user=request.user,

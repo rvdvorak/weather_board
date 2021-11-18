@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate
 from weather_app.views.utils import get_location_params, render_user_profile
 
 
+# TODO Tests
 def user_profile(request):
     if request.method == 'GET':
         return render_user_profile(request)

@@ -5,6 +5,7 @@ from weather_app.views.utils import redirect_to_dashboard, get_favorite_location
 from weather_app.views.API_keys import ORS_key
 
 
+# TODO Tests
 def random_location(request):
     user = request.user
     try:

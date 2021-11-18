@@ -91,13 +91,13 @@ class TestUtils(TestCase):
         assert response.url == reverse('dashboard')
 
     def test_redirect_to_dashboard_with_location_params(self):
-        url = reverse('dashboard')
+        base_url = reverse('dashboard')
         location_params = {
             'latitude': 30,
             'longitude': 40,
             'label': 'Test Location'}
         query_string = urlencode(location_params)
-        uri = f'{url}?{query_string}'
+        uri = f'{base_url}?{query_string}'
         response = redirect_to_dashboard(location_params)
         assert response.status_code == 302
         assert response.url == uri
@@ -106,14 +106,14 @@ class TestUtils(TestCase):
         # https://docs.djangoproject.com/en/3.2/ref/request-response/
         # https://docs.djangoproject.com/en/3.2/topics/testing/advanced/#the-request-factory
         factory = RequestFactory()
-        request = factory.get('this_URL_does_not_matter')
+        request = factory.get(reverse('dashboard'))
         request.user = AnonymousUser()
         response = render_dashboard(request)
         assert response.status_code == 200
 
     def test_render_dashboard_with_params(self):
         factory = RequestFactory()
-        request = factory.get('this_URL_does_not_matter')
+        request = factory.get(reverse('dashboard'))
         request.user = AnonymousUser()
         response = render_dashboard(
             request,
@@ -124,4 +124,5 @@ class TestUtils(TestCase):
         assert response.status_code == 200
 
     def test_get_charts(self):
-        assert get_charts(self.sample_weather) == self.sample_charts
+        assert get_charts(self.sample_weather) == self.sample_charts          
+        

@@ -5,6 +5,7 @@ from weather_app.views.utils import get_search_results, get_location_history, ge
 from weather_app.views.API_keys import ORS_key
 
 
+# TODO Tests
 def search_location(request):
     user = request.user
     max_count = 20
