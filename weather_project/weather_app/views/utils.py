@@ -30,7 +30,6 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
             'favorite_locations': get_favorite_locations(request.user)})
 
 
-# TODO Tests
 def render_user_profile(request, error_message=None, success_message=None):
     return render(
         request,
@@ -42,7 +41,6 @@ def render_user_profile(request, error_message=None, success_message=None):
             'favorite_locations': get_favorite_locations(request.user)})
 
 
-# TODO Tests
 def get_location_params(request):
     if request.method == 'GET':
         latitude = request.GET.get('latitude')
