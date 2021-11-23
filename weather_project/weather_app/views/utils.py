@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from urllib.parse import urlencode
 from datetime import datetime
@@ -8,7 +8,8 @@ import requests
 import json
 import pytz
 import random
-import pickle # Used for persisting sample data for tests
+import pickle  # Used for persisting sample data for tests
+from django.template.response import TemplateResponse
 
 
 def redirect_to_dashboard(location_params=None):
@@ -19,7 +20,7 @@ def redirect_to_dashboard(location_params=None):
 
 
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
-    return render(
+    return TemplateResponse(
         request,
         'weather_app/dashboard.html', {
             'location': location,
@@ -31,7 +32,7 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
 
 
 def render_user_profile(request, error_message=None, success_message=None):
-    return render(
+    return TemplateResponse(
         request,
         'weather_app/user_profile.html', {
             'success_message': success_message,

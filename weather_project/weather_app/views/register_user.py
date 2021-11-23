@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login
@@ -8,7 +8,7 @@ from weather_app.views.utils import redirect_to_dashboard, get_location_params
 # TODO Tests
 def register_user(request):
     if request.method == 'GET':
-        return render(
+        return TemplateResponse(
             request,
             'weather_app/register_user.html', {
                 'location_params': get_location_params(request)})
@@ -21,7 +21,7 @@ def register_user(request):
             try:
                 user.save()
             except IntegrityError:
-                return render(
+                return TemplateResponse(
                     request,
                     'weather_app/register_user.html', {
                         'error_message': 'User already exists. Please choose different username.',
@@ -29,7 +29,7 @@ def register_user(request):
                 login(request, user)
                 return redirect_to_dashboard(get_location_params(request))
         else:
-            return render(
+            return TemplateResponse(
                 request,
                 'weather_app/register_user.html', {
                     'error_message': 'Passwords do not match.',

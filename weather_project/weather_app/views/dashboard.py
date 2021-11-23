@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib import messages
 from requests.exceptions import Timeout, HTTPError
 from django.core.exceptions import ValidationError
@@ -13,7 +12,6 @@ import pickle
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
 
 
-# TODO Tests
 def dashboard(request):
     user = request.user
     location_params = get_location_params(request)
