@@ -1,10 +1,14 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
 from weather_app.views.utils import get_location_params, render_user_profile
+from django.shortcuts import redirect
+from django.urls import reverse
 
 
 # TODO Tests
 def user_profile(request):
+    if not request.user.is_authenticated:
+        return redirect(reverse('login_user'))
     if request.method == 'GET':
         return render_user_profile(request)
     elif request.method == 'POST':

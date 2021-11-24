@@ -5,6 +5,7 @@ backports.entry-points-selectable==1.1.0
 certifi==2021.5.30
 charset-normalizer==2.0.4
 colorama==0.4.4
+coverage==6.1.2
 distlib==0.3.3
 Django==3.2.5
 django-adminlte3==0.1.6

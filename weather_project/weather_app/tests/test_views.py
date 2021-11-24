@@ -1,3 +1,4 @@
+from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, Client, RequestFactory
 from weather_app.views import *
@@ -6,7 +7,7 @@ import pytz
 import copy
 from django.urls import reverse
 from urllib.parse import urlencode
-from django.test import RequestFactory
+from django.test import RequestFactory, Client
 import json
 import pickle
 from weather_app.models import User, Location
@@ -33,9 +34,9 @@ class TestViews(TestCase):
 
     def get_sample_user(self):
         return User(
-            username='John',
+            username='Roman',
             password='123456')
-        
+
     def get_current_weather_keys(self):
         return {
             'dt', 'temp', 'feels_like', 'pressure', 'humidity', 'dew_point',
@@ -61,7 +62,97 @@ class TestViews(TestCase):
         with open('weather_app/tests/sample_data/favorite_locations.pkl', 'rb') as file:
             pickle.load(file)
 
-    def test_dashboard_without_location_with_anonymous_user(self):
+    # Testing VIEWS
+
+    def test_login_page_with_location(self):
+        url = reverse('login_user')
+        location_params = self.get_sample_location_params()
+        request = RequestFactory().get(url, location_params)
+        request.user = AnonymousUser()
+        response = login_user(request)
+        assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/login_user.html'):
+            response.render()
+        assert response.context_data == {'location_params': location_params}
+
+    def test_login_page_without_location(self):
+        url = reverse('login_user')
+        request = RequestFactory().get(url)
+        request.user = AnonymousUser()
+        response = login_user(request)
+        assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/login_user.html'):
+            response.render()
+        assert response.context_data == {'location_params': {}}
+
+    def test_login_user_with_correct_credentials_without_location(self):
+        login_page_url = reverse('login_user')
+        dashboard_url = reverse('dashboard')
+        credentials = {
+            'username': 'roman',
+            'password': '123456'}
+        User.objects.create_user(**credentials)
+        client = Client()
+        response = client.post(login_page_url, credentials)
+        self.assertRedirects(response, dashboard_url)
+        assert auth.get_user(client).is_authenticated
+
+    def test_login_user_with_correct_credentials_with_location(self):
+        location_params = self.get_sample_location_params()
+        login_page_url = reverse('login_user')
+        dashboard_url = reverse('dashboard')
+        credentials = {
+            'username': 'roman',
+            'password': '123456'}
+        User.objects.create_user(**credentials)
+        client = Client()
+        response = client.post(
+            login_page_url,
+            {**credentials, **location_params})
+        self.assertRedirects(
+            response,
+            f'{dashboard_url}?{urlencode(location_params)}')
+        assert auth.get_user(client).is_authenticated
+
+    def test_login_user_with_bad_credentials_without_location(self):
+        login_page_url = reverse('login_user')
+        credentials = {
+            'username': 'roman',
+            'password': '123456'}
+        User.objects.create_user(**credentials)
+        client = Client()
+        bad_credentials = {
+            'username': 'roman',
+            'password': 'bad_password'}
+        response = client.post(login_page_url, bad_credentials)
+        self.assertTemplateUsed(response, 'weather_app/login_user.html')
+        self.assertEquals(
+            response.context['error_message'],
+            'Username and password do not match.')
+        assert response.context['location_params'] == {}
+        assert not auth.get_user(client).is_authenticated
+
+    def test_login_user_with_bad_credentials_with_location(self):
+        location_params = self.get_sample_location_params()
+        login_page_url = reverse('login_user')
+        credentials = {
+            'username': 'roman',
+            'password': '123456'}
+        User.objects.create_user(**credentials)
+        client = Client()
+        bad_credentials = {
+            'username': 'roman',
+            'password': 'bad_password'}
+        response = client.post(
+            login_page_url, {**bad_credentials, **location_params})
+        self.assertTemplateUsed(response, 'weather_app/login_user.html')
+        self.assertEquals(
+            response.context['error_message'],
+            'Username and password do not match.')
+        assert response.context['location_params'] == location_params
+        assert not auth.get_user(client).is_authenticated
+
+    def test_dashboard_without_location_without_user(self):
         user = AnonymousUser()
         url = reverse('dashboard')
         request = RequestFactory().get(url)
@@ -71,14 +162,14 @@ class TestViews(TestCase):
         with self.assertTemplateUsed('weather_app/dashboard.html'):
             response.render()
         assert response.context_data == {
+            'location': None,
+            'weather': None,
             'air_pollution': None,
             'charts': None,
             'favorite_locations': None,
-            'location': None,
-            'location_history': None,
-            'weather': None}
+            'location_history': None}
 
-    def test_dashboard_without_location_with_signed_user(self):
+    def test_dashboard_without_location_with_user(self):
         user = self.get_sample_user()
         url = reverse('dashboard')
         request = RequestFactory().get(url)
@@ -91,10 +182,12 @@ class TestViews(TestCase):
         assert response.context_data['weather'] == None
         assert response.context_data['air_pollution'] == None
         assert response.context_data['charts'] == None
-        assert isinstance(response.context_data['favorite_locations'], QuerySet)
-        assert isinstance(response.context_data['location_history'], QuerySet)
+        assert isinstance(
+            response.context_data['favorite_locations'], QuerySet)
+        assert isinstance(
+            response.context_data['location_history'], QuerySet)
 
-    def test_dashboard_with_location_with_anonymous_user(self):
+    def test_dashboard_with_location_without_user(self):
         user = AnonymousUser()
         location_params = self.get_sample_location_params()
         url = reverse('dashboard')
@@ -114,16 +207,18 @@ class TestViews(TestCase):
         assert weather['lon'] == float(location_params['longitude'])
         assert pytz.timezone(weather['timezone']) == timezone
         air_pollution = response.context_data['air_pollution']
-        assert air_pollution['coord']['lat'] == float(location_params['latitude'])
-        assert air_pollution['coord']['lon'] == float(location_params['longitude'])
+        assert air_pollution['coord']['lat'] == float(
+            location_params['latitude'])
+        assert air_pollution['coord']['lon'] == float(
+            location_params['longitude'])
         charts = response.context_data['charts']
         assert charts.keys() == {'minutely', 'hourly', 'daily'}
         assert response.context_data['favorite_locations'] == None
         assert response.context_data['location_history'] == None
 
-    def test_dashboard_with_location_with_signed_user(self):
+    def test_dashboard_with_location_with_user(self):
         user = self.get_sample_user()
-        user.save() # Necessary in this test
+        user.save()  # Necessary in this test
         location_params = self.get_sample_location_params()
         url = reverse('dashboard')
         timezone = self.get_sample_timezone()
@@ -142,12 +237,17 @@ class TestViews(TestCase):
         assert weather['lon'] == float(location_params['longitude'])
         assert pytz.timezone(weather['timezone']) == timezone
         air_pollution = response.context_data['air_pollution']
-        assert air_pollution['coord']['lat'] == float(location_params['latitude'])
-        assert air_pollution['coord']['lon'] == float(location_params['longitude'])
+        assert air_pollution['coord']['lat'] == float(
+            location_params['latitude'])
+        assert air_pollution['coord']['lon'] == float(
+            location_params['longitude'])
         charts = response.context_data['charts']
         assert charts.keys() == {'minutely', 'hourly', 'daily'}
-        assert isinstance(response.context_data['favorite_locations'], QuerySet)
+        assert isinstance(
+            response.context_data['favorite_locations'], QuerySet)
         assert isinstance(response.context_data['location_history'], QuerySet)
+
+    # Testing UTILS
 
     def test_convert_timestamps_to_datetimes(self):
         # TODO Test timestamps just before/after DST begin/end
@@ -198,108 +298,125 @@ class TestViews(TestCase):
             keys_to_convert,
             timezone) == [[[output_data]]]
 
-    def test_redirect_to_dashboard_without_params(self):
+    def test_redirect_to_dashboard_with_location(self):
         # https://docs.djangoproject.com/en/3.2/ref/request-response/
-        url = reverse('dashboard')
-        response = redirect_to_dashboard()
-        assert response.status_code == 302
-        assert response.url == url
-
-    def test_redirect_to_dashboard_with_location_params(self):
-        location_params = self.get_sample_location_params()
         base_url = reverse('dashboard')
+        location_params = self.get_sample_location_params()
         query_string = urlencode(location_params)
         uri = f'{base_url}?{query_string}'
         response = redirect_to_dashboard(location_params)
         assert response.status_code == 302
         assert response.url == uri
 
-    def test_render_dashboard_without_params_with_anonymous_user(self):
+    def test_redirect_to_dashboard_without_location(self):
         # https://docs.djangoproject.com/en/3.2/ref/request-response/
-        # https://docs.djangoproject.com/en/3.2/topics/testing/advanced/#the-request-rf
+        response = redirect_to_dashboard()
+        assert response.status_code == 302
+        assert response.url == reverse('dashboard')
+
+    def test_render_dashboard_without_location_without_user(self):
         url = reverse('dashboard')
         request = RequestFactory().get(url)
         request.user = AnonymousUser()
         response = render_dashboard(request)
         assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/dashboard.html'):
+            response.render()
+        assert response.context_data == {
+            'location': None,
+            'weather': None,
+            'air_pollution': None,
+            'charts': None,
+            'favorite_locations': None,
+            'location_history': None}
 
-    def test_render_dashboard_with_params_with_signed_user(self):
-        # TODO Test context
-        user = self.get_sample_user()
-        user.save()
+    def test_render_dashboard_with_location_with_user(self):
+        url = reverse('dashboard')
         location_params = self.get_sample_location_params()
-        base_url = reverse('dashboard')
-        query_string = urlencode(location_params)
-        uri = f'{base_url}?{query_string}'
+        request = RequestFactory().get(url, location_params)
+        request.user = self.get_sample_user()
         location = self.get_sample_location_instance()
         weather = self.get_sample_weather()
         air_pollution = self.get_sample_air_pollution()
         charts = self.get_sample_charts()
-        location_history = self.get_sample_location_history()
-        favorite_locations = self.get_sample_favorite_locations()
-        url = reverse('dashboard')
-        request = RequestFactory().get(url)
-        request.user = user
         response = render_dashboard(
-            request,
-            location=location,
-            weather=weather,
-            air_pollution=air_pollution,
-            charts=charts)
+            request, location, weather, air_pollution, charts)
         assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/dashboard.html'):
+            response.render()
+        assert response.context_data['location'] == location
+        assert response.context_data['weather'] == weather
+        assert response.context_data['air_pollution'] == air_pollution
+        assert response.context_data['charts'] == charts
+        assert isinstance(
+            response.context_data['favorite_locations'], QuerySet)
+        assert isinstance(
+            response.context_data['location_history'], QuerySet)
 
     def test_get_charts(self):
         weather = self.get_sample_weather()
         charts = self.get_sample_charts()
         assert get_charts(weather) == charts
 
-    def test_render_user_profile_without_params_with_anonymous_user(self):
+    def test_render_user_profile_without_location_without_user(self):
         url = reverse('user_profile')
         request = RequestFactory().get(url)
         request.user = AnonymousUser()
         response = render_user_profile(request)
         assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/user_profile.html'):
+            response.render()
+        assert response.context_data == {
+            'error_message': None,
+            'success_message': None,
+            'location_params': {},
+            'location_history': None,
+            'favorite_locations': None}
 
-    def test_render_user_profile_with_params_with_signed_user(self):
+    def test_render_user_profile_with_location_with_user_with_messages(self):
+        location_params = self.get_sample_location_params()
         url = reverse('user_profile')
-        request = RequestFactory().get(url)
-        request.user = AnonymousUser()
+        request = RequestFactory().get(url, location_params)
+        request.user = self.get_sample_user()
         response = render_user_profile(
             request,
-            error_message='TEST error message',
-            success_message='TEST successs message')
+            error_message='error message',
+            success_message='success message')
         assert response.status_code == 200
+        with self.assertTemplateUsed('weather_app/user_profile.html'):
+            response.render()
+        assert response.context_data['error_message'] == 'error message'
+        assert response.context_data['success_message'] == 'success message'
+        assert response.context_data['location_params'] == location_params
+        assert isinstance(
+            response.context_data['favorite_locations'], QuerySet)
+        assert isinstance(
+            response.context_data['location_history'], QuerySet)
 
-    def test_get_location_params_from_GET_request_with_params_with_signed_user(self):
-        base_url = reverse('dashboard')
+    def test_get_location_params_from_GET_with_location(self):
+        url = reverse('dashboard')
         location_params = self.get_sample_location_params()
-        query_string = urlencode(location_params)
-        request = RequestFactory().get(f'{base_url}?{query_string}')
-        request.user = self.get_sample_user()
+        request = RequestFactory().get(url, location_params)
         assert get_location_params(request) == location_params
 
-    def test_get_location_params_from_GET_request_without_params_with_anonymous_user(self):
+    def test_get_location_params_from_GET_without_location(self):
         url = reverse('dashboard')
         request = RequestFactory().get(url)
-        request.user = AnonymousUser()
         assert get_location_params(request) == {}
 
-    def test_get_location_params_from_POST_request_with_params_with_signed_user(self):
+    def test_get_location_params_from_POST_with_location(self):
         url = reverse('dashboard')
         location_params = self.get_sample_location_params()
         request = RequestFactory().post(url, location_params)
-        request.user = self.get_sample_user()
         assert get_location_params(request) == location_params
 
-    def test_get_location_params_from_POST_request_without_params_with_anonymous_user(self):
+    def test_get_location_params_from_POST_without_location(self):
         url = reverse('dashboard')
         request = RequestFactory().post(url)
-        request.user = AnonymousUser()
         assert get_location_params(request) == {}
 
     def test_get_random_location_params(self):
         location_params = get_random_location_params(ORS_key)
-        assert type(location_params) is dict
         assert -90.0 <= location_params['latitude'] <= 90.0
         assert -180.0 <= location_params['longitude'] <= 180.0
         assert (location_params['label']) not in ['', None]
@@ -351,7 +468,7 @@ class TestViews(TestCase):
             search_query,
             ORS_key)
 
-    def test_get_location_instance_with_params_with_signed_user(self):
+    def test_get_location_instance_with_params_with_user(self):
         location_params = self.get_sample_location_params()
         user = self.get_sample_user()
         user.save()
@@ -360,7 +477,7 @@ class TestViews(TestCase):
         location.save()
         assert get_location_instance(location_params, user) == location
 
-    def test_get_location_instance_with_params_with_anonymous_user(self):
+    def test_get_location_instance_with_params_without_user(self):
         location_params = self.get_sample_location_params()
         user_1 = self.get_sample_user()
         user_1.save()
@@ -374,17 +491,17 @@ class TestViews(TestCase):
         assert location_2.longitude == location_1.longitude
         assert location_2 != location_1
 
-    def test_get_location_instance_without_params_with_anonymous_user(self):
+    def test_get_location_instance_without_params_without_user(self):
         user = AnonymousUser()
         location_params = {}
         assert get_location_instance(location_params, user) == None
 
-    def test_get_location_instance_without_params_with_signed_user(self):
+    def test_get_location_instance_without_params_with_user(self):
         user = self.get_sample_user()
         location_params = {}
         assert get_location_instance(location_params, user) == None
 
-    def test_get_location_history_with_signed_user(self):
+    def test_get_location_history_with_user(self):
         user = self.get_sample_user()
         user.save()
         location = self.get_sample_location_instance()
@@ -394,7 +511,7 @@ class TestViews(TestCase):
         assert location_history[0] == location
         assert len(location_history) == 1
 
-    def test_get_location_history_with_anonymous_user(self):
+    def test_get_location_history_without_user(self):
         user_1 = self.get_sample_user()
         user_1.save()
         location = self.get_sample_location_instance()
@@ -404,7 +521,7 @@ class TestViews(TestCase):
         location_history = get_location_history(user_2)
         assert location_history == None
 
-    def test_get_favorite_locations_with_signed_user(self):
+    def test_get_favorite_locations_with_user(self):
         user = self.get_sample_user()
         user.save()
         common_location = Location(
@@ -425,7 +542,7 @@ class TestViews(TestCase):
         assert common_location not in favorites
         assert favorite_location in favorites
 
-    def test_get_favorite_locations_with_anonymous_user(self):
+    def test_get_favorite_locations_without_user(self):
         user_1 = self.get_sample_user()
         user_1.save()
         common_location = Location(

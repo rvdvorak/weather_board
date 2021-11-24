@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from weather_app.views.utils import get_location_params, redirect_to_dashboard
 
 
-# TODO Tests
 def login_user(request):
     location_params = get_location_params(request)
     if request.method == 'GET':
