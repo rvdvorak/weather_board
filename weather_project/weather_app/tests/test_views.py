@@ -66,6 +66,72 @@ class TestViews(TestCase):
             pickle.load(file)
 
     # Testing VIEWS
+    
+    def test_show_user_registration_page_with_location(self):
+        url = reverse('register_user')
+        location_params = self.get_sample_location_params()
+        client = Client()
+        response = client.get(url, location_params)
+        self.assertTemplateUsed(response, 'weather_app/register_user.html')
+        assert response.status_code == 200
+        assert response.context['location_params'] == location_params
+        assert not auth.get_user(client).is_authenticated
+        
+    def test_show_user_registration_page_without_location(self):
+        url = reverse('register_user')
+        client = Client()
+        response = client.get(url)
+        self.assertTemplateUsed(response, 'weather_app/register_user.html')
+        assert response.status_code == 200
+        assert response.context['location_params'] == {}
+        assert not auth.get_user(client).is_authenticated
+        
+    def test_register_new_user_with_unmatched_passwords(self):
+        url = reverse('register_user')
+        location_params = self.get_sample_location_params()
+        credentials = {
+            'username': 'new user',
+            'password1': '123456',
+            'password2': '123456789'}
+        client = Client()
+        response = client.post(url, {**location_params, **credentials})
+        self.assertTemplateUsed(response, 'weather_app/register_user.html')
+        assert response.status_code == 200
+        assert response.context['error_message'] == 'Passwords do not match.'
+        assert response.context['location_params'] == location_params
+        assert not auth.get_user(client).is_authenticated
+
+    def test_register_existing_user(self):
+        url = reverse('register_user')
+        location_params = self.get_sample_location_params()
+        User.objects.create_user(
+            username='new user',
+            password='123456')
+        credentials = {
+            'username': 'new user',
+            'password1': '123456',
+            'password2': '123456'}
+        client = Client()
+        response = client.post(url, {**location_params, **credentials})
+        self.assertTemplateUsed(response, 'weather_app/register_user.html')
+        assert response.status_code == 200
+        assert response.context['error_message'] == 'User already exists. Please choose different username.'
+        assert response.context['location_params'] == location_params
+        
+    def test_register_new_user(self):
+        register_url = reverse('register_user')
+        dashboard_url = reverse('dashboard')
+        location_params = self.get_sample_location_params()
+        query_string = urlencode(location_params)
+        redirect_uri = f"{dashboard_url}?{query_string}"
+        credentials = {
+            'username': 'new user',
+            'password1': '123456',
+            'password2': '123456'}
+        client = Client()
+        response = client.post(register_url, {**location_params, **credentials})
+        self.assertRedirects(response, redirect_uri)
+        assert auth.get_user(client).is_authenticated
 
     def test_show_random_location(self):
         client = Client()
