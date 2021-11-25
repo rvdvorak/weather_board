@@ -1,11 +1,17 @@
 from weather_app.models import Location
-from weather_app.views.utils import redirect_to_dashboard
+from weather_app.views.utils import redirect_to_dashboard, redirect_to_login, get_location_params
 
 
-# TODO Tests
+# TODO Test add favorite location
+# TODO Test remove favorite location
+# TODO Refactor using location_params
+# TODO Implement "login required" decorator
 def update_location(request):
+    user = request.user
+    if not user.is_authenticated:
+        redirect_to_login(get_location_params(request))
     location = Location.objects.filter(
-        user=request.user,
+        user=user,
         id=int(request.POST.get('location_id')))[0]
     if request.POST.get('is_favorite') == 'yes':
         location.is_favorite = True

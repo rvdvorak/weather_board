@@ -1,11 +1,34 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import redirect_to_dashboard, get_favorite_locations, get_location_history, get_random_location_params, render_dashboard
+from weather_app.views.utils import redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
 from weather_app.views.API_keys import ORS_key
+import random
+import requests
 
 
-# TODO Tests
+def get_random_location_params(ORS_key, timeout=5):
+    # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
+    url = 'https://api.openrouteservice.org/geocode/reverse'
+    latitude = round(
+        random.random() * 180 - 90,
+        6)
+    longitude = round(
+        random.random() * 360 - 180,
+        6)
+    params = {
+        'api_key': ORS_key,
+        'point.lat': latitude,
+        'point.lon': longitude,
+        'size': 1}
+    response = requests.get(url, params=params, timeout=timeout)
+    response.raise_for_status()
+    return {
+        'latitude': latitude,
+        'longitude': longitude,
+        'label': response.json()['features'][0]['properties']['label']}
+
+
 def random_location(request):
     user = request.user
     try:

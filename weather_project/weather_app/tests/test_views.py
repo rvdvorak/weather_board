@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 import copy
 from django.urls import reverse
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse, parse_qs
 from django.test import RequestFactory, Client
 import json
 import pickle
@@ -32,10 +32,13 @@ class TestViews(TestCase):
             longitude=float(location_params['longitude']),
             label=location_params['label'])
 
+    def get_sample_credentials(self):
+        return {
+            'username': 'roman',
+            'password': '123456'}
+    
     def get_sample_user(self):
-        return User(
-            username='Roman',
-            password='123456')
+        return User(**self.get_sample_credentials())
 
     def get_current_weather_keys(self):
         return {
@@ -64,6 +67,43 @@ class TestViews(TestCase):
 
     # Testing VIEWS
 
+    def test_show_random_location(self):
+        client = Client()
+        response = client.get(reverse('random_location'))
+        parsed_uri = urlparse(response.url)
+        query_string = parsed_uri.query
+        params = parse_qs(query_string)
+        label = params['label'][0]
+        latitude = float(params['latitude'][0])
+        longitude = float(params['longitude'][0])
+        assert label not in ['', None]
+        assert -90.0 <= latitude <= 90.0
+        assert -180.0 <= longitude <= 180.0
+        assert response.status_code == 302
+    
+    def test_logout_with_location(self):
+        location_params = self.get_sample_location_params()
+        logout_url = reverse('logout_user')
+        dashboard_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        credentials = self.get_sample_credentials()
+        User.objects.create_user(**credentials)
+        client = Client()
+        client.login(**credentials)
+        assert auth.get_user(client).is_authenticated
+        response = client.post(logout_url, location_params)
+        assert not auth.get_user(client).is_authenticated
+        self.assertRedirects(response, dashboard_uri)
+
+    def test_logout_without_location(self):
+        credentials = self.get_sample_credentials()
+        User.objects.create_user(**credentials)
+        client = Client()
+        client.login(**credentials)
+        assert auth.get_user(client).is_authenticated
+        response = client.post(reverse('logout_user'))
+        assert not auth.get_user(client).is_authenticated
+        self.assertRedirects(response, reverse('dashboard'))
+
     def test_login_page_with_location(self):
         url = reverse('login_user')
         location_params = self.get_sample_location_params()
@@ -88,9 +128,7 @@ class TestViews(TestCase):
     def test_login_user_with_correct_credentials_without_location(self):
         login_page_url = reverse('login_user')
         dashboard_url = reverse('dashboard')
-        credentials = {
-            'username': 'roman',
-            'password': '123456'}
+        credentials = self.get_sample_credentials()
         User.objects.create_user(**credentials)
         client = Client()
         response = client.post(login_page_url, credentials)
@@ -101,9 +139,7 @@ class TestViews(TestCase):
         location_params = self.get_sample_location_params()
         login_page_url = reverse('login_user')
         dashboard_url = reverse('dashboard')
-        credentials = {
-            'username': 'roman',
-            'password': '123456'}
+        credentials = self.get_sample_credentials()
         User.objects.create_user(**credentials)
         client = Client()
         response = client.post(
@@ -116,9 +152,7 @@ class TestViews(TestCase):
 
     def test_login_user_with_bad_credentials_without_location(self):
         login_page_url = reverse('login_user')
-        credentials = {
-            'username': 'roman',
-            'password': '123456'}
+        credentials = self.get_sample_credentials()
         User.objects.create_user(**credentials)
         client = Client()
         bad_credentials = {
@@ -135,9 +169,7 @@ class TestViews(TestCase):
     def test_login_user_with_bad_credentials_with_location(self):
         location_params = self.get_sample_location_params()
         login_page_url = reverse('login_user')
-        credentials = {
-            'username': 'roman',
-            'password': '123456'}
+        credentials = self.get_sample_credentials()
         User.objects.create_user(**credentials)
         client = Client()
         bad_credentials = {
@@ -152,7 +184,7 @@ class TestViews(TestCase):
         assert response.context['location_params'] == location_params
         assert not auth.get_user(client).is_authenticated
 
-    def test_dashboard_without_location_without_user(self):
+    def test_dashboard_without_location_logged_out(self):
         user = AnonymousUser()
         url = reverse('dashboard')
         request = RequestFactory().get(url)
@@ -169,7 +201,7 @@ class TestViews(TestCase):
             'favorite_locations': None,
             'location_history': None}
 
-    def test_dashboard_without_location_with_user(self):
+    def test_dashboard_without_location_logged_in(self):
         user = self.get_sample_user()
         url = reverse('dashboard')
         request = RequestFactory().get(url)
@@ -187,7 +219,7 @@ class TestViews(TestCase):
         assert isinstance(
             response.context_data['location_history'], QuerySet)
 
-    def test_dashboard_with_location_without_user(self):
+    def test_dashboard_with_location_logged_out(self):
         user = AnonymousUser()
         location_params = self.get_sample_location_params()
         url = reverse('dashboard')
@@ -216,7 +248,7 @@ class TestViews(TestCase):
         assert response.context_data['favorite_locations'] == None
         assert response.context_data['location_history'] == None
 
-    def test_dashboard_with_location_with_user(self):
+    def test_dashboard_with_location_logged_in(self):
         user = self.get_sample_user()
         user.save()  # Necessary in this test
         location_params = self.get_sample_location_params()
@@ -314,7 +346,7 @@ class TestViews(TestCase):
         assert response.status_code == 302
         assert response.url == reverse('dashboard')
 
-    def test_render_dashboard_without_location_without_user(self):
+    def test_render_dashboard_without_location_logged_out(self):
         url = reverse('dashboard')
         request = RequestFactory().get(url)
         request.user = AnonymousUser()
@@ -330,7 +362,7 @@ class TestViews(TestCase):
             'favorite_locations': None,
             'location_history': None}
 
-    def test_render_dashboard_with_location_with_user(self):
+    def test_render_dashboard_with_location_logged_in(self):
         url = reverse('dashboard')
         location_params = self.get_sample_location_params()
         request = RequestFactory().get(url, location_params)
@@ -358,7 +390,7 @@ class TestViews(TestCase):
         charts = self.get_sample_charts()
         assert get_charts(weather) == charts
 
-    def test_render_user_profile_without_location_without_user(self):
+    def test_render_user_profile_without_location_logged_out(self):
         url = reverse('user_profile')
         request = RequestFactory().get(url)
         request.user = AnonymousUser()
@@ -373,7 +405,7 @@ class TestViews(TestCase):
             'location_history': None,
             'favorite_locations': None}
 
-    def test_render_user_profile_with_location_with_user_with_messages(self):
+    def test_render_user_profile_with_location_logged_in_with_messages(self):
         location_params = self.get_sample_location_params()
         url = reverse('user_profile')
         request = RequestFactory().get(url, location_params)
@@ -468,7 +500,7 @@ class TestViews(TestCase):
             search_query,
             ORS_key)
 
-    def test_get_location_instance_with_params_with_user(self):
+    def test_get_location_instance_with_params_logged_in(self):
         location_params = self.get_sample_location_params()
         user = self.get_sample_user()
         user.save()
@@ -477,7 +509,7 @@ class TestViews(TestCase):
         location.save()
         assert get_location_instance(location_params, user) == location
 
-    def test_get_location_instance_with_params_without_user(self):
+    def test_get_location_instance_with_params_logged_out(self):
         location_params = self.get_sample_location_params()
         user_1 = self.get_sample_user()
         user_1.save()
@@ -491,17 +523,17 @@ class TestViews(TestCase):
         assert location_2.longitude == location_1.longitude
         assert location_2 != location_1
 
-    def test_get_location_instance_without_params_without_user(self):
+    def test_get_location_instance_without_params_logged_out(self):
         user = AnonymousUser()
         location_params = {}
         assert get_location_instance(location_params, user) == None
 
-    def test_get_location_instance_without_params_with_user(self):
+    def test_get_location_instance_without_params_logged_in(self):
         user = self.get_sample_user()
         location_params = {}
         assert get_location_instance(location_params, user) == None
 
-    def test_get_location_history_with_user(self):
+    def test_get_location_history_logged_in(self):
         user = self.get_sample_user()
         user.save()
         location = self.get_sample_location_instance()
@@ -511,7 +543,7 @@ class TestViews(TestCase):
         assert location_history[0] == location
         assert len(location_history) == 1
 
-    def test_get_location_history_without_user(self):
+    def test_get_location_history_logged_out(self):
         user_1 = self.get_sample_user()
         user_1.save()
         location = self.get_sample_location_instance()
@@ -521,7 +553,7 @@ class TestViews(TestCase):
         location_history = get_location_history(user_2)
         assert location_history == None
 
-    def test_get_favorite_locations_with_user(self):
+    def test_get_favorite_locations_logged_in(self):
         user = self.get_sample_user()
         user.save()
         common_location = Location(
@@ -542,7 +574,7 @@ class TestViews(TestCase):
         assert common_location not in favorites
         assert favorite_location in favorites
 
-    def test_get_favorite_locations_without_user(self):
+    def test_get_favorite_locations_logged_out(self):
         user_1 = self.get_sample_user()
         user_1.save()
         common_location = Location(
