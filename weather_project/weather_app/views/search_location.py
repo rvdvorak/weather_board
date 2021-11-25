@@ -6,7 +6,7 @@ from weather_app.views.API_keys import ORS_key
 import requests
 
 
-def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
+def get_search_results(search_query, ORS_key=ORS_key, timeout=5, max_count=20):
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
@@ -15,15 +15,22 @@ def get_search_results(search_query, ORS_key, timeout=5, max_count=20):
         'text': search_query}
     response = requests.get(url, params=params, timeout=timeout)
     response.raise_for_status()
-    return response.json()['features']
+    json_items = response.json()['features']
+    search_results = []
+    if not len(json_items) == 0:
+        for item in json_items:
+            search_results.append({
+                'label': item['properties']['label'],
+                'latitude': item['geometry']['coordinates'][1],
+                'longitude': item['geometry']['coordinates'][0]})
+    return search_results
 
 
-def search_location(request):
+def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
     max_count = 20
     search_query = request.GET.get('search_query')
     if search_query in ['', None]:
-        # TODO Test search location without search text
-        # Missing search text
+        # Missing search query
         messages.warning(
             request, {
                 'header': 'Nothing to search',
@@ -33,9 +40,10 @@ def search_location(request):
         return render_dashboard(request)
     try:
         search_results = get_search_results(
-            search_query, ORS_key, max_count=20)
+            search_query, ORS_key=ORS_key, timeout=timeout, max_count=max_count)
     except Timeout as err:
         # API request time out
+        #TODO Test search location timeout
         messages.warning(
             request, {
                 'header': 'Location service time out',
@@ -46,6 +54,7 @@ def search_location(request):
         return render_dashboard(request)
     except HTTPError as err:
         # API request failed
+        #TODO Test search location HTTPError
         messages.error(
             request, {
                 'header': 'Location service error',
@@ -55,7 +64,6 @@ def search_location(request):
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     if len(search_results) == 0:
-        # TODO Test search location not found
         # Location not found
         messages.warning(
             request, {
@@ -65,14 +73,12 @@ def search_location(request):
                 'show_search_form': True})
         return render_dashboard(request)
     elif len(search_results) == 1:
-        # TODO Test search location with single match
         # Single match => rerdirect to Dashboard
         return redirect_to_dashboard({
-            'latitude': search_results[0]['geometry']['coordinates'][1],
-            'longitude': search_results[0]['geometry']['coordinates'][0],
-            'label': search_results[0]['properties']['label']})
+            'latitude': search_results[0]['latitude'],
+            'longitude': search_results[0]['longitude'],
+            'label': search_results[0]['label']})
     elif len(search_results) > 1:
-        # TODO Test search location with multiple matches
         # Multiple matches => show search results in message
         if len(search_results) == max_count:
             # TODO Test search location with too many matches

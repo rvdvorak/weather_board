@@ -65,8 +65,99 @@ class TestViews(TestCase):
         with open('weather_app/tests/sample_data/favorite_locations.pkl', 'rb') as file:
             pickle.load(file)
 
-    # Testing VIEWS
+# SEARCH LOCATION
+#=============================================================================
+
+    def test_search_location_with_too_many_matches(self):
+        url = reverse('search_location')
+        search_query = 'Lhota'
+        lhota = {
+            'label': 'Lhota, OK, Czechia',
+            'latitude': 49.71667,
+            'longitude': 17.28333}
+        response = Client().get(url, {'search_query': search_query})
+        self.assertTemplateUsed(response, 'weather_app/dashboard.html')
+        assert response.status_code == 200
+        messages = list(response.context['messages'])
+        assert messages[0].message['header'] == 'Select location'
+        self.assertEquals(
+            messages[0].message['description'], 
+            'Showing only first 20 matching locations:')
+        search_results = messages[0].message['search_results']
+        assert lhota in search_results
+        assert len(search_results) == 20
+
+    def test_search_location_with_multiple_matches(self):
+        url = reverse('search_location')
+        search_query = 'Praha'
+        praha = {
+            'label': 'Prague, Czechia',
+            'latitude': 50.06694,
+            'longitude': 14.460249}
+        response = Client().get(url, {'search_query': search_query})
+        self.assertTemplateUsed(response, 'weather_app/dashboard.html')
+        assert response.status_code == 200
+        messages = list(response.context['messages'])
+        assert messages[0].message['header'] == 'Select location'
+        search_results = messages[0].message['search_results']
+        assert praha in search_results
+        assert len(search_results) > 3
+
+    def test_search_location_with_single_match(self):
+        url = reverse('search_location')
+        search_query = 'Růžďka'
+        ruzdka = {
+            'label': 'Růžďka, ZK, Czechia',
+            'latitude': 49.39395,
+            'longitude': 17.99559}
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(ruzdka)}"
+        response = Client().get(url, {'search_query': search_query})
+        self.assertRedirects(response, redirect_uri)
     
+    def test_search_location_without_match(self):
+        url = reverse('search_location')
+        search_query = 'incorrect_location_name'
+        response = Client().get(url, {'search_query': search_query})
+        self.assertTemplateUsed(response, 'weather_app/dashboard.html')
+        assert response.status_code == 200
+        messages = list(response.context['messages'])
+        assert messages[0].message['header'] == 'Location not found'
+    
+    def test_search_location_without_search_query(self):
+        response = Client().get(reverse('search_location'))
+        self.assertTemplateUsed(response, 'weather_app/dashboard.html')
+        assert response.status_code == 200
+        messages = list(response.context['messages'])
+        assert messages[0].message['header'] == 'Nothing to search'
+    
+    # def test_search_location_timeout(self):
+    #     base_url = reverse('search_location')
+    #     query_string = urlencode({'search_query': 'Praha'})
+    #     uri = f'{base_url}?{query_string}'
+    #     request = RequestFactory().get(uri)
+    #     response = search_location(request)
+    #     pprint.pprint(response.context_data)
+        
+
+    def test_get_search_results_timeout(self):
+        search_query = 'brno cz'
+        timeout = 0.000001
+        self.assertRaises(
+            Timeout,
+            get_search_results,
+            search_query,
+            ORS_key,
+            timeout)
+
+    def test_get_search_results_http_error(self):
+        search_query = 'brno cz'
+        ORS_key = 'bad_key'
+        self.assertRaises(
+            HTTPError,
+            get_search_results,
+            search_query,
+            ORS_key)
+
     def test_show_user_registration_page_with_location(self):
         url = reverse('register_user')
         location_params = self.get_sample_location_params()
@@ -533,37 +624,6 @@ class TestViews(TestCase):
         self.assertRaises(
             HTTPError,
             get_random_location_params,
-            ORS_key)
-
-    def test_get_search_results(self):
-        search_query = 'brno cz'
-        search_results = get_search_results(search_query, ORS_key)
-        assert type(search_results) is list
-        assert len(search_results) != 0
-        assert search_results[0]['properties']['label'] == 'Brno, JM, Czechia'
-
-    def test_get_search_results_with_bad_search_query(self):
-        search_query = 'some_incorrect_location_name'
-        search_results = get_search_results(search_query, ORS_key)
-        assert search_results == []
-
-    def test_get_search_results_timeout(self):
-        search_query = 'brno cz'
-        timeout = 0.000001
-        self.assertRaises(
-            Timeout,
-            get_search_results,
-            search_query,
-            ORS_key,
-            timeout)
-
-    def test_get_search_results_http_error(self):
-        search_query = 'brno cz'
-        ORS_key = 'bad_key'
-        self.assertRaises(
-            HTTPError,
-            get_search_results,
-            search_query,
             ORS_key)
 
     def test_get_location_instance_with_params_logged_in(self):
