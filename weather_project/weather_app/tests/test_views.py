@@ -1,18 +1,19 @@
-from django.contrib import auth
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.auth.models import AnonymousUser
+from django.contrib import auth
 from django.test import TestCase, Client, RequestFactory
-from weather_app.views import *
-from datetime import datetime
-import pytz
-import copy
 from django.urls import reverse
 from urllib.parse import urlencode, urlparse, parse_qs
-from django.test import RequestFactory, Client
-import json
-import pickle
-from weather_app.models import User, Location
 from requests.exceptions import Timeout, HTTPError
 from django.db.models.query import QuerySet
+from weather_app.views import *
+from weather_app.models import User, Location
+from datetime import datetime
+import json
+import pickle
+import pytz
+import copy
 
 
 class TestViews(TestCase):
@@ -36,7 +37,7 @@ class TestViews(TestCase):
         return {
             'username': 'roman',
             'password': '123456'}
-    
+
     def get_sample_user(self):
         return User(**self.get_sample_credentials())
 
@@ -66,7 +67,7 @@ class TestViews(TestCase):
             pickle.load(file)
 
 # SEARCH LOCATION
-#=============================================================================
+# =============================================================================
 
     def test_search_location_with_too_many_matches(self):
         url = reverse('search_location')
@@ -78,14 +79,13 @@ class TestViews(TestCase):
         response = Client().get(url, {'search_query': search_query})
         self.assertTemplateUsed(response, 'weather_app/dashboard.html')
         assert response.status_code == 200
-        messages = list(response.context['messages'])
-        assert messages[0].message['header'] == 'Select location'
+        message = list(response.context['messages'])[0].message
+        assert message['header'] == 'Select location'
         self.assertEquals(
-            messages[0].message['description'], 
+            message['description'],
             'Showing only first 20 matching locations:')
-        search_results = messages[0].message['search_results']
-        assert lhota in search_results
-        assert len(search_results) == 20
+        assert lhota in message['search_results']
+        assert len(message['search_results']) == 20
 
     def test_search_location_with_multiple_matches(self):
         url = reverse('search_location')
@@ -97,66 +97,91 @@ class TestViews(TestCase):
         response = Client().get(url, {'search_query': search_query})
         self.assertTemplateUsed(response, 'weather_app/dashboard.html')
         assert response.status_code == 200
-        messages = list(response.context['messages'])
-        assert messages[0].message['header'] == 'Select location'
-        search_results = messages[0].message['search_results']
-        assert praha in search_results
-        assert len(search_results) > 3
+        message = list(response.context['messages'])[0].message
+        assert message['header'] == 'Select location'
+        assert praha in message['search_results']
+        assert len(message['search_results']) > 3
 
     def test_search_location_with_single_match(self):
         url = reverse('search_location')
         search_query = 'Růžďka'
-        ruzdka = {
+        location_params = {
             'label': 'Růžďka, ZK, Czechia',
             'latitude': 49.39395,
             'longitude': 17.99559}
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(ruzdka)}"
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
         response = Client().get(url, {'search_query': search_query})
         self.assertRedirects(response, redirect_uri)
-    
+
     def test_search_location_without_match(self):
         url = reverse('search_location')
         search_query = 'incorrect_location_name'
         response = Client().get(url, {'search_query': search_query})
         self.assertTemplateUsed(response, 'weather_app/dashboard.html')
         assert response.status_code == 200
-        messages = list(response.context['messages'])
-        assert messages[0].message['header'] == 'Location not found'
-    
+        message = list(response.context['messages'])[0].message
+        assert message['header'] == 'Location not found'
+        assert message['search_results'] == None
+
     def test_search_location_without_search_query(self):
         response = Client().get(reverse('search_location'))
         self.assertTemplateUsed(response, 'weather_app/dashboard.html')
         assert response.status_code == 200
-        messages = list(response.context['messages'])
-        assert messages[0].message['header'] == 'Nothing to search'
-    
-    # def test_search_location_timeout(self):
-    #     base_url = reverse('search_location')
-    #     query_string = urlencode({'search_query': 'Praha'})
-    #     uri = f'{base_url}?{query_string}'
-    #     request = RequestFactory().get(uri)
-    #     response = search_location(request)
-    #     pprint.pprint(response.context_data)
-        
+        message = list(response.context['messages'])[0].message
+        assert message['header'] == 'Nothing to search'
+        assert message['search_results'] == None
 
-    def test_get_search_results_timeout(self):
-        search_query = 'brno cz'
+    def test_search_location_timeout(self):
         timeout = 0.000001
-        self.assertRaises(
-            Timeout,
-            get_search_results,
-            search_query,
-            ORS_key,
-            timeout)
+        base_url = reverse('search_location')
+        query_string = urlencode({'search_query': 'Praha'})
+        uri = f'{base_url}?{query_string}'
+        request = RequestFactory().get(uri)
+        request.user = AnonymousUser()
+        # adding session
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session.save()
+        # adding messages
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        response = search_location(request, timeout=timeout)
+        message = list(messages)[0].message
+        assert response.context_data == {
+            'air_pollution': None,
+            'charts': None,
+            'favorite_locations': None,
+            'location': None,
+            'location_history': None,
+            'weather': None}
+        assert message['header'] == 'Location service time out'
+        assert message['search_results'] == None
 
-    def test_get_search_results_http_error(self):
-        search_query = 'brno cz'
+    def test_search_location_http_error(self):
         ORS_key = 'bad_key'
-        self.assertRaises(
-            HTTPError,
-            get_search_results,
-            search_query,
-            ORS_key)
+        base_url = reverse('search_location')
+        query_string = urlencode({'search_query': 'Praha'})
+        uri = f'{base_url}?{query_string}'
+        request = RequestFactory().get(uri)
+        request.user = AnonymousUser()
+        # adding session
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session.save()
+        # adding messages
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        response = search_location(request, ORS_key=ORS_key)
+        message = list(messages)[0].message
+        assert response.context_data == {
+            'air_pollution': None,
+            'charts': None,
+            'favorite_locations': None,
+            'location': None,
+            'location_history': None,
+            'weather': None}
+        assert message['header'] == 'Location service error'
+        assert message['search_results'] == None
 
     def test_show_user_registration_page_with_location(self):
         url = reverse('register_user')
@@ -167,7 +192,7 @@ class TestViews(TestCase):
         assert response.status_code == 200
         assert response.context['location_params'] == location_params
         assert not auth.get_user(client).is_authenticated
-        
+
     def test_show_user_registration_page_without_location(self):
         url = reverse('register_user')
         client = Client()
@@ -176,7 +201,7 @@ class TestViews(TestCase):
         assert response.status_code == 200
         assert response.context['location_params'] == {}
         assert not auth.get_user(client).is_authenticated
-        
+
     def test_register_new_user_with_unmatched_passwords(self):
         url = reverse('register_user')
         location_params = self.get_sample_location_params()
@@ -208,7 +233,7 @@ class TestViews(TestCase):
         assert response.status_code == 200
         assert response.context['error_message'] == 'User already exists. Please choose different username.'
         assert response.context['location_params'] == location_params
-        
+
     def test_register_new_user(self):
         register_url = reverse('register_user')
         dashboard_url = reverse('dashboard')
@@ -220,7 +245,8 @@ class TestViews(TestCase):
             'password1': '123456',
             'password2': '123456'}
         client = Client()
-        response = client.post(register_url, {**location_params, **credentials})
+        response = client.post(
+            register_url, {**location_params, **credentials})
         self.assertRedirects(response, redirect_uri)
         assert auth.get_user(client).is_authenticated
 
@@ -237,7 +263,7 @@ class TestViews(TestCase):
         assert -90.0 <= latitude <= 90.0
         assert -180.0 <= longitude <= 180.0
         assert response.status_code == 302
-    
+
     def test_logout_with_location(self):
         location_params = self.get_sample_location_params()
         logout_url = reverse('logout_user')

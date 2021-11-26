@@ -35,6 +35,7 @@ def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
             request, {
                 'header': 'Nothing to search',
                 'description': 'First enter the name of the location to search.',
+                'search_results': None,
                 'icon': 'bi bi-geo-alt-fill',
                 'show_search_form': True})
         return render_dashboard(request)
@@ -43,23 +44,23 @@ def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
             search_query, ORS_key=ORS_key, timeout=timeout, max_count=max_count)
     except Timeout as err:
         # API request time out
-        #TODO Test search location timeout
         messages.warning(
             request, {
                 'header': 'Location service time out',
                 'description': 'Please try it again or later.',
                 'icon': 'fas fa-hourglass-end',
+                'search_results': None,
                 'show_search_form': True,
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     except HTTPError as err:
         # API request failed
-        #TODO Test search location HTTPError
         messages.error(
             request, {
                 'header': 'Location service error',
                 'description': 'Communication with location service failed.',
                 'icon': 'fas fa-times-circle',
+                'search_results': None,
                 'show_search_form': True,
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
@@ -70,6 +71,7 @@ def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
                 'header': 'Location not found',
                 'description': f'"{search_query}" may not be the correct location name. Please type something else.',
                 'icon': 'bi bi-geo-alt-fill',
+                'search_results': None,
                 'show_search_form': True})
         return render_dashboard(request)
     elif len(search_results) == 1:
@@ -81,7 +83,6 @@ def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
     elif len(search_results) > 1:
         # Multiple matches => show search results in message
         if len(search_results) == max_count:
-            # TODO Test search location with too many matches
             # Too many matches
             message_description = f'Showing only first {max_count} matching locations:'
         else:
