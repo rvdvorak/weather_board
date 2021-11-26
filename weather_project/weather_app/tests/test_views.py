@@ -66,7 +66,7 @@ class TestViews(TestCase):
         with open('weather_app/tests/sample_data/favorite_locations.pkl', 'rb') as file:
             pickle.load(file)
 
-# SEARCH LOCATION
+# SEARCH LOCATION TESTS
 # =============================================================================
 
     def test_search_location_with_too_many_matches(self):
@@ -182,6 +182,104 @@ class TestViews(TestCase):
             'weather': None}
         assert message['header'] == 'Location service error'
         assert message['search_results'] == None
+
+# UPDATE LOCATION TESTS
+# =============================================================================
+
+    def test_add_favorite_location_logged_in(self):
+        credentials = self.get_sample_credentials()
+        user = User.objects.create_user(**credentials)
+        location_params = self.get_sample_location_params()
+        location = Location(**location_params)
+        location.is_favorite = False
+        location.user = user
+        location.save()
+        client = Client()
+        client.login(**credentials)
+        url = reverse('update_location')
+        params = {
+            'location_id': location.id,
+            'label': location.label,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'is_favorite': True # Add location to favorites
+        }
+        response = client.post(url, params)
+        updated_location = Location.objects.get(pk=location.id)
+        assert updated_location.is_favorite # Location updated successfully
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        self.assertRedirects(response, redirect_uri)
+        
+    def test_remove_favorite_location_logged_in(self):
+        credentials = self.get_sample_credentials()
+        user = User.objects.create_user(**credentials)
+        location_params = self.get_sample_location_params()
+        location = Location(**location_params)
+        location.is_favorite = True
+        location.user = user
+        location.save()
+        client = Client()
+        client.login(**credentials)
+        url = reverse('update_location')
+        params = {
+            'location_id': location.id,
+            'label': location.label,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'is_favorite': False # Remove location from favorites
+        }
+        response = client.post(url, params)
+        updated_location = Location.objects.get(pk=location.id)
+        assert updated_location.is_favorite == False # Location updated successfully
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        self.assertRedirects(response, redirect_uri)
+
+    def test_add_favorite_location_logged_out(self):
+        credentials = self.get_sample_credentials()
+        user = User.objects.create_user(**credentials)
+        location_params = self.get_sample_location_params()
+        location = Location(**location_params)
+        location.is_favorite = False
+        location.user = user
+        location.save()
+        url = reverse('update_location')
+        params = {
+            'location_id': location.id,
+            'label': location.label,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'is_favorite': True # Try to add location to favorites
+        }
+        response = Client().post(url, params)
+        updated_location = Location.objects.get(pk=location.id)
+        assert updated_location.is_favorite == False # Location NOT updated
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        self.assertRedirects(response, redirect_uri)
+
+    def test_remove_favorite_location_logged_out(self):
+        credentials = self.get_sample_credentials()
+        user = User.objects.create_user(**credentials)
+        location_params = self.get_sample_location_params()
+        location = Location(**location_params)
+        location.is_favorite = True
+        location.user = user
+        location.save()
+        url = reverse('update_location')
+        params = {
+            'location_id': location.id,
+            'label': location.label,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'is_favorite': False # Try to remove location from favorites
+        }
+        response = Client().post(url, params)
+        updated_location = Location.objects.get(pk=location.id)
+        assert updated_location.is_favorite == True # Location NOT updated
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        self.assertRedirects(response, redirect_uri)
+
+
+# =============================================================================
 
     def test_show_user_registration_page_with_location(self):
         url = reverse('register_user')
@@ -785,7 +883,7 @@ class TestViews(TestCase):
         assert air_pollution.keys() == {'coord', 'list', }
         assert air_pollution['coord']['lat'] == location.latitude
         assert air_pollution['coord']['lon'] == location.longitude
-        assert 80 <= len(air_pollution['list']) <= 120
+        assert 70 <= len(air_pollution['list']) <= 120
         for item in air_pollution['list']:
             with self.subTest(item=item):
                 assert item['components'].keys() == components

@@ -42,10 +42,13 @@
                         {% if location.is_favorite %}
                         <!-- Remove favorite -->
                         <li class="dropdown-item">
-                            <form action="{% url 'update_location' %}" method="post">
+                            <form action="{% url 'update_location' %}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="location_id" value="{{ location.id }}">
-                                <input type="hidden" name="is_favorite" value="no">
+                                <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                                <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                                <input type="hidden" name="label" value="{{ location.label }}">
+                                <input type="hidden" name="is_favorite" value="False">
                                 <button class="btn btn-block btn-secondary btn-sm" type="submit">
                                     <i class="fas fa-trash-alt"></i>
                                     Remove current location
@@ -55,10 +58,13 @@
                         {% else %}
                         <!-- Add favorite -->
                         <li class="dropdown-item">
-                            <form action="{% url 'update_location' %}" method="post">
+                            <form action="{% url 'update_location' %}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="location_id" value="{{ location.id }}">
-                                <input type="hidden" name="is_favorite" value="yes">
+                                <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                                <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                                <input type="hidden" name="label" value="{{ location.label }}">
+                                <input type="hidden" name="is_favorite" value="True">
                                 <button class="btn btn-block btn-secondary btn-sm" type="submit">
                                     <i class="fas fa-heart"></i>
                                     Add current location
