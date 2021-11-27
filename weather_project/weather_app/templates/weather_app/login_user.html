@@ -34,6 +34,9 @@
                             <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
                             <input type="hidden" name="label" value="{{ location_params.label }}">
+                            {% if next_url %}
+                            <input type="hidden" name="next_url" value="{{ next_url }}">
+                            {% endif %}
                             <div style="text-align: center;">
                                 <button type="submit" class="btn btn-secondary">
                                     <i class="fas fa-key"></i>

@@ -11,6 +11,7 @@ from weather_app.views import *
 from weather_app.models import User, Location
 from weather_app.tests.utils import *
 from datetime import datetime
+from django.conf import settings
 import pytz
 import copy
 
@@ -433,18 +434,18 @@ class TestUpdateLocation(TestCase):
         user = User.objects.create_user(**credentials)
         location_params = get_sample_location_params()
         location = Location(**location_params)
-        location.is_favorite = False
+        # location.is_favorite == False by default
         location.user = user
         location.save()
         client = Client()
         client.login(**credentials)
         url = reverse('update_location')
         params = {
-            'location_id': location.id,
             'label': location.label,
             'latitude': location.latitude,
             'longitude': location.longitude,
-            'is_favorite': True  # Add location to favorites
+            'location_id': location.id,
+            'is_favorite': True  # Add the location to favorites
         }
         response = client.post(url, params)
         updated_location = Location.objects.get(pk=location.id)
@@ -464,15 +465,39 @@ class TestUpdateLocation(TestCase):
         client.login(**credentials)
         url = reverse('update_location')
         params = {
-            'location_id': location.id,
             'label': location.label,
             'latitude': location.latitude,
             'longitude': location.longitude,
-            'is_favorite': False  # Remove location from favorites
+            'location_id': location.id,
+            'is_favorite': False  # Remove the location from favorites
         }
         response = client.post(url, params)
         updated_location = Location.objects.get(pk=location.id)
         assert updated_location.is_favorite == False  # Location updated successfully
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        self.assertRedirects(response, redirect_uri)
+
+    def test_add_favorite_location_without_location_id_logged_in(self):
+        credentials = get_sample_credentials()
+        user = User.objects.create_user(**credentials)
+        location_params = get_sample_location_params()
+        location = Location(**location_params)
+        # location.is_favorite == False by default
+        location.user = user
+        location.save()
+        client = Client()
+        client.login(**credentials)
+        url = reverse('update_location')
+        params = {
+            'label': location.label,
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            # MISSING 'location_id': location.id,
+            'is_favorite': True  # Try to add the location to favorites
+        }
+        response = client.post(url, params)
+        updated_location = Location.objects.get(pk=location.id)
+        assert updated_location.is_favorite == False  # Location NOT updated
         redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
         self.assertRedirects(response, redirect_uri)
 
@@ -481,21 +506,23 @@ class TestUpdateLocation(TestCase):
         user = User.objects.create_user(**credentials)
         location_params = get_sample_location_params()
         location = Location(**location_params)
-        location.is_favorite = False
+        # location.is_favorite == False by default
         location.user = user
         location.save()
-        url = reverse('update_location')
-        params = {
-            'location_id': location.id,
+        update_params = {
             'label': location.label,
             'latitude': location.latitude,
             'longitude': location.longitude,
-            'is_favorite': True  # Try to add location to favorites
+            'location_id': location.id,
+            'is_favorite': True  # Try to add the location to favorites
         }
-        response = Client().post(url, params)
+        update_url = reverse('update_location')
+        login_url = reverse('login_user')
+        assert login_url == settings.LOGIN_URL
+        response = Client().post(update_url, update_params)
         updated_location = Location.objects.get(pk=location.id)
         assert updated_location.is_favorite == False  # Location NOT updated
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        redirect_uri = f"{login_url}?next_url={update_url}"
         self.assertRedirects(response, redirect_uri)
 
     def test_remove_favorite_location_logged_out(self):
@@ -506,18 +533,20 @@ class TestUpdateLocation(TestCase):
         location.is_favorite = True
         location.user = user
         location.save()
-        url = reverse('update_location')
-        params = {
-            'location_id': location.id,
+        update_params = {
             'label': location.label,
             'latitude': location.latitude,
             'longitude': location.longitude,
-            'is_favorite': False  # Try to remove location from favorites
+            'location_id': location.id,
+            'is_favorite': False  # Try to remove the location from favorites
         }
-        response = Client().post(url, params)
+        update_url = reverse('update_location')
+        login_url = reverse('login_user')
+        assert login_url == settings.LOGIN_URL
+        response = Client().post(update_url, update_params)
         updated_location = Location.objects.get(pk=location.id)
         assert updated_location.is_favorite == True  # Location NOT updated
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(location_params)}"
+        redirect_uri = f"{login_url}?next_url={update_url}"
         self.assertRedirects(response, redirect_uri)
 
 
@@ -602,7 +631,9 @@ class TestLoginUser(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/login_user.html'):
             response.render()
-        assert response.context_data == {'location_params': location_params}
+        assert response.context_data == {
+            'location_params': location_params,
+            'next_url': None}
 
     def test_login_page_without_location(self):
         url = reverse('login_user')
@@ -612,7 +643,9 @@ class TestLoginUser(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/login_user.html'):
             response.render()
-        assert response.context_data == {'location_params': {}}
+        assert response.context_data == {
+            'location_params': {},
+            'next_url': None}
 
     def test_login_user_with_correct_credentials_without_location(self):
         login_page_url = reverse('login_user')

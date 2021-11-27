@@ -1,6 +1,7 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from weather_app.views.utils import get_location_params, get_location_history, get_favorite_locations, redirect_to_login
+from django.contrib.auth.decorators import login_required
+from weather_app.views.utils import get_location_params, get_location_history, get_favorite_locations
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.template.response import TemplateResponse
@@ -17,10 +18,8 @@ def render_user_profile(request, error_message=None, success_message=None):
             'favorite_locations': get_favorite_locations(request.user)})
 
 
-# TODO Implement "login required" decorator
+@login_required(redirect_field_name='next_url')
 def user_profile(request):
-    if not request.user.is_authenticated:
-        return redirect_to_login(get_location_params(request))
     if request.method == 'GET':
         # TODO Test show user profile page logged in
         # TODO Test show user profile page logged out
@@ -51,7 +50,7 @@ def user_profile(request):
                     request,
                     success_message='New password has been set successfully.')
             elif password == new_password1 == new_password2:
-                # New password is same as oldpassword
+                # New password is same as old password
                 # TODO Test new password is same like old password
                 return render_user_profile(
                     request,

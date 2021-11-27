@@ -51,13 +51,6 @@ def get_favorite_locations(user):
     return None
 
 
-def redirect_to_login(location_params=None):
-    uri = reverse('login_user')
-    if location_params:
-        uri += f'?{urlencode(location_params)}'
-    return redirect(uri)
-
-
 def redirect_to_dashboard(location_params=None):
     uri = reverse('dashboard')
     if location_params:
@@ -75,3 +68,4 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
             'charts': charts,
             'location_history': get_location_history(request.user),
             'favorite_locations': get_favorite_locations(request.user)})
+
