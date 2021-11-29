@@ -7,7 +7,7 @@ import random
 import requests
 
 
-def get_random_location_params(ORS_key, timeout=5):
+def get_random_location_params(ORS_key, ORS_timeout):
     # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
     url = 'https://api.openrouteservice.org/geocode/reverse'
     latitude = round(
@@ -21,7 +21,7 @@ def get_random_location_params(ORS_key, timeout=5):
         'point.lat': latitude,
         'point.lon': longitude,
         'size': 1}
-    response = requests.get(url, params=params, timeout=timeout)
+    response = requests.get(url, params=params, timeout=ORS_timeout)
     response.raise_for_status()
     return {
         'latitude': latitude,
@@ -29,10 +29,10 @@ def get_random_location_params(ORS_key, timeout=5):
         'label': response.json()['features'][0]['properties']['label']}
 
 
-def random_location(request):
+def random_location(request, ORS_key=ORS_key, ORS_timeout=5):
     user = request.user
     try:
-        location_params = get_random_location_params(ORS_key)
+        location_params = get_random_location_params(ORS_key, ORS_timeout)
     except Timeout as err:
         messages.warning(
             request, {

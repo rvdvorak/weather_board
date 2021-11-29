@@ -6,14 +6,14 @@ from weather_app.views.API_keys import ORS_key
 import requests
 
 
-def get_search_results(search_query, ORS_key=ORS_key, timeout=5, max_count=20):
+def get_search_results(search_query, ORS_key, ORS_timeout, max_count):
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
         'api_key': ORS_key,
         'size': max_count,
         'text': search_query}
-    response = requests.get(url, params=params, timeout=timeout)
+    response = requests.get(url, params=params, timeout=ORS_timeout)
     response.raise_for_status()
     json_items = response.json()['features']
     search_results = []
@@ -26,7 +26,7 @@ def get_search_results(search_query, ORS_key=ORS_key, timeout=5, max_count=20):
     return search_results
 
 
-def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
+def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
     max_count = 20
     search_query = request.GET.get('search_query')
     if search_query in ['', None]:
@@ -41,7 +41,7 @@ def search_location(request, ORS_key=ORS_key, timeout=5, max_count=20):
         return render_dashboard(request)
     try:
         search_results = get_search_results(
-            search_query, ORS_key=ORS_key, timeout=timeout, max_count=max_count)
+            search_query, ORS_key=ORS_key, ORS_timeout=ORS_timeout, max_count=max_count)
     except Timeout as err:
         # API request time out
         messages.warning(

@@ -1,3 +1,4 @@
+<!-- Weather dashboard -->
 {% extends 'weather_app/base.html' %}
 {% comment %}
 TODO toasts:
@@ -8,12 +9,6 @@ TODO toasts:
 -Delete account
 {% endcomment %}
 {% block content %}
-{% if messages %}
-<div>
-    {% include 'weather_app/messages.html' %}
-</div>
-{% elif location and weather %}
-<!-- Weather dashboard widgets -->
 <div class="card-columns">
     {% load tz %}
     {% timezone weather.timezone %}
@@ -38,9 +33,4 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_7d_summary.html' %}
     {% endtimezone %}
 </div>
-{% else %}
-<div>
-    {% include 'weather_app/no_location.html' %}
-</div>
-{% endif %}
 {% endblock content %}

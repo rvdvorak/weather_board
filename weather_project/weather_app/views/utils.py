@@ -1,13 +1,14 @@
+from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from urllib.parse import urlencode
 from weather_app.models import Location
-from django.contrib.auth.models import User
 import requests
 import json
 import pytz
 import pickle  # Used for persisting sample data for tests
-from django.template.response import TemplateResponse
 
 
 def get_location_params(request):
@@ -59,13 +60,27 @@ def redirect_to_dashboard(location_params=None):
 
 
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
-    return TemplateResponse(
-        request,
-        'weather_app/dashboard.html', {
-            'location': location,
-            'weather': weather,
-            'air_pollution': air_pollution,
-            'charts': charts,
-            'location_history': get_location_history(request.user),
-            'favorite_locations': get_favorite_locations(request.user)})
+    if get_messages(request):
+        return TemplateResponse(
+            request,
+            'weather_app/messages.html', {
+                'location_history': get_location_history(request.user),
+                'favorite_locations': get_favorite_locations(request.user)})
+    elif location and weather and air_pollution and charts:
+        return TemplateResponse(
+            request,
+            'weather_app/dashboard.html', {
+                'location': location,
+                'weather': weather,
+                'air_pollution': air_pollution,
+                'charts': charts,
+                'location_history': get_location_history(request.user),
+                'favorite_locations': get_favorite_locations(request.user)})
+    else:
+        return TemplateResponse(
+            request,
+            'weather_app/no_location.html', {
+                'location_history': get_location_history(request.user),
+                'favorite_locations': get_favorite_locations(request.user)})
+        
 

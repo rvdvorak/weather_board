@@ -13,15 +13,15 @@ import pickle
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
-def get_weather(location, OWM_key, timeout=5):
+def get_weather(location, weather_key, weather_timeout):
     # https://openweathermap.org/api/one-call-api
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
         'units': 'metric',
-        'appid': OWM_key}
-    response = requests.get(base_url, params=params, timeout=timeout)
+        'appid': weather_key}
+    response = requests.get(base_url, params=params, timeout=weather_timeout)
     response.raise_for_status()
     weather = response.json()
     timezone = pytz.timezone(weather['timezone'])
@@ -31,14 +31,14 @@ def get_weather(location, OWM_key, timeout=5):
     return weather
 
 
-def get_air_pollution(location, timezone, OWM_key, timeout=5):
+def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
     # https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
-        'appid': OWM_key}
-    response = requests.get(url, params=params, timeout=timeout)
+        'appid': air_pltn_key}
+    response = requests.get(url, params=params, timeout=air_pltn_timeout)
     response.raise_for_status()
     air_pollution = response.json()
     air_pollution = convert_timestamps_to_datetimes(
@@ -139,7 +139,7 @@ def get_location_instance(location_params, user):
     return None
 
 
-def dashboard(request):
+def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeout=5, air_pltn_timeout=5):
     user = request.user
     location_params = get_location_params(request)
     try:
@@ -156,7 +156,7 @@ def dashboard(request):
     if not location:
         return render_dashboard(request)
     try:
-        weather = get_weather(location, OWM_key)
+        weather = get_weather(location, weather_key, weather_timeout)
         # Persist sample data for testing
         # with open('weather_app/tests/sample_data/weather.pkl', 'wb') as file:
         #     pickle.dump(weather, file)
@@ -180,7 +180,8 @@ def dashboard(request):
         return render_dashboard(request)
     timezone = pytz.timezone(weather['timezone'])
     try:
-        air_pollution = get_air_pollution(location, timezone, OWM_key)
+        air_pollution = get_air_pollution(
+            location, timezone, air_pltn_key, air_pltn_timeout)
         # Persist sample data for testing
         # with open('weather_app/tests/sample_data/air_pollution.pkl', 'wb') as file:
         #     pickle.dump(air_pollution, file)
