@@ -875,7 +875,6 @@ class TestLoginUser(TestCase):
         assert auth.get_user(client).is_authenticated
 
 
-
 class TestLogoutUser(TestCase):
 
     def test_logout_with_location_query(self):

@@ -13,8 +13,11 @@ import pickle
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
+
 def get_weather(location, weather_key, weather_timeout):
+    # Weather API docs:
     # https://openweathermap.org/api/one-call-api
+
     base_url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
         'lat': location.latitude,
@@ -32,7 +35,9 @@ def get_weather(location, weather_key, weather_timeout):
 
 
 def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
+    # Air pollution API docs:
     # https://openweathermap.org/api/air-pollution
+
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,

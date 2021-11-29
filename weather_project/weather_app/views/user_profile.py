@@ -72,7 +72,6 @@ def user_profile(request):
                     success_message='Your location history has been deleted completely.')
         elif delete_account and i_am_sure:
             # Delete user account
-            # TODO Test delete user account with bad credentials
             user.delete()
             return render_user_profile(
                 request,

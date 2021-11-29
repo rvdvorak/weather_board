@@ -7,7 +7,9 @@ import requests
 
 
 def get_search_results(search_query, ORS_key, ORS_timeout, max_count):
+    # Location API docs:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
+    
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
         'api_key': ORS_key,
