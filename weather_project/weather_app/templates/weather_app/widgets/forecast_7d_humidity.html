@@ -26,17 +26,17 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyHumidityChart').getContext('2d');
         const dailyHumidityChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [{
                     label: 'Humidity [%]',
                     data: daily.humidity,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 127, 255, 0.25)'],
+                    backgroundColor: ['rgba(0, 127, 255, 0.5)'],
                     borderColor: ['rgba(0, 95, 190, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

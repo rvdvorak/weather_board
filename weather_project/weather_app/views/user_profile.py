@@ -1,7 +1,7 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from weather_app.views.utils import get_location_params, get_location_history, get_favorite_locations
+from weather_app.views.utils import get_location_params, get_location_history, get_favorite_locations, get_view_mode
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.template.response import TemplateResponse
@@ -13,9 +13,10 @@ def render_user_profile(request, error_message=None, success_message=None):
         'weather_app/user_profile.html', {
             'success_message': success_message,
             'error_message': error_message,
-            'location_params': get_location_params(request),
+            'location': get_location_params(request),
             'location_history': get_location_history(request.user),
-            'favorite_locations': get_favorite_locations(request.user)})
+            'favorite_locations': get_favorite_locations(request.user),
+            'view_mode': get_view_mode(request)})
 
 
 @login_required(redirect_field_name='next_url')

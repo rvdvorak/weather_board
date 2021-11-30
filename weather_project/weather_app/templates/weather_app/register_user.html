@@ -35,9 +35,10 @@
                                 <label for="password2">Confirm password</label>
                                 <input type="password" name="password2" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <div style="text-align: center;">
                                 <button type="submit" class="btn btn-secondary">
                                     <i class="fas fa-user-plus"></i>
@@ -48,9 +49,10 @@
                         <hr>
                         Already registered?
                         <form action="{% url 'login_user' %}" method="GET">
-                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <button type="submit" class="btn btn-link">Login existing user</button>
                         </form>
                     </div>

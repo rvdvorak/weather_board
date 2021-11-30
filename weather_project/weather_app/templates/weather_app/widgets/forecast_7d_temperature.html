@@ -26,25 +26,25 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyTemperatureChart').getContext('2d');
         const dailyTemperatureChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [{
                     label: 'Max. temperature [°C]',
                     data: daily.max_temp,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(255, 0, 0, 0.25)'],
+                    backgroundColor: ['rgba(255, 0, 0, 0.5)'],
                     borderColor: ['rgba(255, 0, 0, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }, {
                     label: 'Min. temperature [°C]',
                     data: daily.min_temp,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 0, 255, 0.25)'],
+                    backgroundColor: ['rgba(0, 0, 255, 0.5)'],
                     borderColor: ['rgba(0, 0, 255, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

@@ -17,6 +17,7 @@
             <!-- Search form -->
             <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
+                    <input type="hidden" name="view_mode" value="{{ view_mode }}">
                     <input name="search_query" class="form-control form-control-navbar" type="search"
                         placeholder="Search location" aria-label="Search location" required>
                     <div class="input-group-append">
@@ -28,6 +29,69 @@
             </form>
             <!-- Main menu -->
             <ul class="navbar-nav ml-lg-auto">
+                <!-- View -->
+                {# TODO View modes #}
+                <li class="nav-item dropdown">
+                    <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="nav-link dropdown-toggle">
+                        <i class="far fa-eye"></i>
+                        View
+                    </a>
+                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="48h_detail">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-chart-bar"></i>
+                                48 hours detailed
+                            </button>
+                        </form>
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="48h_brief">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-list"></i>
+                                48 hours briefly
+                            </button>
+                        </form>
+                        <li class="dropdown-divider"></li>
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="7d_detail">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-chart-bar"></i>
+                                7 days detailed
+                            </button>
+                        </form>
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="7d_brief">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-list"></i>
+                                7 days briefly
+                            </button>
+                        </form>
+                        <li class="dropdown-divider"></li>
+                        <a href="{% url 'random_location' %}">
+                            <li class="dropdown-item">
+                                <i class="fas fa-random"></i>
+                                Random location
+                            </li>
+                        </a>
+                    </ul>
+                </li>
                 {% if user.is_authenticated %}
                 <!-- Favorites -->
                 <li class="nav-item dropdown">
@@ -44,6 +108,7 @@
                         <li class="dropdown-item">
                             <form action="{% url 'update_location' %}" method="POST">
                                 {% csrf_token %}
+                                <input type="hidden" name="view_mode" value="{{ view_mode }}">
                                 <input type="hidden" name="location_id" value="{{ location.id }}">
                                 <input type="hidden" name="latitude" value="{{ location.latitude }}">
                                 <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -60,6 +125,7 @@
                         <li class="dropdown-item">
                             <form action="{% url 'update_location' %}" method="POST">
                                 {% csrf_token %}
+                                <input type="hidden" name="view_mode" value="{{ view_mode }}">
                                 <input type="hidden" name="location_id" value="{{ location.id }}">
                                 <input type="hidden" name="latitude" value="{{ location.latitude }}">
                                 <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -117,13 +183,6 @@
                     </ul>
                 </li>
                 {% endif %}
-                <!-- Random location -->
-                <li class="nav-item">
-                    <a href="{% url 'random_location' %}" class="nav-link">
-                        <i class="fas fa-random"></i>
-                        Random location
-                    </a>
-                </li>
                 {% if user.is_authenticated %}
                 <!-- User account menu -->
                 <li class="nav-item dropdown">

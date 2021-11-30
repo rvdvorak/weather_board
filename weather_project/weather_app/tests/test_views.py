@@ -492,9 +492,8 @@ class TestSearchLocation(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        assert response.context_data == {
-            'favorite_locations': None,
-            'location_history': None}
+        assert response.context_data['favorite_locations'] == None
+        assert response.context_data['location_history'] == None
         message = list(messages)[0].message
         assert message['header'] == 'Location service time out'
         assert message['search_results'] == None
@@ -517,9 +516,8 @@ class TestSearchLocation(TestCase):
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
         message = list(messages)[0].message
-        assert response.context_data == {
-            'favorite_locations': None,
-            'location_history': None}
+        assert response.context_data['favorite_locations'] == None
+        assert response.context_data['location_history'] == None
         assert message['header'] == 'Location service error'
         assert message['search_results'] == None
 
@@ -556,9 +554,8 @@ class TestRandomLocation(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        assert response.context_data == {
-            'favorite_locations': None,
-            'location_history': None}
+        assert response.context_data['favorite_locations'] == None
+        assert response.context_data['location_history'] == None
         message = list(messages)[0].message
         assert message['header'] == 'Location service time out'
         
@@ -576,9 +573,8 @@ class TestRandomLocation(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        assert response.context_data == {
-            'favorite_locations': None,
-            'location_history': None}
+        assert response.context_data['favorite_locations'] == None
+        assert response.context_data['location_history'] == None
         message = list(messages)[0].message
         assert message['header'] == 'Location service error'
         
@@ -710,7 +706,7 @@ class TestRegisterUser(TestCase):
         response = client.get(url, location_params)
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
         assert response.status_code == 200
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
         assert not auth.get_user(client).is_authenticated
 
     def test_show_user_registration_page_without_location_query(self):
@@ -719,7 +715,7 @@ class TestRegisterUser(TestCase):
         response = client.get(url)
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
         assert response.status_code == 200
-        assert response.context['location_params'] == {}
+        assert response.context['location'] == {}
         assert not auth.get_user(client).is_authenticated
 
     def test_register_new_user_with_unmatched_passwords(self):
@@ -734,7 +730,7 @@ class TestRegisterUser(TestCase):
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
         assert response.status_code == 200
         assert response.context['error_message'] == 'Passwords do not match.'
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
         assert not auth.get_user(client).is_authenticated
 
     def test_register_existing_user(self):
@@ -752,7 +748,7 @@ class TestRegisterUser(TestCase):
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
         assert response.status_code == 200
         assert response.context['error_message'] == 'User already exists. Please choose different username.'
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_register_new_user(self):
         register_url = reverse('register_user')
@@ -782,10 +778,8 @@ class TestLoginUser(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/login_user.html'):
             response.render()
-        assert response.context_data == {
-            'location_params': location_params,
-            'next_url': None}
-
+        assert response.context_data['location'] == location_params
+        assert response.context_data['next_url'] == None
     def test_login_page_without_location_query(self):
         url = reverse('login_user')
         request = RequestFactory().get(url)
@@ -794,10 +788,8 @@ class TestLoginUser(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/login_user.html'):
             response.render()
-        assert response.context_data == {
-            'location_params': {},
-            'next_url': None}
-
+        assert response.context_data['location'] == {}
+        assert response.context_data['next_url'] == None
     def test_login_user_with_correct_credentials_without_location_query(self):
         login_page_url = reverse('login_user')
         dashboard_url = reverse('dashboard')
@@ -836,7 +828,7 @@ class TestLoginUser(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Username and password do not match.')
-        assert response.context['location_params'] == {}
+        assert response.context['location'] == {}
         assert not auth.get_user(client).is_authenticated
 
     def test_login_user_with_bad_credentials_with_location_query(self):
@@ -854,7 +846,7 @@ class TestLoginUser(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Username and password do not match.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
         assert not auth.get_user(client).is_authenticated
         
     def test_login_required_decorator(self):
@@ -912,7 +904,7 @@ class TestUserProfile(TestCase):
         client.login(**credentials)
         response = client.get(profile_url, location_params)
         self.assertTemplateUsed(response, 'weather_app/user_profile.html')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_show_user_profile_without_login(self):
         user = AnonymousUser()
@@ -945,7 +937,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['success_message'],
             'New password has been set successfully.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_change_password_with_bad_credentials(self):
         original_credentials = sample_credentials()
@@ -967,7 +959,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Username and password do not match.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_change_password_to_the_same_password(self):
         credentials = sample_credentials()
@@ -988,7 +980,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'New password must be different from the old one.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_change_password_with_unmatched_new_passwords(self):
         original_credentials = sample_credentials()
@@ -1009,7 +1001,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'New passwords do not match.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_delete_location_history_with_bad_credentials(self):
         credentials = sample_credentials()
@@ -1032,7 +1024,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Username and password do not match.')
-        assert response.context['location_params'] == actual_location_params
+        assert response.context['location'] == actual_location_params
 
     def test_delete_location_history_except_favorites(self):
         credentials = sample_credentials()
@@ -1064,7 +1056,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['success_message'],
             'Your location history except favorites has been deleted.')
-        assert response.context['location_params'] == actual_location_params
+        assert response.context['location'] == actual_location_params
 
     def test_delete_location_history_completely(self):
         credentials = sample_credentials()
@@ -1093,7 +1085,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['success_message'],
             'Your location history has been deleted completely.')
-        assert response.context['location_params'] == actual_location_params
+        assert response.context['location'] == actual_location_params
 
     def test_delete_user_account(self):
         credentials = sample_credentials()
@@ -1117,7 +1109,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['success_message'],
             'Your user account has been deleted completely.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_delete_user_account_without_confirmation(self):
         credentials = sample_credentials()
@@ -1143,7 +1135,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Invalid options.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
     def test_delete_user_account_with_bad_credentials(self):
         credentials = sample_credentials()
@@ -1168,7 +1160,7 @@ class TestUserProfile(TestCase):
         self.assertEquals(
             response.context['error_message'],
             'Username and password do not match.')
-        assert response.context['location_params'] == location_params
+        assert response.context['location'] == location_params
 
 
 class TestUtils(TestCase):
@@ -1280,9 +1272,8 @@ class TestUtils(TestCase):
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/no_location.html'):
             response.render()
-        assert response.context_data == {
-            'favorite_locations': None,
-            'location_history': None}
+        assert response.context_data['favorite_locations'] == None
+        assert response.context_data['location_history'] == None
 
     def test_render_dashboard_with_location_query_with_login(self):
         url = reverse('dashboard')

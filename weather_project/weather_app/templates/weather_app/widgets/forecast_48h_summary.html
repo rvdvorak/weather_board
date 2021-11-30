@@ -31,6 +31,8 @@
                 {# Convert precipitation probability to percents (multiply by 100) #}
                 {% widthratio hour.pop 1 100 %} %
                 <i class="fas fa-cloud-showers-heavy"></i>
+                <br>
+                <small>probability</small>
             </td>
             <td style="text-align: right; vertical-align: middle; padding-top: 0em; padding-bottom: 0em;">
                 <img width="50px" height="50px" src="https://openweathermap.org/img/wn/{{ hour.weather.0.icon }}@2x.png"

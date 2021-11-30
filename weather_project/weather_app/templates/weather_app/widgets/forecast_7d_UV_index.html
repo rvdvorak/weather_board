@@ -26,17 +26,17 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyUVindexChart').getContext('2d');
         const dailyUVindexChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [{
                     label: 'UV index',
                     data: daily.uvi,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(127, 0, 255, 0.25)'],
+                    backgroundColor: ['rgba(127, 0, 255, 0.5)'],
                     borderColor: ['rgba(95, 0, 190, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

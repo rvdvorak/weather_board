@@ -11,6 +11,7 @@
             <!-- Search form -->
             <form action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-md">
+                    <input type="hidden" name="view_mode" value="{{ view_mode }}">
                     <input name="search_query" class="form-control" type="search" placeholder="Search location"
                         aria-label="Search location" required>
                     <div class="input-group-append">

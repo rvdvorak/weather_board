@@ -26,17 +26,17 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyPrecipitationChart').getContext('2d');
         const dailyPrecipitationChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [{
                     label: 'Precipitation probabilitry [%]',
                     data: daily.pop,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 0, 255, 0.25)'],
+                    backgroundColor: ['rgba(0, 0, 255, 0.5)'],
                     borderColor: ['rgba(0, 0, 255, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

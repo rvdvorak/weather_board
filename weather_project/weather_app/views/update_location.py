@@ -1,5 +1,5 @@
 from weather_app.models import Location
-from weather_app.views.utils import redirect_to_dashboard, get_location_params
+from weather_app.views.utils import redirect_to_dashboard, get_location_params, get_view_mode
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from pprint import pprint
@@ -17,4 +17,6 @@ def update_location(request):
             location = match[0]
             location.is_favorite = is_favorite
             location.save()
-    return redirect_to_dashboard(get_location_params(request))
+    return redirect_to_dashboard(
+        get_location_params(request),
+        get_view_mode(request))

@@ -11,6 +11,21 @@ import pytz
 import pickle  # Used for persisting sample data for tests
 
 
+def get_view_mode(request):
+    valid_modes = [
+        '48h_detail',
+        '48h_brief',
+        '7d_detail',
+        '7d_brief']
+    if request.method == 'GET':
+        view_mode = request.GET.get('view_mode')
+    elif request.method == 'POST':
+        view_mode = request.POST.get('view_mode')
+    if view_mode in valid_modes:
+        return view_mode
+    else:
+        return valid_modes[0]
+
 def get_location_params(request):
     if request.method == 'GET':
         latitude = request.GET.get('latitude')
@@ -52,10 +67,11 @@ def get_favorite_locations(user):
     return None
 
 
-def redirect_to_dashboard(location_params=None):
-    uri = reverse('dashboard')
-    if location_params:
-        uri += f'?{urlencode(location_params)}'
+def redirect_to_dashboard(location_params={}, view_mode=None):
+    base_url = reverse('dashboard')
+    query = {'view_mode': view_mode, **location_params}    
+    query_string = urlencode(query)
+    uri = f'{base_url}?{query_string}'
     return redirect(uri)
 
 
@@ -64,23 +80,29 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
         return TemplateResponse(
             request,
             'weather_app/messages.html', {
+                'view_mode': get_view_mode(request),
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user)})
+                'favorite_locations': get_favorite_locations(request.user),
+                'view_mode': get_view_mode(request)})
     elif location and weather and air_pollution and charts:
         return TemplateResponse(
             request,
             'weather_app/dashboard.html', {
+                'view_mode': get_view_mode(request),
                 'location': location,
                 'weather': weather,
                 'air_pollution': air_pollution,
                 'charts': charts,
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user)})
+                'favorite_locations': get_favorite_locations(request.user),
+                'view_mode': get_view_mode(request)})
     else:
         return TemplateResponse(
             request,
             'weather_app/no_location.html', {
+                'view_mode': get_view_mode(request),
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user)})
+                'favorite_locations': get_favorite_locations(request.user),
+                'view_mode': get_view_mode(request)})
         
 

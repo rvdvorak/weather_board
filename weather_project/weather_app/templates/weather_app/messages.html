@@ -33,6 +33,7 @@
                         {% for location in message.message.search_results %}
                         <form action="{% url 'dashboard' %}" method="GET"
                             style="text-align: center; margin-bottom: 0.75em;">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
@@ -48,6 +49,7 @@
                 <!-- Search form -->
                 <form action="{% url 'search_location' %}" method="GET">
                     <div class="input-group input-group-sm">
+                        <input type="hidden" name="view_mode" value="{{ view_mode }}">
                         <input name="search_query" class="form-control" type="search" placeholder="Search location"
                             aria-label="Search location" required>
                         <div class="input-group-append">

@@ -1,7 +1,7 @@
 from django.template.response import TemplateResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from weather_app.views.utils import get_location_params, redirect_to_dashboard
+from weather_app.views.utils import get_location_params, redirect_to_dashboard, get_view_mode
 from django.shortcuts import redirect
 from urllib.parse import urlencode
 
@@ -14,8 +14,9 @@ def login_user(request):
         return TemplateResponse(
             request,
             'weather_app/login_user.html', {
-                'location_params': location_params,
-                'next_url': next_url})
+                'location': location_params,
+                'next_url': next_url,
+                'view_mode': get_view_mode(request)})
     elif request.method == 'POST':
         # Try to login
         next_url = request.POST.get('next_url')
@@ -29,12 +30,15 @@ def login_user(request):
             if next_url:
                 return redirect(f"{next_url}?{urlencode(location_params)}")
             else:
-                return redirect_to_dashboard(location_params)
+                return redirect_to_dashboard(
+                    location_params,
+                    get_view_mode(request))
         else:
             # Login failed
             return TemplateResponse(
                 request,
                 'weather_app/login_user.html', {
                     'error_message': 'Username and password do not match.',
-                    'location_params': location_params,
-                    'next_url': next_url})
+                    'location': location_params,
+                    'next_url': next_url,
+                    'view_mode': get_view_mode(request)})

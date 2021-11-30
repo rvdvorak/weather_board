@@ -15,12 +15,41 @@ TODO toasts:
     {{ charts|json_script:"charts" }}
     {# TODO Air pollution forecast widgets #}
     {# TODO Wind direction #}
+    
+    {% if view_mode == '48h_brief' %}
+    <!-- 48 hours brief view mode -->
     {% include 'weather_app/widgets/current_summary.html' %}
-    {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
-    {% include 'weather_app/widgets/current_weather_details.html' %}
-    {% include 'weather_app/widgets/current_air_pollution.html' %}
     {% include 'weather_app/widgets/weather_alerts.html' %}
     {% include 'weather_app/widgets/forecast_48h_summary.html' %}
+
+
+    {% elif view_mode == '7d_detail' %}
+    <!-- 7 days detailed view mode -->
+    {% include 'weather_app/widgets/current_summary.html' %}
+    {% include 'weather_app/widgets/weather_alerts.html' %}
+    {% include 'weather_app/widgets/current_weather_details.html' %}
+    {% include 'weather_app/widgets/current_air_pollution.html' %}
+    {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
+    {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
+    {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
+    {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
+    {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
+    {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
+    {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
+
+    {% elif view_mode == '7d_brief' %}
+    <!-- 7 days brief view mode -->
+    {% include 'weather_app/widgets/current_summary.html' %}
+    {% include 'weather_app/widgets/weather_alerts.html' %}
+    {% include 'weather_app/widgets/forecast_7d_summary.html' %}
+
+    {% else %}
+    <!-- 48 hours detailed view mode -->
+    {% include 'weather_app/widgets/current_summary.html' %}
+    {% include 'weather_app/widgets/weather_alerts.html' %}
+    {% include 'weather_app/widgets/current_weather_details.html' %}
+    {% include 'weather_app/widgets/current_air_pollution.html' %}
+    {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
     {% include 'weather_app/widgets/forecast_48h_precipitation.html' %}
     {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
     {% include 'weather_app/widgets/forecast_48h_clouds.html' %}
@@ -29,13 +58,9 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
     {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
     {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
-    {% include 'weather_app/widgets/forecast_7d_summary.html' %}
-    {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
-    {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
-    {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
-    {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
-    {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
-    {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
+      
+    {% endif %}
+        
     {% endtimezone %}
 </div>
 {% endblock content %}

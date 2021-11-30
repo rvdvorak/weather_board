@@ -26,17 +26,17 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyCloudsChart').getContext('2d');
         const dailyCloudsChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [{
                     label: 'Cloudiness [%]',
                     data: daily.clouds,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(127, 127, 127, 0.25)'],
-                    borderColor: ['rgba(127, 127, 127, 1)'],
+                    backgroundColor: ['rgba(100, 100, 100, 0.5)'],
+                    borderColor: ['rgba(100, 100, 100, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

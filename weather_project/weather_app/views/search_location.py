@@ -1,7 +1,7 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
+from weather_app.views.utils import get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard, get_view_mode
 from weather_app.views.API_keys import ORS_key
 import requests
 
@@ -9,7 +9,7 @@ import requests
 def get_search_results(search_query, ORS_key, ORS_timeout, max_count):
     # Location API docs:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
-    
+
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
         'api_key': ORS_key,
@@ -81,7 +81,8 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
         return redirect_to_dashboard({
             'latitude': search_results[0]['latitude'],
             'longitude': search_results[0]['longitude'],
-            'label': search_results[0]['label']})
+            'label': search_results[0]['label']},
+            get_view_mode(request))
     elif len(search_results) > 1:
         # Multiple matches => show search results in message
         if len(search_results) == max_count:

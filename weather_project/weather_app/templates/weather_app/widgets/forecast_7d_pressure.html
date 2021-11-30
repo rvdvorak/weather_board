@@ -26,17 +26,17 @@
         const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
         const ctx = document.getElementById('hourlyPressureChart').getContext('2d');
         const hourlyPressureChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: hourly.timeline,
                 datasets: [{
                     label: 'Atmospheric pressure on the sea level [hPa]',
                     data: hourly.pressure,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 255, 255, 0.25)'],
+                    backgroundColor: ['rgba(0, 255, 255, 0.5)'],
                     borderColor: ['rgba(0, 190, 190, 1)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

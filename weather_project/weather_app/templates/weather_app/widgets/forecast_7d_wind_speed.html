@@ -26,7 +26,7 @@
         const daily = JSON.parse(document.getElementById('charts').textContent).daily;
         const ctx = document.getElementById('dailyWindSpeedChart').getContext('2d');
         const dailyWindSpeedChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: daily.timeline,
                 datasets: [
@@ -34,18 +34,18 @@
                         label: 'Wind gust [meter/sec.]',
                         data: daily.wind_gust,
                         cubicInterpolationMode: 'default',
-                        backgroundColor: ['rgba(0, 0, 0, 0)'],
-                        borderColor: ['rgba(0, 0, 255, 1)'],
+                        backgroundColor: ['rgba(0, 128, 128, 0.5)'],
+                        borderColor: ['rgba(0, 0, 128, 1)'],
                         fill: false,
-                        borderWidth: 2
+                        borderWidth: 0
                     }, {
                         label: 'Wind speed [meter/sec.]',
                         data: daily.wind_speed,
                         cubicInterpolationMode: 'default',
-                        backgroundColor: ['rgba(0, 255, 0, 0.25)'],
-                        borderColor: ['rgba(0, 190, 0, 1)'],
+                        backgroundColor: ['rgba(0, 128, 0, 0.5)'],
+                        borderColor: ['rgba(0, 128, 0, 1)'],
                         fill: true,
-                        borderWidth: 2
+                        borderWidth: 0
                     }]
             },
             options: {

@@ -12,9 +12,10 @@
             </div>
             <div class="card-body">
                 <form action="{% url 'dashboard' %}" method="GET">
-                    <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                    <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                    <input type="hidden" name="label" value="{{ location_params.label }}">
+                    <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                    <input type="hidden" name="label" value="{{ location.label }}">
                     <div style="text-align: left;">
                         <button type="submit" class="btn btn-link">
                             <i class="fas fa-arrow-circle-left"></i>
@@ -69,9 +70,10 @@
                                 </label>
                                 <input type="password" name="new_password2" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <div style="text-align: center;">
                                 <button type="submit" class="btn btn-secondary">
                                     <i class="fas fa-lock"></i>
@@ -113,9 +115,10 @@
                                 </label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <div style="text-align: center;">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-trash-alt"></i>
@@ -157,9 +160,10 @@
                                 </label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="latitude" value="{{ location_params.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location_params.longitude }}">
-                            <input type="hidden" name="label" value="{{ location_params.label }}">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <div style="text-align: center;">
                                 <button type="submit" class="btn btn-danger">
                                     <i class="fas fa-user-alt-slash"></i>
