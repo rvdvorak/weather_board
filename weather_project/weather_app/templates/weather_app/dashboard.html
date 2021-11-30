@@ -14,7 +14,6 @@ TODO toasts:
     {% timezone weather.timezone %}
     {{ charts|json_script:"charts" }}
     {# TODO Air pollution forecast widgets #}
-    {# TODO 7d Chart widgets #}
     {# TODO Wind direction #}
     {% include 'weather_app/widgets/current_summary.html' %}
     {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
@@ -31,6 +30,12 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
     {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
     {% include 'weather_app/widgets/forecast_7d_summary.html' %}
+    {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
+    {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
+    {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
+    {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
+    {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
+    {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
     {% endtimezone %}
 </div>
 {% endblock content %}

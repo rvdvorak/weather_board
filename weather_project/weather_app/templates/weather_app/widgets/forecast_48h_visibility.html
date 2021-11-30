@@ -6,7 +6,7 @@
 {% endblock %}
 {% block widget_header_text %}48 h visibility{% endblock %}
 {% block widget_content %}
-{% if charts.hourly.temp %}
+{% if charts.hourly.visibility %}
 <div class="chart p-2">
     <div class="chartjs-size-monitor">
         <div class="chartjs-size-monitor-expand">
@@ -33,8 +33,8 @@
                     label: 'Average visibility [m]',
                     data: hourly.visibility,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(190, 255, 0, 0.5)'],
-                    borderColor: ['rgba(95, 127, 0, 1)'],
+                    backgroundColor: ['rgba(255, 255, 0, 0.25)'],
+                    borderColor: ['rgba(128, 128, 128, 1)'],
                     fill: true,
                     borderWidth: 2
                 }]

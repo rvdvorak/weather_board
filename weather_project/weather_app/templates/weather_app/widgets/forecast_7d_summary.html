@@ -12,9 +12,9 @@
         <tr>
             <td colspan="4" style="text-align: center; vertical-align: middle;">
                 <i class="far fa-calendar-alt"></i>
-                <b>
-                    {{ day.dt|date:"D, j. M Y" }}
-                </b>
+                <b>{{ day.dt|date:"D j. M" }}</b>
+                <br>
+                {{ day.weather.0.description|capfirst }}
             </td>
         </tr>
         <tr style="background-color: #3c8dbc54;">

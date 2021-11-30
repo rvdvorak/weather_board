@@ -1,12 +1,12 @@
-<!-- 48h humidity forecast widget -->
+<!-- 7 days UV index forecast widget -->
 {% extends 'weather_app/widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-tint" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-sun" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}48 h humidity{% endblock %}
+{% block widget_header_text %}7 days UV index{% endblock %}
 {% block widget_content %}
-{% if charts.hourly.humidity %}
+{% if charts.daily.uvi %}
 <div class="chart p-2">
     <div class="chartjs-size-monitor">
         <div class="chartjs-size-monitor-expand">
@@ -16,25 +16,25 @@
             <div class=""></div>
         </div>
     </div>
-    <canvas id="hourlyHumidityChart"
+    <canvas id="dailyUVindexChart"
         style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
         height="500" class="chartjs-render-monitor">
     </canvas>
 </div>
 <script>
     {
-        const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
-        const ctx = document.getElementById('hourlyHumidityChart').getContext('2d');
-        const hourlyHumidityChart = new Chart(ctx, {
+        const daily = JSON.parse(document.getElementById('charts').textContent).daily;
+        const ctx = document.getElementById('dailyUVindexChart').getContext('2d');
+        const dailyUVindexChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: hourly.timeline,
+                labels: daily.timeline,
                 datasets: [{
-                    label: 'Humidity [%]',
-                    data: hourly.humidity,
+                    label: 'UV index',
+                    data: daily.uvi,
                     cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 127, 255, 0.25)'],
-                    borderColor: ['rgba(0, 95, 190, 1)'],
+                    backgroundColor: ['rgba(127, 0, 255, 0.25)'],
+                    borderColor: ['rgba(95, 0, 190, 1)'],
                     fill: true,
                     borderWidth: 2
                 }]
@@ -49,7 +49,7 @@
                     y: {
                         type: 'linear',
                         min: 0,
-                        max: 100
+                        max: 14
                     }
                 }
             }

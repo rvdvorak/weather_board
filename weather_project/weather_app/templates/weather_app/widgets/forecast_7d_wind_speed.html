@@ -1,12 +1,12 @@
-<!-- 48h wind speed forecast widget -->
+<!-- 7 days wind speed forecast widget -->
 {% extends 'weather_app/widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-wind" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}48 h wind speed{% endblock %}
+{% block widget_header_text %}7 days wind speed{% endblock %}
 {% block widget_content %}
-{% if charts.hourly.wind_speed %}
+{% if charts.daily.wind_speed %}
 <div class="chart p-2">
     <div class="chartjs-size-monitor">
         <div class="chartjs-size-monitor-expand">
@@ -16,23 +16,23 @@
             <div class=""></div>
         </div>
     </div>
-    <canvas id="hourlyWindSpeedChart"
+    <canvas id="dailyWindSpeedChart"
         style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
         height="500" class="chartjs-render-monitor">
     </canvas>
 </div>
 <script>
     {
-        const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
-        const ctx = document.getElementById('hourlyWindSpeedChart').getContext('2d');
-        const hourlyWindSpeedChart = new Chart(ctx, {
+        const daily = JSON.parse(document.getElementById('charts').textContent).daily;
+        const ctx = document.getElementById('dailyWindSpeedChart').getContext('2d');
+        const dailyWindSpeedChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: hourly.timeline,
+                labels: daily.timeline,
                 datasets: [
                     {
                         label: 'Wind gust [meter/sec.]',
-                        data: hourly.wind_gust,
+                        data: daily.wind_gust,
                         cubicInterpolationMode: 'default',
                         backgroundColor: ['rgba(0, 0, 0, 0)'],
                         borderColor: ['rgba(0, 0, 255, 1)'],
@@ -40,7 +40,7 @@
                         borderWidth: 2
                     }, {
                         label: 'Wind speed [meter/sec.]',
-                        data: hourly.wind_speed,
+                        data: daily.wind_speed,
                         cubicInterpolationMode: 'default',
                         backgroundColor: ['rgba(0, 255, 0, 0.25)'],
                         borderColor: ['rgba(0, 190, 0, 1)'],

@@ -85,39 +85,68 @@ def get_charts(weather):
             'uvi': [],
             'visibility': []},
         'daily': {
-            'timeline': []}}
+            'timeline': [],
+            'min_temp': [],
+            'max_temp': [],
+            'pop': [],
+            'clouds': [],
+            'humidity': [],
+            'pressure': [],
+            'wind_speed': [],
+            'wind_gust': [],
+            'uvi': []}}
     if 'minutely' in weather:
         for minute in weather['minutely']:
             charts['minutely']['timeline'].append(
                 minute['dt'].strftime("%H:%M"))
             charts['minutely']['precipitation'].append(
                 round(minute['precipitation'], 2))
-    if 'hourly' in weather:
-        for hour in weather['hourly']:
-            charts['hourly']['timeline'].append(
-                hour['dt'].strftime("%a %H:%M"))
-            charts['hourly']['pop'].append(
-                hour['pop']*100)
-            charts['hourly']['temp'].append(
-                round(hour['temp'], 1))
-            charts['hourly']['feels_like'].append(
-                round(hour['feels_like'], 1))
-            charts['hourly']['dew_point'].append(
-                round(hour['dew_point'], 1))
-            charts['hourly']['clouds'].append(
-                hour['clouds'])
-            charts['hourly']['humidity'].append(
-                hour['humidity'])
-            charts['hourly']['pressure'].append(
-                hour['pressure'])
-            charts['hourly']['wind_speed'].append(
-                hour['wind_speed'])
-            charts['hourly']['wind_gust'].append(
-                hour['wind_gust'])
-            charts['hourly']['uvi'].append(
-                hour['uvi'])
-            charts['hourly']['visibility'].append(
-                hour['visibility'])
+    for hour in weather['hourly']:
+        charts['hourly']['timeline'].append(
+            hour['dt'].strftime("%a %H:%M"))
+        charts['hourly']['temp'].append(
+            round(hour['temp'], 1))
+        charts['hourly']['feels_like'].append(
+            round(hour['feels_like'], 1))
+        charts['hourly']['dew_point'].append(
+            round(hour['dew_point'], 1))
+        charts['hourly']['pop'].append(
+            hour['pop']*100)
+        charts['hourly']['clouds'].append(
+            hour['clouds'])
+        charts['hourly']['humidity'].append(
+            hour['humidity'])
+        charts['hourly']['pressure'].append(
+            hour['pressure'])
+        charts['hourly']['wind_speed'].append(
+            hour['wind_speed'])
+        charts['hourly']['wind_gust'].append(
+            hour['wind_gust'])
+        charts['hourly']['uvi'].append(
+            hour['uvi'])
+        charts['hourly']['visibility'].append(
+            hour['visibility'])
+    for day in weather['daily']:
+        charts['daily']['timeline'].append(
+            day['dt'].strftime('%a %d. %b'))
+        charts['daily']['min_temp'].append(
+            round(day['temp']['min'], 1))
+        charts['daily']['max_temp'].append(
+            round(day['temp']['max'], 1))
+        charts['daily']['pop'].append(
+            day['pop']*100)
+        charts['daily']['clouds'].append(
+            day['clouds'])
+        charts['daily']['humidity'].append(
+            day['humidity'])
+        charts['daily']['pressure'].append(
+            day['pressure'])
+        charts['daily']['wind_speed'].append(
+            day['wind_speed'])
+        charts['daily']['wind_gust'].append(
+            day['wind_gust'])
+        charts['daily']['uvi'].append(
+            day['uvi'])
     return charts
 
 

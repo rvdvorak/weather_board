@@ -30,11 +30,19 @@
             data: {
                 labels: hourly.timeline,
                 datasets: [{
+                    label: 'Temperature [°C]',
+                    data: hourly.temp,
+                    cubicInterpolationMode: 'default',
+                    backgroundColor: ['rgba(255, 0, 0, 0.25)'],
+                    borderColor: ['rgba(255, 0, 0, 1)'],
+                    fill: true,
+                    borderWidth: 2
+                }, {
                     label: 'Temperature feels like [°C]',
                     data: hourly.feels_like,
                     cubicInterpolationMode: 'default',
                     backgroundColor: ['rgba(0, 0, 0, 0)'],
-                    borderColor: ['rgba(255, 0, 0, 1)'],
+                    borderColor: ['rgba(0, 255, 0, 1)'],
                     fill: false,
                     borderWidth: 2
                 }, {
@@ -42,16 +50,8 @@
                     data: hourly.dew_point,
                     cubicInterpolationMode: 'default',
                     backgroundColor: ['rgba(0, 0, 0, 0)'],
-                    borderColor: ['rgba(0, 0, 255, 1)'],
+                    borderColor: ['rgba(150, 150, 150, 1)'],
                     fill: false,
-                    borderWidth: 2
-                }, {
-                    label: 'Temperature [°C]',
-                    data: hourly.temp,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(255, 190, 0, 0.5)'],
-                    borderColor: ['rgba(255, 190, 0, 1)'],
-                    fill: true,
                     borderWidth: 2
                 }]
             },
