@@ -56,9 +56,7 @@ def sample_location_instance_1():
 def view_modes():
     return [
         '48h_detail',
-        '48h_brief',
-        '7d_detail',
-        '7d_brief']
+        '7d_detail']
 
 
 def sample_credentials():

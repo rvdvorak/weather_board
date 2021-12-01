@@ -66,7 +66,7 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
     return data
 
 
-def get_charts(weather):
+def get_charts(weather, air_pollution):
     charts = {
         'minutely': {
             'timeline': [],
@@ -83,7 +83,8 @@ def get_charts(weather):
             'wind_speed': [],
             'wind_gust': [],
             'uvi': [],
-            'visibility': []},
+            'visibility': [],
+            'aqi': []},
         'daily': {
             'timeline': [],
             'min_temp': [],
@@ -94,7 +95,10 @@ def get_charts(weather):
             'pressure': [],
             'wind_speed': [],
             'wind_gust': [],
-            'uvi': []}}
+            'uvi': []},
+        'air_pollution': {
+            'timeline': [],
+            'aqi': []}}
     if 'minutely' in weather:
         for minute in weather['minutely']:
             charts['minutely']['timeline'].append(
@@ -147,6 +151,11 @@ def get_charts(weather):
             day['wind_gust'])
         charts['daily']['uvi'].append(
             day['uvi'])
+    for hour in air_pollution['list']:
+        charts['air_pollution']['timeline'].append(
+            hour['dt'].strftime("%a %d. %H:%M"))
+        charts['air_pollution']['aqi'].append(
+            hour['main']['aqi'])
     return charts
 
 
@@ -237,7 +246,7 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
                 'show_search_form': True,
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
-    charts = get_charts(weather)
+    charts = get_charts(weather, air_pollution)
     # Persist sample data for testing
     # with open('weather_app/tests/sample_data/charts.pkl', 'wb') as file:
     #     pickle.dump(charts, file)

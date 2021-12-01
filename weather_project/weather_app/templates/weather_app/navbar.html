@@ -2,7 +2,7 @@
 {% load static %}
 <nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
-        <!-- Brand -->
+        <!-- Brand navlink -->
         <a href="{% url 'dashboard' %}" class="navbar-brand">
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
@@ -15,6 +15,7 @@
         <!-- Collapsible menu -->
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
             <!-- Search form -->
+            {# TODO Hide search form on "no_location" template #}
             <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
                     <input type="hidden" name="view_mode" value="{{ view_mode }}">
@@ -29,8 +30,7 @@
             </form>
             <!-- Main menu -->
             <ul class="navbar-nav ml-lg-auto">
-                <!-- View -->
-                {# TODO View modes #}
+                <!-- View menu -->
                 <li class="nav-item dropdown">
                     <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -39,57 +39,33 @@
                     </a>
                     <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
                         <form action="{% url 'dashboard' %}" method="GET">
-                            {% csrf_token %}
                             <input type="hidden" name="view_mode" value="48h_detail">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
-                                48 hours detailed
+                                48 hours
                             </button>
                         </form>
                         <form action="{% url 'dashboard' %}" method="GET">
-                            {% csrf_token %}
-                            <input type="hidden" name="view_mode" value="48h_brief">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-list"></i>
-                                48 hours briefly
-                            </button>
-                        </form>
-                        <li class="dropdown-divider"></li>
-                        <form action="{% url 'dashboard' %}" method="GET">
-                            {% csrf_token %}
                             <input type="hidden" name="view_mode" value="7d_detail">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
-                                7 days detailed
-                            </button>
-                        </form>
-                        <form action="{% url 'dashboard' %}" method="GET">
-                            {% csrf_token %}
-                            <input type="hidden" name="view_mode" value="7d_brief">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-list"></i>
-                                7 days briefly
+                                7 days
                             </button>
                         </form>
                         <li class="dropdown-divider"></li>
-                        <a href="{% url 'random_location' %}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'random_location' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-random"></i>
                                 Random location
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                     </ul>
                 </li>
                 {% if user.is_authenticated %}
@@ -105,49 +81,49 @@
                         {% if location %}
                         {% if location.is_favorite %}
                         <!-- Remove favorite -->
-                        <li class="dropdown-item">
-                            <form action="{% url 'update_location' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="view_mode" value="{{ view_mode }}">
-                                <input type="hidden" name="location_id" value="{{ location.id }}">
-                                <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                                <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                                <input type="hidden" name="label" value="{{ location.label }}">
-                                <input type="hidden" name="is_favorite" value="False">
-                                <button class="btn btn-block btn-secondary btn-sm" type="submit">
-                                    <i class="fas fa-trash-alt"></i>
-                                    Remove current location
-                                </button>
-                            </form>
-                        </li>
+                        <form action="{% url 'update_location' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="location_id" value="{{ location.id }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="is_favorite" value="False">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-trash-alt"></i>
+                                Remove current location
+                            </button>
+                        </form>
                         {% else %}
                         <!-- Add favorite -->
-                        <li class="dropdown-item">
-                            <form action="{% url 'update_location' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="view_mode" value="{{ view_mode }}">
-                                <input type="hidden" name="location_id" value="{{ location.id }}">
-                                <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                                <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                                <input type="hidden" name="label" value="{{ location.label }}">
-                                <input type="hidden" name="is_favorite" value="True">
-                                <button class="btn btn-block btn-secondary btn-sm" type="submit">
-                                    <i class="fas fa-heart"></i>
-                                    Add current location
-                                </button>
-                            </form>
-                        </li>
+                        <form action="{% url 'update_location' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="location_id" value="{{ location.id }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="is_favorite" value="True">
+                            <button class="dropdown-item" type="submit">
+                                <i class="fas fa-plus"></i>
+                                Add current location
+                            </button>
+                        </form>
                         {% endif %}
+                        <li class="dropdown-divider"></li>
                         {% endif %}
                         {% if favorite_locations %}
                         {% for location in favorite_locations %}
-                        <a
-                            href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ location.label|truncatechars:28 }}
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                         {% endfor %}
                         {% else %}
                         <li class="dropdown-item">
@@ -167,13 +143,16 @@
                         style="max-height: 320px; overflow-y: auto;">
                         {% if location_history %}
                         {% for location in location_history %}
-                        <a
-                            href="{% url 'dashboard' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'dashboard' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ location.label|truncatechars:28 }}
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                         {% endfor %}
                         {% else %}
                         <li class="dropdown-item">
@@ -193,21 +172,28 @@
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log Out -->
-                        <a
-                            href="{% url 'logout_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'logout_user' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Log out
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                         <!-- User profile -->
-                        <a
-                            href="{% url 'user_profile' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'user_profile' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-address-card"></i>
                                 User profile
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                     </ul>
                 </li>
                 {% else %}
@@ -220,21 +206,27 @@
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log In -->
-                        <a
-                            href="{% url 'login_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'login_user' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-key"></i>
                                 Log in
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                         <!-- Register -->
-                        <a
-                            href="{% url 'register_user' %}?latitude={{ location.latitude|urlencode }}&longitude={{ location.longitude|urlencode }}&label={{ location.label|urlencode }}">
-                            <li class="dropdown-item">
+                        <form action="{% url 'register_user' %}" method="GET">
+                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
+                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <button class="dropdown-item" type="submit">
                                 <i class="fas fa-user-plus"></i>
                                 Register
-                            </li>
-                        </a>
+                            </button>
+                        </form>
                     </ul>
                 </li>
                 {% endif %}

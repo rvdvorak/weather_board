@@ -1,10 +1,10 @@
 <!-- 48h summary forecast widget -->
-{% extends 'weather_app/widget.html' %}
+{% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-forward" style="width: 1.5em;"></i>
 {% endblock %}
-{% block widget_header_text %}48 h summary forecast{% endblock %}
+{% block widget_header_text %}Summary forecast{% endblock %}
 {% block widget_content %}
 <table class="table table-sm table-hover;">
     <tbody>

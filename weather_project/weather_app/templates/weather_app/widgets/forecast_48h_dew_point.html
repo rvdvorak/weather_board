@@ -1,12 +1,12 @@
-<!-- 7 days UV index forecast widget -->
+<!-- 48h dew point forecast widget -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-sun" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-temperature-low" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}UV index{% endblock %}
+{% block widget_header_text %}Dew point{% endblock %}
 {% block widget_content %}
-{% if charts.daily.uvi %}
+{% if charts.hourly.temp and charts.hourly.dew_point %}
 <div class="chart p-2">
     <div class="chartjs-size-monitor">
         <div class="chartjs-size-monitor-expand">
@@ -16,24 +16,32 @@
             <div class=""></div>
         </div>
     </div>
-    <canvas id="dailyUVindexChart"
+    <canvas id="hourlyDewPointChart"
         style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
         height="500" class="chartjs-render-monitor">
     </canvas>
 </div>
 <script>
     {
-        const daily = JSON.parse(document.getElementById('charts').textContent).daily;
-        const ctx = document.getElementById('dailyUVindexChart').getContext('2d');
-        const dailyUVindexChart = new Chart(ctx, {
+        const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
+        const ctx = document.getElementById('hourlyDewPointChart').getContext('2d');
+        const hourlyDewPointChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: daily.timeline,
+                labels: hourly.timeline,
                 datasets: [{
-                    label: 'UV index',
-                    data: daily.uvi,
-                    backgroundColor: ['rgba(127, 0, 255, 0.5)'],
-                    borderColor: ['rgba(127, 0, 255, 0.5)'],
+                    label: 'Dew point [°C]',
+                    data: hourly.dew_point,
+                    backgroundColor: ['rgba(0, 0, 255, 1)'],
+                    borderColor: ['rgba(0, 0, 255, 1)'],
+                    fill: false,
+                    borderWidth: 2,
+                    type: 'line'
+                }, {
+                    label: 'Temperature [°C]',
+                    data: hourly.temp,
+                    backgroundColor: ['rgba(255, 0, 0, 0.5)'],
+                    borderColor: ['rgba(255, 0, 0, 0.5)'],
                     fill: true,
                     borderWidth: 0
                 }]
@@ -47,8 +55,6 @@
                     },
                     y: {
                         type: 'linear',
-                        min: 0,
-                        max: 14
                     }
                 }
             }

@@ -1,10 +1,10 @@
-<!-- 48h pressure forecast widget -->
-{% extends 'weather_app/widget.html' %}
+<!-- 48 h atmospheric pressure forecast widget -->
+{% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-tachometer-alt" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}48 h atmospheric pressure{% endblock %}
+{% block widget_header_text %}Atmospheric pressure{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.pressure %}
 <div class="chart p-2">
@@ -26,17 +26,16 @@
         const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
         const ctx = document.getElementById('hourlyPressureChart').getContext('2d');
         const hourlyPressureChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: hourly.timeline,
                 datasets: [{
-                    label: 'Atmospheric pressure on the sea level [hPa]',
+                    label: 'Atmospheric pressure (sea level) [hPa]',
                     data: hourly.pressure,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 255, 255, 0.25)'],
-                    borderColor: ['rgba(0, 190, 190, 1)'],
+                    backgroundColor: ['rgba(0, 127, 127, 0.5)'],
+                    borderColor: ['rgba(0, 127, 127, 0.5)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {

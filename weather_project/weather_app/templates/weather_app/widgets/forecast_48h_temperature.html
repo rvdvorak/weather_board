@@ -1,10 +1,10 @@
 <!-- 48h temperature forecast widget -->
-{% extends 'weather_app/widget.html' %}
+{% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-temperature-low" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}48 h temperature{% endblock %}
+{% block widget_header_text %}Temperature{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.temp %}
 <div class="chart p-2">
@@ -26,33 +26,24 @@
         const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
         const ctx = document.getElementById('hourlyTemperatureChart').getContext('2d');
         const hourlyTemperatureChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: hourly.timeline,
                 datasets: [{
-                    label: 'Temperature [°C]',
-                    data: hourly.temp,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(255, 0, 0, 0.25)'],
-                    borderColor: ['rgba(255, 0, 0, 1)'],
-                    fill: true,
-                    borderWidth: 2
-                }, {
                     label: 'Temperature feels like [°C]',
                     data: hourly.feels_like,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 0, 0, 0)'],
-                    borderColor: ['rgba(0, 255, 0, 1)'],
+                    backgroundColor: ['rgba(0, 190, 0, 1)'],
+                    borderColor: ['rgba(0, 190, 0, 1)'],
                     fill: false,
-                    borderWidth: 2
+                    borderWidth: 2,
+                    type: 'line'
                 }, {
-                    label: 'Dew point [°C]',
-                    data: hourly.dew_point,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(0, 0, 0, 0)'],
-                    borderColor: ['rgba(150, 150, 150, 1)'],
-                    fill: false,
-                    borderWidth: 2
+                    label: 'Temperature [°C]',
+                    data: hourly.temp,
+                    backgroundColor: ['rgba(255, 0, 0, 0.5)'],
+                    borderColor: ['rgba(255, 0, 0, 0.5)'],
+                    fill: true,
+                    borderWidth: 0
                 }]
             },
             options: {

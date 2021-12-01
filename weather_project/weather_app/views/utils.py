@@ -12,11 +12,7 @@ import pickle  # Used for persisting sample data for tests
 
 
 def get_view_mode(request):
-    valid_modes = [
-        '48h_detail',
-        '48h_brief',
-        '7d_detail',
-        '7d_brief']
+    valid_modes = ['48h_detail', '7d_detail']
     if request.method == 'GET':
         view_mode = request.GET.get('view_mode')
     elif request.method == 'POST':

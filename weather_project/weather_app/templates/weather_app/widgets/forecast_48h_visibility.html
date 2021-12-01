@@ -1,10 +1,10 @@
 <!-- 48h visibility forecast widget -->
-{% extends 'weather_app/widget.html' %}
+{% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-binoculars" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}48 h visibility{% endblock %}
+{% block widget_header_text %}Visibility{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.visibility %}
 <div class="chart p-2">
@@ -26,17 +26,16 @@
         const hourly = JSON.parse(document.getElementById('charts').textContent).hourly;
         const ctx = document.getElementById('hourlyVisibilityChart').getContext('2d');
         const hourlyVisibilityChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: hourly.timeline,
                 datasets: [{
                     label: 'Average visibility [m]',
                     data: hourly.visibility,
-                    cubicInterpolationMode: 'default',
-                    backgroundColor: ['rgba(255, 255, 0, 0.25)'],
-                    borderColor: ['rgba(128, 128, 128, 1)'],
+                    backgroundColor: ['rgba(0, 255, 0, 0.8)'],
+                    borderColor: ['rgba(0, 255, 0, 0.8)'],
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: 0
                 }]
             },
             options: {
