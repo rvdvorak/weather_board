@@ -1,7 +1,7 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard, get_view_mode
+from weather_app.views.utils import get_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
 from weather_app.views.API_keys import ORS_key
 import random
 import requests
@@ -31,8 +31,9 @@ def get_random_location_params(ORS_key, ORS_timeout):
 
 def random_location(request, ORS_key=ORS_key, ORS_timeout=5):
     user = request.user
+    query = get_query(request)
     try:
-        location_params = get_random_location_params(ORS_key, ORS_timeout)
+        location = get_random_location_params(ORS_key, ORS_timeout)
     except Timeout as err:
         messages.warning(
             request, {
@@ -51,4 +52,7 @@ def random_location(request, ORS_key=ORS_key, ORS_timeout=5):
                 'show_search_form': True,
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
-    return redirect_to_dashboard(location_params, get_view_mode(request))
+    query['label'] = location['label']
+    query['latitude'] = location['latitude']
+    query['longitude'] = location['longitude']
+    return redirect_to_dashboard(query)

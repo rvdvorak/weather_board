@@ -11,33 +11,21 @@ import pytz
 import pickle  # Used for persisting sample data for tests
 
 
-def get_view_mode(request):
-    valid_modes = ['48h_detail', '7d_detail']
+def get_query(request):
+    query = {}
     if request.method == 'GET':
-        view_mode = request.GET.get('view_mode')
+        query['display_mode'] = request.GET.get('display_mode')
+        query['label'] = request.GET.get('label') or ''
+        query['latitude'] = request.GET.get('latitude') or ''
+        query['longitude'] = request.GET.get('longitude') or ''
     elif request.method == 'POST':
-        view_mode = request.POST.get('view_mode')
-    if view_mode in valid_modes:
-        return view_mode
-    else:
-        return valid_modes[0]
-
-def get_location_params(request):
-    if request.method == 'GET':
-        latitude = request.GET.get('latitude')
-        longitude = request.GET.get('longitude')
-        label = request.GET.get('label')
-    elif request.method == 'POST':
-        latitude = request.POST.get('latitude')
-        longitude = request.POST.get('longitude')
-        label = request.POST.get('label')
-    if latitude and longitude and label:
-        return {
-            'latitude': latitude,
-            'longitude': longitude,
-            'label': label}
-    else:
-        return {}
+        query['display_mode'] = request.POST.get('display_mode')
+        query['label'] = request.POST.get('label') or ''
+        query['latitude'] = request.POST.get('latitude') or ''
+        query['longitude'] = request.POST.get('longitude') or ''
+    if not query['display_mode'] in ['48h_detail', '7d_detail']:
+        query['display_mode'] = '48h_detail'
+    return query
 
 
 def get_location_history(user):
@@ -63,42 +51,51 @@ def get_favorite_locations(user):
     return None
 
 
-def redirect_to_dashboard(location_params={}, view_mode=None):
+def redirect_to_dashboard(query):
     base_url = reverse('dashboard')
-    query = {'view_mode': view_mode, **location_params}    
     query_string = urlencode(query)
     uri = f'{base_url}?{query_string}'
     return redirect(uri)
 
 
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
+    query = get_query(request)
     if get_messages(request):
+        # Show messages
         return TemplateResponse(
             request,
             'weather_app/messages.html', {
-                'view_mode': get_view_mode(request),
+                'display_mode': query['display_mode'],
+                'location': {
+                    'label': query['label'],
+                    'latitude': query['latitude'],
+                    'longitude': query['longitude']},
+                'weather': None,
+                'air_pollution': None,
+                'charts': None,
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user),
-                'view_mode': get_view_mode(request)})
+                'favorite_locations': get_favorite_locations(request.user)})
     elif location and weather and air_pollution and charts:
+        # Show weather forecast
         return TemplateResponse(
             request,
             'weather_app/dashboard.html', {
-                'view_mode': get_view_mode(request),
+                'display_mode': query['display_mode'],
                 'location': location,
                 'weather': weather,
                 'air_pollution': air_pollution,
                 'charts': charts,
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user),
-                'view_mode': get_view_mode(request)})
+                'favorite_locations': get_favorite_locations(request.user)})
     else:
+        # Show empty dashboard
         return TemplateResponse(
             request,
             'weather_app/no_location.html', {
-                'view_mode': get_view_mode(request),
+                'display_mode': query['display_mode'],
+                'location': None,
+                'weather': None,
+                'air_pollution': None,
+                'charts': None,
                 'location_history': get_location_history(request.user),
-                'favorite_locations': get_favorite_locations(request.user),
-                'view_mode': get_view_mode(request)})
-        
-
+                'favorite_locations': get_favorite_locations(request.user)})

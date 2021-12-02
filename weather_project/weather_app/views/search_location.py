@@ -1,7 +1,7 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard, get_view_mode
+from weather_app.views.utils import get_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
 from weather_app.views.API_keys import ORS_key
 import requests
 
@@ -79,10 +79,10 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
     elif len(search_results) == 1:
         # Single match => rerdirect to Dashboard
         return redirect_to_dashboard({
+            'display_mode': get_query(request)['display_mode'],
+            'label': search_results[0]['label'],
             'latitude': search_results[0]['latitude'],
-            'longitude': search_results[0]['longitude'],
-            'label': search_results[0]['label']},
-            get_view_mode(request))
+            'longitude': search_results[0]['longitude']})
     elif len(search_results) > 1:
         # Multiple matches => show search results in message
         if len(search_results) == max_count:

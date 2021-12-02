@@ -3,7 +3,7 @@ from requests.exceptions import Timeout, HTTPError
 from django.core.exceptions import ValidationError
 from datetime import datetime
 import pytz
-from weather_app.views.utils import get_location_params, render_dashboard
+from weather_app.views.utils import get_query, render_dashboard
 from weather_app.views.API_keys import OWM_key
 from weather_app.models import Location
 import requests
@@ -159,15 +159,15 @@ def get_charts(weather, air_pollution):
     return charts
 
 
-def get_location_instance(location_params, user):
-    if location_params:
+def get_location_instance(query, user):
+    if query['label'] and query['latitude'] and query['longitude']:
         location_instance = Location(
-            latitude=location_params['latitude'],
-            longitude=location_params['longitude'],
-            label=location_params['label'])
+            label=query['label'],
+            latitude=query['latitude'],
+            longitude=query['longitude'])
         location_instance.clean_fields(exclude=['user'])
         if user.is_authenticated:
-            # Check whether the location is new
+            # Check if the location is new
             location_instance.user = user
             match = Location.objects.filter(
                 user=user,
@@ -178,15 +178,15 @@ def get_location_instance(location_params, user):
                 # Location is already saved in DB
                 return match[0]
         return location_instance
-    # Empty location params
+    # Missing or incomplete location query
     return None
 
 
 def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeout=5, air_pltn_timeout=5):
     user = request.user
-    location_params = get_location_params(request)
+    query = get_query(request)
     try:
-        location = get_location_instance(location_params, user)
+        location = get_location_instance(query, user)
     except ValidationError as err:
         messages.error(
             request, {

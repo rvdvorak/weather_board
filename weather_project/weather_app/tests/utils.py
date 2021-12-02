@@ -53,7 +53,7 @@ def sample_location_instance_1():
 #         label=location_params['label'])
 
 
-def view_modes():
+def display_modes():
     return [
         '48h_detail',
         '7d_detail']

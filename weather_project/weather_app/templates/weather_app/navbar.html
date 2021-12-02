@@ -18,7 +18,7 @@
             {# TODO Hide search form on "no_location" template #}
             <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
-                    <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                    <input type="hidden" name="display_mode" value="{{ display_mode }}">
                     <input name="search_query" class="form-control form-control-navbar" type="search"
                         placeholder="Search location" aria-label="Search location" required>
                     <div class="input-group-append">
@@ -39,28 +39,28 @@
                     </a>
                     <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="48h_detail">
+                            <input type="hidden" name="display_mode" value="48h_detail">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
-                                48 hours
+                                48 hours forecast
                             </button>
                         </form>
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="7d_detail">
+                            <input type="hidden" name="display_mode" value="7d_detail">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
-                                7 days
+                                7 days forecast
                             </button>
                         </form>
                         <li class="dropdown-divider"></li>
                         <form action="{% url 'random_location' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-random"></i>
                                 Random location
@@ -83,7 +83,7 @@
                         <!-- Remove favorite -->
                         <form action="{% url 'update_location' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="location_id" value="{{ location.id }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -98,7 +98,7 @@
                         <!-- Add favorite -->
                         <form action="{% url 'update_location' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="location_id" value="{{ location.id }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -115,7 +115,7 @@
                         {% if favorite_locations %}
                         {% for location in favorite_locations %}
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -144,7 +144,7 @@
                         {% if location_history %}
                         {% for location in location_history %}
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -174,7 +174,7 @@
                         <!-- Log Out -->
                         <form action="{% url 'logout_user' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -185,7 +185,7 @@
                         </form>
                         <!-- User profile -->
                         <form action="{% url 'user_profile' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -207,7 +207,7 @@
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log In -->
                         <form action="{% url 'login_user' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -218,7 +218,7 @@
                         </form>
                         <!-- Register -->
                         <form action="{% url 'register_user' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">

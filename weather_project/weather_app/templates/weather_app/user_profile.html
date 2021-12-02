@@ -11,20 +11,23 @@
                 </h4>
             </div>
             <div class="card-body">
+                <!-- Go back to Weather -->
                 <form action="{% url 'dashboard' %}" method="GET">
-                    <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                    <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                    <input type="hidden" name="label" value="{{ location.label }}">
                     <input type="hidden" name="latitude" value="{{ location.latitude }}">
                     <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                    <input type="hidden" name="label" value="{{ location.label }}">
                     <div style="text-align: left;">
                         <button type="submit" class="btn btn-link">
                             <i class="fas fa-arrow-circle-left"></i>
                             <b>Go back to Weather</b>
                         </button>
+                    </div>
                 </form>
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9" style="text-align: center;">
                         {% if error_message %}
+                        <!-- Error message -->
                         <div class="alert bg-danger">
                             <b>
                                 <i class="icon fas fa-exclamation-triangle"></i>
@@ -32,6 +35,7 @@
                             </b>
                         </div>
                         {% elif success_message %}
+                        <!-- Success message -->
                         <div class="alert bg-success">
                             <b>
                                 <i class="fas fa-check-circle"></i>
@@ -70,7 +74,7 @@
                                 </label>
                                 <input type="password" name="new_password2" class="form-control" required>
                             </div>
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
@@ -115,7 +119,7 @@
                                 </label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
@@ -160,7 +164,7 @@
                                 </label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
                             <input type="hidden" name="label" value="{{ location.label }}">

@@ -11,9 +11,23 @@
                 </h3>
             </div>
             <div class="card-body">
+                <!-- Go back to Weather -->
+                <form action="{% url 'dashboard' %}" method="GET">
+                    <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                    <input type="hidden" name="label" value="{{ location.label }}">
+                    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+                    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                    <div style="text-align: left;">
+                        <button type="submit" class="btn btn-link">
+                            <i class="fas fa-arrow-circle-left"></i>
+                            <b>Go back to Weather</b>
+                        </button>
+                    </div>
+                </form>
                 <div class="row justify-content-sm-center" style="margin-top: 0.75em; margin-bottom: 0.75em;">
                     <div class="col-sm-9" style="text-align: center;">
                         {% if error_message %}
+                        <!-- Error message -->
                         <div class="alert bg-danger">
                             <b>
                                 <i class="icon fas fa-exclamation-triangle"></i>
@@ -31,10 +45,10 @@
                                 <label for="password">Password</label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
                             {% if next_url %}
                             <input type="hidden" name="next_url" value="{{ next_url }}">
                             {% endif %}
@@ -48,10 +62,13 @@
                         <hr>
                         Don't have an account yet?
                         <form action="{% url 'register_user' %}" method="GET">
-                            <input type="hidden" name="view_mode" value="{{ view_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
+                            {% if next_url %}
+                            <input type="hidden" name="next_url" value="{{ next_url }}">
+                            {% endif %}
                             <button type="submit" class="btn btn-link">Register new user</button>
                         </form>
                     </div>
