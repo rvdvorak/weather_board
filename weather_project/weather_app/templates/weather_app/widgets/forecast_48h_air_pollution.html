@@ -1,0 +1,66 @@
+<!-- 48 hours air pollution forecast widget -->
+{% extends 'weather_app/widgets/_widget.html' %}
+{% block widget_style %}lightblue{% endblock %}
+{% block widget_header_icon %}
+<i class="fas fa-smog" style="width: 1.5em; text-align: left"></i>
+{% endblock %}
+{% block widget_header_text %}Air pollution{% endblock %}
+{% block widget_content %}
+{% if charts.air_pollution.aqi %}
+<div class="chart p-2">
+    <div class="chartjs-size-monitor">
+        <div class="chartjs-size-monitor-expand">
+            <div class=""></div>
+        </div>
+        <div class="chartjs-size-monitor-shrink">
+            <div class=""></div>
+        </div>
+    </div>
+    <canvas id="hourlyAirPollutionChart"
+        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block;" width="498"
+        height="500" class="chartjs-render-monitor">
+    </canvas>
+</div>
+<script>
+    {
+        const air_pollution = JSON.parse(document.getElementById('charts').textContent).air_pollution;
+        const timeline = JSON.parse(document.getElementById('charts').textContent).hourly.timeline;
+        const ctx = document.getElementById('hourlyAirPollutionChart').getContext('2d');
+        const hourlyAirPollutionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: timeline,
+                datasets: [{
+                    label: 'CAQI index (lower = better)',
+                    data: air_pollution.aqi,
+                    backgroundColor: ['rgba(0, 0, 0, 0.8)'],
+                    borderColor: ['rgba(0, 0, 0, 1)'],
+                    fill: true,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                radius: 0,
+                pointBackground: '#f00',
+                scales: {
+                    x: {
+                        display: true
+                    },
+                    y: {
+                        type: 'linear',
+                        ticks: {
+                            stepSize: 1},
+                        min: 1,
+                        max: 5
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% else %}
+<div style="padding: 1em; text-align: center;">
+    Currently not available for {{ location.label }}.
+</div>
+{% endif %}
+{% endblock widget_content %}

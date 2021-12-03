@@ -7,26 +7,26 @@ import pytz
 def sample_location_params_1():
     return {
         'label': 'San Matías, SC, Bolivia',
-        'latitude': '-16.3667',
-        'longitude': '-58.4'}
+        'latitude': -16.3667,
+        'longitude': -58.4}
 
 
 def sample_location_params_2():
     return {
         'label': 'Clair, SK, Canada',
-        'latitude': '52.0167',
-        'longitude': '-104.0843'}
+        'latitude': 52.0167,
+        'longitude': -104.0843}
 
 
 def sample_location_params_3():
     return {
         'label': 'Sydney, NSW, Australia',
-        'latitude': '-33.8686',
-        'longitude': '151.2094'}
+        'latitude': -33.8686,
+        'longitude': 151.2094}
 
 
 def sample_timezone_1():
-    return pytz.timezone('America/La_Paz')
+    return 'America/La_Paz'
 
 
 def sample_location_instance_1():
@@ -54,6 +54,7 @@ def sample_location_instance_1():
 
 
 def display_modes():
+    # Valid display modes
     return [
         '48h_detail',
         '7d_detail']
@@ -70,6 +71,7 @@ def sample_user():
 
 
 def required_current_weather_keys():
+    # Those keys must be alwyas present in "current" weather data
     return {
         'dt', 'temp', 'feels_like', 'pressure', 'humidity', 'dew_point',
         'clouds', 'uvi', 'visibility', 'wind_speed', 'wind_deg', 'weather'}

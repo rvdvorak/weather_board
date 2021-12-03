@@ -3,7 +3,11 @@
 <nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
         <!-- Brand navlink -->
+        {% if query.display_mode %}
+        <a href="{% url 'dashboard' %}?display_mode={{ query.display_mode }}" class="navbar-brand">
+        {% else %}
         <a href="{% url 'dashboard' %}" class="navbar-brand">
+        {% endif %}
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
         </a>
@@ -18,7 +22,7 @@
             {# TODO Hide search form on "no_location" template #}
             <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-sm">
-                    <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                     <input name="search_query" class="form-control form-control-navbar" type="search"
                         placeholder="Search location" aria-label="Search location" required>
                     <div class="input-group-append">
@@ -30,19 +34,19 @@
             </form>
             <!-- Main menu -->
             <ul class="navbar-nav ml-lg-auto">
-                <!-- View menu -->
+                <!-- View Options -->
                 <li class="nav-item dropdown">
-                    <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    <a id="viewOptions" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
                         <i class="far fa-eye"></i>
                         View
                     </a>
-                    <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow">
+                    <ul aria-labelledby="viewOptions" class="dropdown-menu border-0 shadow">
                         <form action="{% url 'dashboard' %}" method="GET">
                             <input type="hidden" name="display_mode" value="48h_detail">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
                                 48 hours forecast
@@ -50,9 +54,9 @@
                         </form>
                         <form action="{% url 'dashboard' %}" method="GET">
                             <input type="hidden" name="display_mode" value="7d_detail">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-chart-bar"></i>
                                 7 days forecast
@@ -60,7 +64,7 @@
                         </form>
                         <li class="dropdown-divider"></li>
                         <form action="{% url 'random_location' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-random"></i>
                                 Random location
@@ -83,7 +87,7 @@
                         <!-- Remove favorite -->
                         <form action="{% url 'update_location' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <input type="hidden" name="location_id" value="{{ location.id }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -98,7 +102,7 @@
                         <!-- Add favorite -->
                         <form action="{% url 'update_location' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <input type="hidden" name="location_id" value="{{ location.id }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -115,7 +119,7 @@
                         {% if favorite_locations %}
                         {% for location in favorite_locations %}
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -144,7 +148,7 @@
                         {% if location_history %}
                         {% for location in location_history %}
                         <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <input type="hidden" name="label" value="{{ location.label }}">
                             <input type="hidden" name="latitude" value="{{ location.latitude }}">
                             <input type="hidden" name="longitude" value="{{ location.longitude }}">
@@ -172,12 +176,11 @@
                     </a>
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log Out -->
-                        <form action="{% url 'logout_user' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                        <form action="{% url 'logout_user' %}" method="GET">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Log out
@@ -185,10 +188,10 @@
                         </form>
                         <!-- User profile -->
                         <form action="{% url 'user_profile' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-address-card"></i>
                                 User profile
@@ -207,10 +210,10 @@
                     <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
                         <!-- Log In -->
                         <form action="{% url 'login_user' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-key"></i>
                                 Log in
@@ -218,10 +221,10 @@
                         </form>
                         <!-- Register -->
                         <form action="{% url 'register_user' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
+                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+                            <input type="hidden" name="label" value="{{ query.label }}">
+                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
                                 <i class="fas fa-user-plus"></i>
                                 Register

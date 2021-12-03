@@ -1,4 +1,4 @@
-<!-- Air pollution forecast widget -->
+<!-- 5 days air pollution forecast widget -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
@@ -32,10 +32,10 @@
                 datasets: [{
                     label: 'CAQI index (lower = better)',
                     data: air_pollution.aqi,
-                    backgroundColor: ['rgba(128, 0, 128, 0.8)'],
+                    backgroundColor: ['rgba(0, 0, 0, 0.8)'],
                     borderColor: ['rgba(0, 0, 0, 1)'],
                     fill: true,
-                    borderWidth: 3
+                    borderWidth: 0
                 }]
             },
             options: {

@@ -15,18 +15,22 @@ import pickle
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
 
 def get_weather(location, weather_key, weather_timeout):
-    # Weather API docs:
+    # Get weather forecast data for given location
+    # from Open Weather Map free API:
     # https://openweathermap.org/api/one-call-api
-
-    base_url = 'https://api.openweathermap.org/data/2.5/onecall'
+    url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
         'units': 'metric',
         'appid': weather_key}
-    response = requests.get(base_url, params=params, timeout=weather_timeout)
+    # Send API request
+    # Raise Timeout error if timeout
+    response = requests.get(url, params=params, timeout=weather_timeout)
+    # Raise HTTPError if request fails
     response.raise_for_status()
     weather = response.json()
+    # Convert timestamps to datetime 
     timezone = pytz.timezone(weather['timezone'])
     keys_to_convert = ['dt', 'sunrise', 'sunset', 'start', 'end']
     weather = convert_timestamps_to_datetimes(
@@ -35,23 +39,29 @@ def get_weather(location, weather_key, weather_timeout):
 
 
 def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
-    # Air pollution API docs:
+    # Get air pollution forecast data for given location
+    # from Open Weather Map free API:
     # https://openweathermap.org/api/air-pollution
-
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
         'lat': location.latitude,
         'lon': location.longitude,
         'appid': air_pltn_key}
+    # Send API request
+    # Raise Timeout error if timeout
     response = requests.get(url, params=params, timeout=air_pltn_timeout)
+    # Convert timestamps to datetime 
     response.raise_for_status()
     air_pollution = response.json()
+    # Convert timestamps to datetime 
     air_pollution = convert_timestamps_to_datetimes(
         air_pollution, ['dt'], timezone)
     return air_pollution
 
 
 def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
+    # Recursively iterate over JSON-like data structure and
+    # convert values of given keys from UTC timestamp to local datetime
     if isinstance(data, dict):
         for key, value in data.items():
             if key in keys_to_convert:
@@ -67,11 +77,16 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
 
 
 def get_charts(weather, air_pollution):
+    # Generate chart data for Chart.JS library
+    # from weather and air pollution forecast data
     charts = {
         'minutely': {
+            # 60 minutes precipitation forecast
+            # Not available in some locations
             'timeline': [],
             'precipitation': []},
         'hourly': {
+            # 48 hours weather forecast
             'timeline': [],
             'pop': [],
             'temp': [],
@@ -86,6 +101,7 @@ def get_charts(weather, air_pollution):
             'visibility': [],
             'aqi': []},
         'daily': {
+            # 7 days weather forecast
             'timeline': [],
             'min_temp': [],
             'max_temp': [],
@@ -97,15 +113,19 @@ def get_charts(weather, air_pollution):
             'wind_gust': [],
             'uvi': []},
         'air_pollution': {
+            # 5 days air pollution forecast
             'timeline': [],
             'aqi': []}}
     if 'minutely' in weather:
+        # 60 minutes precipitation forecast
+        # Not available in some locations
         for minute in weather['minutely']:
             charts['minutely']['timeline'].append(
                 minute['dt'].strftime("%H:%M"))
             charts['minutely']['precipitation'].append(
                 round(minute['precipitation'], 2))
     for hour in weather['hourly']:
+        # 48 hours weather forecast
         charts['hourly']['timeline'].append(
             hour['dt'].strftime("%a %H:%M"))
         charts['hourly']['temp'].append(
@@ -131,6 +151,7 @@ def get_charts(weather, air_pollution):
         charts['hourly']['visibility'].append(
             hour['visibility'])
     for day in weather['daily']:
+        # 7 days weather forecast
         charts['daily']['timeline'].append(
             day['dt'].strftime('%a %d. %b'))
         charts['daily']['min_temp'].append(
@@ -152,6 +173,7 @@ def get_charts(weather, air_pollution):
         charts['daily']['uvi'].append(
             day['uvi'])
     for hour in air_pollution['list']:
+        # 5 days air pollution forecast
         charts['air_pollution']['timeline'].append(
             hour['dt'].strftime("%a %d. %H:%M"))
         charts['air_pollution']['aqi'].append(
@@ -160,6 +182,8 @@ def get_charts(weather, air_pollution):
 
 
 def get_location_instance(query, user):
+    # Get location record from DB or new Location
+    # instance based on location query
     if query['label'] and query['latitude'] and query['longitude']:
         location_instance = Location(
             label=query['label'],
@@ -183,11 +207,15 @@ def get_location_instance(query, user):
 
 
 def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeout=5, air_pltn_timeout=5):
-    user = request.user
+    # Gather all the necessary data for the weather forecast dashboard
+    # and handle eventual exceptions
     query = get_query(request)
+    user = request.user
     try:
         location = get_location_instance(query, user)
     except ValidationError as err:
+        # Incorrect location query
+        # Render error message
         messages.error(
             request, {
                 'header': 'Incorrect location parameters',
@@ -197,6 +225,7 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     if not location:
+        # Render empty dashboard
         return render_dashboard(request)
     try:
         weather = get_weather(location, weather_key, weather_timeout)
@@ -204,6 +233,8 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
         # with open('weather_app/tests/sample_data/weather.pkl', 'wb') as file:
         #     pickle.dump(weather, file)
     except Timeout as err:
+        # Weather API timeout
+        # Render error message
         messages.warning(
             request, {
                 'header': 'Weather service time out',
@@ -213,6 +244,8 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     except HTTPError as err:
+        # Weather API request failed
+        # Render error message
         messages.error(
             request, {
                 'header': 'Weather service error',
@@ -229,6 +262,8 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
         # with open('weather_app/tests/sample_data/air_pollution.pkl', 'wb') as file:
         #     pickle.dump(air_pollution, file)
     except Timeout as err:
+        # Air pollution API timeout
+        # Render error message
         messages.warning(
             request, {
                 'header': 'Air pollution service time out',
@@ -238,6 +273,8 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
                 'admin_details': f'Exception: {pprint.pformat(err)}'})
         return render_dashboard(request)
     except HTTPError as err:
+        # Air pollution API request failed
+        # Render error message
         messages.error(
             request, {
                 'header': 'Air pollution service error',
@@ -253,6 +290,7 @@ def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeou
     if user.is_authenticated:
         location.save()
     return render_dashboard(
+        # Render the dashboard with data
         request,
         location=location,
         weather=weather,

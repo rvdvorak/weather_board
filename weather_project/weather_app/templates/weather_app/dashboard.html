@@ -24,10 +24,9 @@ TODO toasts:
     
     {% include 'weather_app/widgets/current_weather_details.html' %}
     
-    {% include 'weather_app/widgets/forecast_air_pollution.html' %}
-    
-    {% if display_mode == '7d_detail' %}
+    {% if query.display_mode == '7d_detail' %}
     <!-- 7 days chart widgets -->
+    {% include 'weather_app/widgets/forecast_5d_air_pollution.html' %}
     {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
 
     {% if weather.minutely %}
@@ -42,6 +41,7 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
     {% else %}
     <!-- 48 hours chart widgets -->
+    {% include 'weather_app/widgets/forecast_48h_air_pollution.html' %}
     {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
     {% include 'weather_app/widgets/forecast_48h_dew_point.html' %}
 
