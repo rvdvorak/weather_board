@@ -1,0 +1,12 @@
+<!-- login_required.html -->
+<form action="{% url 'login_user' %}" method="GET">
+    {% csrf_token %}
+    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+    <input type="hidden" name="label" value="{{ location.label }}">
+    <button class="dropdown-item" type="submit">
+        <i class="fas fa-key"></i>
+        You need to sign in
+    </button>
+</form>

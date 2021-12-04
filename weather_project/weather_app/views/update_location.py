@@ -1,15 +1,15 @@
 from weather_app.models import Location
-from weather_app.views.utils import get_query, redirect_to_dashboard
-from django.contrib.auth.decorators import login_required
+from weather_app.views.utils import get_query, redirect_to_login, redirect_to_dashboard
 from django.urls import reverse
 from pprint import pprint
 
 
-@login_required(redirect_field_name='next_url')
 def update_location(request):
+    if not request.user.is_authenticated:
+        return redirect_to_login(get_query(request))
     # Currently updates only the "is_favorite" attribute.
-    location_id = request.POST.get('location_id')  # String
-    is_favorite = request.POST.get('is_favorite')  # String
+    location_id = request.POST.get('location_id')  # type string
+    is_favorite = request.POST.get('is_favorite')  # type string
     if location_id and is_favorite:
         match = Location.objects.filter(
             pk=location_id,

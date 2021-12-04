@@ -1,10 +1,10 @@
-<!-- 1h precipitation forecast widget -->
+<!-- forecast_1h_precipitation.html -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}Precipitation volume{% endblock %} 
+{% block widget_header_text %}Precipitation volume{% endblock %}
 {% block widget_content %}
 {% if charts.minutely.precipitation %}
 <div class="chart p-2">

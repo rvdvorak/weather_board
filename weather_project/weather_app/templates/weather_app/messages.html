@@ -1,4 +1,4 @@
-<!-- Messages -->
+<!-- messages.html -->
 {% extends 'weather_app/base.html' %}
 {% block content %}
 <div class="row justify-content-sm-center">
@@ -26,7 +26,6 @@
                 </div>
                 {% endif %}
                 {% if message.message.search_results %}
-                {# TODO Separate Search Results #}
                 <!-- Location search results -->
                 <div class="row justify-content-sm-center" style="margin-bottom: 0.75em;">
                     <div class="col-sm-9">
@@ -50,7 +49,7 @@
                 <form action="{% url 'search_location' %}" method="GET">
                     <div class="input-group input-group-sm">
                         <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                        <input name="search_query" class="form-control" type="search" placeholder="Search location"
+                        <input name="search_text" class="form-control" type="search" placeholder="Search location"
                             aria-label="Search location" required>
                         <div class="input-group-append">
                             <button class="btn btn-block btn-secondary btn-sm" type="submit">
@@ -80,7 +79,3 @@
     </div>
 </div>
 {% endblock content %}
-
-
-
-

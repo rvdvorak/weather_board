@@ -1,13 +1,15 @@
+<!-- base.html -->
 {% load sass_tags %} {# django-sass-processor #}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Weather Board</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/png" href="{% static 'umbrella.svg' %}"/>
+    <link rel="shortcut icon" type="image/png" href="{% static 'umbrella.svg' %}" />
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -19,7 +21,7 @@
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
     <!-- Custom styles -->
-    <link href="{% sass_src 'main.scss' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% sass_src 'main.scss' %}" rel="stylesheet" type="text/css" />
     <!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -32,8 +34,9 @@
         integrity="sha256-dVs7YxkIJMdWKIx+E4Z7KGIrsH2P7MHj4WDNvzTzsQU=" crossorigin="anonymous"></script>
     <!-- Chart.JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"
-    integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
+        integrity="sha256-yz7K02nILYEeRDwEfzu/1zI9SpBKod/nLYMTFh7vszs=" crossorigin="anonymous"></script>
 </head>
+
 <body class="layout-navbar-fixed layout-top-nav">
     <div class="wrapper">
         {% include 'weather_app/navbar.html' %}
@@ -42,11 +45,13 @@
             <!-- AdminLTE Main content -->
             <div class="content">
                 <div class="container" style="padding-top: 1rem; padding-left: 0rem; padding-right: 0rem;">
-                    {% block content %}{% endblock content %}
+                    {% block content %}
+                    {% endblock content %}
                 </div>
             </div>
         </div>
         {% include 'weather_app/footer.html' %}
     </div>
 </body>
+
 </html>

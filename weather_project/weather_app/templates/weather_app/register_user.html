@@ -1,4 +1,4 @@
-<!-- Register -->
+<!-- register_user.html -->
 {% extends 'weather_app/base.html' %}
 {% block content %}
 <div class="row justify-content-sm-center">
@@ -43,6 +43,7 @@
                             </b>
                         </div>
                         {% endif %}
+                        <!-- Credentials form -->
                         <form method="POST" style="text-align: left;">
                             {% csrf_token %}
                             <div class="form-group">
@@ -70,6 +71,7 @@
                         </form>
                         <hr>
                         Already registered?
+                        <!-- Go to login page -->
                         <form action="{% url 'login_user' %}" method="GET">
                             <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <input type="hidden" name="latitude" value="{{ query.latitude }}">

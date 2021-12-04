@@ -1,4 +1,4 @@
-<!-- 48 hours air pollution forecast widget -->
+<!-- forecast_48h_air_pollution.html -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
@@ -49,7 +49,8 @@
                     y: {
                         type: 'linear',
                         ticks: {
-                            stepSize: 1},
+                            stepSize: 1
+                        },
                         min: 1,
                         max: 5
                     }

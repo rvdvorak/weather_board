@@ -1,0 +1,53 @@
+<!-- favorites.html -->
+{% if location.is_favorite %}
+<!-- Remove favorite -->
+<form action="{% url 'update_location' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+    <input type="hidden" name="location_id" value="{{ location.id }}">
+    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+    <input type="hidden" name="label" value="{{ location.label }}">
+    <input type="hidden" name="is_favorite" value="False">
+    <button class="dropdown-item" type="submit">
+        <i class="fas fa-trash-alt"></i>
+        Remove current location
+    </button>
+</form>
+<li class="dropdown-divider"></li>
+{% elif location %}
+<!-- Add favorite -->
+<form action="{% url 'update_location' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+    <input type="hidden" name="location_id" value="{{ location.id }}">
+    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+    <input type="hidden" name="label" value="{{ location.label }}">
+    <input type="hidden" name="is_favorite" value="True">
+    <button class="dropdown-item" type="submit">
+        <i class="fas fa-plus"></i>
+        Add current location
+    </button>
+</form>
+<li class="dropdown-divider"></li>
+{% endif %}
+{% if favorite_locations %}
+<!-- Favorite list -->
+{% for location in favorite_locations %}
+<form action="{% url 'dashboard' %}" method="GET">
+    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+    <input type="hidden" name="label" value="{{ location.label }}">
+    <input type="hidden" name="latitude" value="{{ location.latitude }}">
+    <input type="hidden" name="longitude" value="{{ location.longitude }}">
+    <button class="dropdown-item" type="submit">
+        <i class="fas fa-map-marker-alt"></i>
+        {{ location.label|truncatechars:28 }}
+    </button>
+</form>
+{% endfor %}
+{% else %}
+<li class="dropdown-item">
+    No favorites yet...
+</li>
+{% endif %}

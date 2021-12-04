@@ -1,0 +1,32 @@
+<!-- sign_in_menu.html -->
+<li class="nav-item dropdown">
+    <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+        class="nav-link dropdown-toggle">
+        <i class="fas fa-sign-in-alt"></i>
+        Sign in
+    </a>
+    <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
+        <!-- Log In -->
+        <form action="{% url 'login_user' %}" method="GET">
+            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+            <input type="hidden" name="label" value="{{ query.label }}">
+            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+            <input type="hidden" name="longitude" value="{{ query.longitude }}">
+            <button class="dropdown-item" type="submit">
+                <i class="fas fa-key"></i>
+                Log in
+            </button>
+        </form>
+        <!-- Register -->
+        <form action="{% url 'register_user' %}" method="GET">
+            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+            <input type="hidden" name="label" value="{{ query.label }}">
+            <input type="hidden" name="latitude" value="{{ query.latitude }}">
+            <input type="hidden" name="longitude" value="{{ query.longitude }}">
+            <button class="dropdown-item" type="submit">
+                <i class="fas fa-user-plus"></i>
+                Register
+            </button>
+        </form>
+    </ul>
+</li>

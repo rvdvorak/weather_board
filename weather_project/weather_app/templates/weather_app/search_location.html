@@ -1,4 +1,4 @@
-<!-- No location selected -->
+<!-- search_location.html -->
 {% extends 'weather_app/base.html' %}
 {% load static %}
 {% block content %}
@@ -12,7 +12,7 @@
             <form action="{% url 'search_location' %}" method="GET">
                 <div class="input-group input-group-md">
                     <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                    <input name="search_query" class="form-control" type="search" placeholder="Search location"
+                    <input name="search_text" class="form-control" type="search" placeholder="Search location"
                         aria-label="Search location" required>
                     <div class="input-group-append">
                         <button class="btn btn-block btn-secondary btn-md" type="submit">
@@ -28,4 +28,3 @@
     </div>
 </div>
 {% endblock content %}
-

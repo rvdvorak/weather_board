@@ -8,7 +8,13 @@ from weather_app.models import Location
 import requests
 import json
 import pytz
-import pickle  # Used for persisting sample data for tests
+import pickle
+
+
+def get_credentials(request):
+    return {
+        'username': request.POST.get('username'),
+        'password': request.POST.get('password')}
 
 
 def get_query(request):
@@ -59,6 +65,13 @@ def redirect_to_dashboard(query):
     return redirect(uri)
 
 
+def redirect_to_login(query):
+    base_url = reverse('login_user')
+    query_string = urlencode(query)
+    uri = f'{base_url}?{query_string}'
+    return redirect(uri)
+
+
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
     query = get_query(request)
     location_history = get_location_history(request.user)
@@ -92,14 +105,15 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
                 'location_history': location_history,
                 'favorite_locations': favorite_locations})
     else:
-        # Show empty dashboard
+        # Show search location page
         return TemplateResponse(
             request,
-            'weather_app/no_location.html', {
+            'weather_app/search_location.html', {
                 'query': query,
                 'location': None,
                 'weather': None,
                 'air_pollution': None,
                 'charts': None,
                 'location_history': location_history,
-                'favorite_locations': favorite_locations})
+                'favorite_locations': favorite_locations,
+                'location_search_page': True})

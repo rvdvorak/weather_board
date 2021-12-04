@@ -1,20 +1,20 @@
 from requests.exceptions import Timeout, HTTPError
+from django.template.response import TemplateResponse
 from django.contrib import messages
-import pprint
 from weather_app.views.utils import get_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
 from weather_app.views.API_keys import ORS_key
 import requests
+import pprint
 
 
-def get_search_results(search_query, ORS_key, ORS_timeout, max_count):
-    # Location API docs:
+def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
+    # Get list of matching locations from Open Route Service free API:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
-
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
         'api_key': ORS_key,
         'size': max_count,
-        'text': search_query}
+        'text': search_text}
     response = requests.get(url, params=params, timeout=ORS_timeout)
     response.raise_for_status()
     json_items = response.json()['features']
@@ -29,21 +29,16 @@ def get_search_results(search_query, ORS_key, ORS_timeout, max_count):
 
 
 def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
-    max_count = 20
-    search_query = request.GET.get('search_query')
-    if search_query in ['', None]:
-        # Missing search query
-        messages.warning(
-            request, {
-                'header': 'Nothing to search',
-                'description': 'First enter the name of the location to search.',
-                'search_results': None,
-                'icon': 'bi bi-geo-alt-fill',
-                'show_search_form': True})
-        return render_dashboard(request)
+    # Handle the location search process.
+    # Location search is available on every page.
+    query = get_query(request)
+    query['search_text'] = request.GET.get('search_text')
+    if not query['search_text']:
+        # Nothing to search
+        return redirect_to_dashboard(query)
     try:
         search_results = get_search_results(
-            search_query, ORS_key=ORS_key, ORS_timeout=ORS_timeout, max_count=max_count)
+            query['search_text'], ORS_key, ORS_timeout, max_count)
     except Timeout as err:
         # API request time out
         messages.warning(
@@ -71,7 +66,7 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
         messages.warning(
             request, {
                 'header': 'Location not found',
-                'description': f'"{search_query}" may not be the correct location name. Please type something else.',
+                'description': f"\"{query['search_text']}\" may not be the correct location name.",
                 'icon': 'bi bi-geo-alt-fill',
                 'search_results': None,
                 'show_search_form': True})
@@ -79,21 +74,20 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
     elif len(search_results) == 1:
         # Single match => rerdirect to Dashboard
         return redirect_to_dashboard({
-            'display_mode': get_query(request)['display_mode'],
+            'display_mode': query['display_mode'],
             'label': search_results[0]['label'],
             'latitude': search_results[0]['latitude'],
             'longitude': search_results[0]['longitude']})
     elif len(search_results) > 1:
         # Multiple matches => show search results in message
+        description = None
         if len(search_results) == max_count:
             # Too many matches
-            message_description = f'Showing only first {max_count} matching locations:'
-        else:
-            message_description = None
+            description = f'Showing only first {max_count} matching locations:'
         messages.success(
             request, {
                 'header': 'Select location',
-                'description': message_description,
+                'description': description,
                 'icon': 'bi bi-geo-alt-fill',
                 'search_results': search_results,
                 'show_search_form': True})

@@ -1,10 +1,10 @@
-<!-- 7 days cloudiness forecast widget -->
+<!-- forecast_7d_clouds.html -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
 <i class="fas fa-cloud" style="width: 1.5em; text-align: left"></i>
 {% endblock %}
-{% block widget_header_text %}Cloudiness{% endblock %} 
+{% block widget_header_text %}Cloudiness{% endblock %}
 {% block widget_content %}
 {% if charts.daily.clouds %}
 <div class="chart p-2">

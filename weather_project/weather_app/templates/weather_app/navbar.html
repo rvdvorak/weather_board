@@ -1,13 +1,9 @@
-<!-- Navbar -->
+<!-- navbar.html -->
 {% load static %}
 <nav class="main-header navbar navbar-expand-lg navbar-light navbar-white">
     <div class="container">
         <!-- Brand navlink -->
-        {% if query.display_mode %}
-        <a href="{% url 'dashboard' %}?display_mode={{ query.display_mode }}" class="navbar-brand">
-        {% else %}
-        <a href="{% url 'dashboard' %}" class="navbar-brand">
-        {% endif %}
+        <a class="navbar-brand" href="{% url 'dashboard' %}?display_mode={{ query.display_mode }}">
             <img src="{% static 'umbrella.svg' %}" alt="WeatherBoard Logo" class="brand-image">
             <span class="brand-text font-weight-light">WeatherBoard</span>
         </a>
@@ -16,25 +12,16 @@
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <!-- Collapsible menu -->
+        <!-- Collapsible -->
         <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-            <!-- Search form -->
-            {# TODO Hide search form on "no_location" template #}
-            <form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
-                <div class="input-group input-group-sm">
-                    <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                    <input name="search_query" class="form-control form-control-navbar" type="search"
-                        placeholder="Search location" aria-label="Search location" required>
-                    <div class="input-group-append">
-                        <button class="btn btn-navbar" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
+            {% if location_search_page %}
+            <!-- Navbar search form is hidden on the location search page -->
+            {% else %}
+            {% include 'weather_app/navbar/search_form.html' %}
+            {% endif %}
             <!-- Main menu -->
             <ul class="navbar-nav ml-lg-auto">
-                <!-- View Options -->
+                <!-- View options -->
                 <li class="nav-item dropdown">
                     <a id="viewOptions" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -42,27 +29,38 @@
                         View
                     </a>
                     <ul aria-labelledby="viewOptions" class="dropdown-menu border-0 shadow">
+                        <!-- 48 hours forecast -->
                         <form action="{% url 'dashboard' %}" method="GET">
                             <input type="hidden" name="display_mode" value="48h_detail">
                             <input type="hidden" name="label" value="{{ query.label }}">
                             <input type="hidden" name="latitude" value="{{ query.latitude }}">
                             <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
-                                <i class="fas fa-chart-bar"></i>
+                                {% if query.display_mode == '48h_detail' %}
+                                <i class="fas fa-check-square"></i>
+                                {% else %}
+                                <i class="far fa-square"></i>
+                                {% endif %}
                                 48 hours forecast
                             </button>
                         </form>
+                        <!-- 7 days forecast -->
                         <form action="{% url 'dashboard' %}" method="GET">
                             <input type="hidden" name="display_mode" value="7d_detail">
                             <input type="hidden" name="label" value="{{ query.label }}">
                             <input type="hidden" name="latitude" value="{{ query.latitude }}">
                             <input type="hidden" name="longitude" value="{{ query.longitude }}">
                             <button class="dropdown-item" type="submit">
-                                <i class="fas fa-chart-bar"></i>
+                                {% if query.display_mode == '7d_detail' %}
+                                <i class="fas fa-check-square"></i>
+                                {% else %}
+                                <i class="far fa-square"></i>
+                                {% endif %}
                                 7 days forecast
                             </button>
                         </form>
                         <li class="dropdown-divider"></li>
+                        <!-- Random location -->
                         <form action="{% url 'random_location' %}" method="GET">
                             <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
                             <button class="dropdown-item" type="submit">
@@ -72,8 +70,7 @@
                         </form>
                     </ul>
                 </li>
-                {% if user.is_authenticated %}
-                <!-- Favorites -->
+                <!-- Favorites menu -->
                 <li class="nav-item dropdown">
                     <a id="favorites" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -82,61 +79,14 @@
                     </a>
                     <ul aria-labelledby="favorites" class="dropdown-menu border-0 shadow"
                         style="max-height: 320px; overflow-y: auto;">
-                        {% if location %}
-                        {% if location.is_favorite %}
-                        <!-- Remove favorite -->
-                        <form action="{% url 'update_location' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="location_id" value="{{ location.id }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="is_favorite" value="False">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-trash-alt"></i>
-                                Remove current location
-                            </button>
-                        </form>
+                        {% if user.is_authenticated %}
+                        {% include 'weather_app/navbar/favorites.html' %}
                         {% else %}
-                        <!-- Add favorite -->
-                        <form action="{% url 'update_location' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="location_id" value="{{ location.id }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="is_favorite" value="True">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-plus"></i>
-                                Add current location
-                            </button>
-                        </form>
-                        {% endif %}
-                        <li class="dropdown-divider"></li>
-                        {% endif %}
-                        {% if favorite_locations %}
-                        {% for location in favorite_locations %}
-                        <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ location.label|truncatechars:28 }}
-                            </button>
-                        </form>
-                        {% endfor %}
-                        {% else %}
-                        <li class="dropdown-item">
-                            No favorites yet...
-                        </li>
+                        {% include 'weather_app/navbar/login_required.html' %}
                         {% endif %}
                     </ul>
                 </li>
-                <!-- History -->
+                <!-- History menu -->
                 <li class="nav-item dropdown">
                     <a id="history" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         class="nav-link dropdown-toggle">
@@ -145,93 +95,18 @@
                     </a>
                     <ul aria-labelledby="history" class="dropdown-menu border-0 shadow"
                         style="max-height: 320px; overflow-y: auto;">
-                        {% if location_history %}
-                        {% for location in location_history %}
-                        <form action="{% url 'dashboard' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ location.label }}">
-                            <input type="hidden" name="latitude" value="{{ location.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ location.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ location.label|truncatechars:28 }}
-                            </button>
-                        </form>
-                        {% endfor %}
+                        {% if user.is_authenticated %}
+                        {% include 'weather_app/navbar/history.html' %}
                         {% else %}
-                        <li class="dropdown-item">
-                            No history yet...
-                        </li>
+                        {% include 'weather_app/navbar/login_required.html' %}
                         {% endif %}
                     </ul>
                 </li>
-                {% endif %}
+                <!-- Accounts menu -->
                 {% if user.is_authenticated %}
-                <!-- User account menu -->
-                <li class="nav-item dropdown">
-                    <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        class="nav-link dropdown-toggle">
-                        <i class="fas fa-user"></i>
-                        {{ user.username|title }}
-                    </a>
-                    <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
-                        <!-- Log Out -->
-                        <form action="{% url 'logout_user' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ query.label }}">
-                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Log out
-                            </button>
-                        </form>
-                        <!-- User profile -->
-                        <form action="{% url 'user_profile' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ query.label }}">
-                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-address-card"></i>
-                                User profile
-                            </button>
-                        </form>
-                    </ul>
-                </li>
+                {% include 'weather_app/navbar/user_account_menu.html' %}
                 {% else %}
-                <!-- Sign in menu -->
-                <li class="nav-item dropdown">
-                    <a id="userAccountMenu" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        class="nav-link dropdown-toggle">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Sign in
-                    </a>
-                    <ul aria-labelledby="userAccountMenu" class="dropdown-menu border-0 shadow">
-                        <!-- Log In -->
-                        <form action="{% url 'login_user' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ query.label }}">
-                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-key"></i>
-                                Log in
-                            </button>
-                        </form>
-                        <!-- Register -->
-                        <form action="{% url 'register_user' %}" method="GET">
-                            <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
-                            <input type="hidden" name="label" value="{{ query.label }}">
-                            <input type="hidden" name="latitude" value="{{ query.latitude }}">
-                            <input type="hidden" name="longitude" value="{{ query.longitude }}">
-                            <button class="dropdown-item" type="submit">
-                                <i class="fas fa-user-plus"></i>
-                                Register
-                            </button>
-                        </form>
-                    </ul>
-                </li>
+                {% include 'weather_app/navbar/sign_in_menu.html' %}
                 {% endif %}
             </ul>
         </div>

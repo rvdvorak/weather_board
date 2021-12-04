@@ -12,11 +12,7 @@ def render_registration_page(request, error_message='', success_message=''):
     return TemplateResponse(
         request,
         'weather_app/register_user.html', {
-            'display_mode': query['display_mode'],
-            'location': {
-                'label': query['label'],
-                'latitude': query['latitude'],
-                'longitude': query['longitude']},
+            'query': query,
             'error_message': error_message,
             'success_message': success_message})
 

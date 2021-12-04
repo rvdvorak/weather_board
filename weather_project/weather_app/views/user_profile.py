@@ -1,43 +1,36 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
-from weather_app.views.utils import get_query, get_location_history, get_favorite_locations
+from weather_app.views.utils import get_query, get_credentials, redirect_to_login
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.template.response import TemplateResponse
 
 
 def render_user_profile(request, error_message='', success_message=''):
-    query = get_query(request)
     return TemplateResponse(
         request,
         'weather_app/user_profile.html', {
-            'display_mode': query['display_mode'],
-            'location': {
-                'label': query['label'],
-                'latitude': query['latitude'],
-                'longitude': query['longitude'] },
-            'location_history': get_location_history(request.user),
-            'favorite_locations': get_favorite_locations(request.user),
+            'query': get_query(request),
             'error_message': error_message,
             'success_message': success_message})
 
 
-@login_required(redirect_field_name='next_url')
 def user_profile(request):
+    # Handle user profile options
+    if not request.user.is_authenticated:
+        return redirect_to_login(get_query(request))
     if request.method == 'GET':
         # Show user profile page
         return render_user_profile(request)
     if request.method == 'POST':
         # Try to apply changes
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        # Verify user identity
-        user = authenticate(username=username, password=password)
+        user = authenticate(**get_credentials(request))
         if not user:
+            # Authentication failed
             return render_user_profile(
                 request,
-                error_message='Username and password do not match.')
+                error_message='Current username and password do not match.')
+        # Gather form data
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
         clear_history = request.POST.get('clear_history')

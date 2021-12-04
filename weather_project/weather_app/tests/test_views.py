@@ -30,7 +30,7 @@ class TestDashboard(TestCase):
         response = Client().get(reverse('dashboard'))
         # Test response
         assert response.status_code == 200
-        self.assertTemplateUsed(response, 'weather_app/no_location.html')
+        self.assertTemplateUsed(response, 'weather_app/search_location.html')
         # No messages
         assert len(list(response.context['messages'])) == 0
         # Query has been set to default
@@ -69,7 +69,7 @@ class TestDashboard(TestCase):
         response = client.get(reverse('dashboard'))
         # Test response
         assert response.status_code == 200
-        self.assertTemplateUsed(response, 'weather_app/no_location.html')
+        self.assertTemplateUsed(response, 'weather_app/search_location.html')
         # No messages
         assert len(list(response.context['messages'])) == 0
         # Query has been set to default
@@ -530,7 +530,7 @@ class TestSearchLocation(TestCase):
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
-            'search_query': 'Lhota'}
+            'search_text': 'Lhota'}
         lhota = {
             'label': 'Lhota, OK, Czechia',
             'latitude': 49.71667,
@@ -557,7 +557,7 @@ class TestSearchLocation(TestCase):
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
-            'search_query': 'Praha'}
+            'search_text': 'Praha'}
         praha = {
             'label': 'Prague, Czechia',
             'latitude': 50.06694,
@@ -577,7 +577,7 @@ class TestSearchLocation(TestCase):
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
-            'search_query': 'Růžďka'}
+            'search_text': 'Růžďka'}
         response = Client().get(url, query)
         redirect_query = {
             'display_mode': display_modes()[1],
@@ -591,7 +591,7 @@ class TestSearchLocation(TestCase):
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
-            'search_query': 'incorrect_location_name'}
+            'search_text': 'incorrect_location_name'}
         response = Client().get(url, query)
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/messages.html')
@@ -613,7 +613,7 @@ class TestSearchLocation(TestCase):
         base_url = reverse('search_location')
         query_string = urlencode({
             'display_mode': display_modes()[1],
-            'search_query': 'Praha'})
+            'search_text': 'Praha'})
         uri = f'{base_url}?{query_string}'
         request = RequestFactory().get(uri)
         request.user = AnonymousUser()
@@ -640,7 +640,7 @@ class TestSearchLocation(TestCase):
 
     def test_search_location_with_ORS_http_error(self):
         base_url = reverse('search_location')
-        query_string = urlencode({'search_query': 'Praha'})
+        query_string = urlencode({'search_text': 'Praha'})
         uri = f'{base_url}?{query_string}'
         request = RequestFactory().get(uri)
         request.user = AnonymousUser()
@@ -1463,7 +1463,7 @@ class TestUtils(TestCase):
         request.user = AnonymousUser()
         response = render_dashboard(request)
         assert response.status_code == 200
-        with self.assertTemplateUsed('weather_app/no_location.html'):
+        with self.assertTemplateUsed('weather_app/search_location.html'):
             response.render()
         assert response.context_data['favorite_locations'] == None
         assert response.context_data['location_history'] == None

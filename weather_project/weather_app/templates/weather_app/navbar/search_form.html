@@ -1,0 +1,13 @@
+<!-- search_form.html -->
+<form class="form-inline ml-0 ml-lg-auto mr-0" action="{% url 'search_location' %}" method="GET">
+    <div class="input-group input-group-sm">
+        <input type="hidden" name="display_mode" value="{{ query.display_mode }}">
+        <input name="search_text" class="form-control form-control-navbar" type="search" placeholder="Search location"
+            aria-label="Search location" required>
+        <div class="input-group-append">
+            <button class="btn btn-navbar" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>

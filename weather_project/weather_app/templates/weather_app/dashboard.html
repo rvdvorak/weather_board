@@ -1,31 +1,25 @@
-<!-- Weather dashboard -->
+<!-- dashboard.html -->
 {% extends 'weather_app/base.html' %}
-{% comment %}
-TODO toasts:
--Login
--Logout
--Register
--Delete locations
--Delete account
-{% endcomment %}
 {% block content %}
 <div class="card-columns">
     {% load tz %}
     {% timezone weather.timezone %}
+
+    <!-- Chart data -->
     {{ charts|json_script:"charts" }}
-    {# TODO Air pollution forecast widget #}
-    {# TODO Wind direction #}
-    
+
+    <!-- Common widgets -->
     {% include 'weather_app/widgets/current_summary.html' %}
 
     {% if weather.alerts %}
     {% include 'weather_app/widgets/weather_alerts.html' %}
     {% endif %}
-    
+
     {% include 'weather_app/widgets/current_weather_details.html' %}
-    
+
     {% if query.display_mode == '7d_detail' %}
-    <!-- 7 days chart widgets -->
+
+    <!-- 7 days widgets -->
     {% include 'weather_app/widgets/forecast_5d_air_pollution.html' %}
     {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
 
@@ -40,7 +34,8 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
     {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
     {% else %}
-    <!-- 48 hours chart widgets -->
+
+    <!-- 48 hours widgets -->
     {% include 'weather_app/widgets/forecast_48h_air_pollution.html' %}
     {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
     {% include 'weather_app/widgets/forecast_48h_dew_point.html' %}
@@ -57,7 +52,7 @@ TODO toasts:
     {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
     {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
     {% endif %}
-        
+
     {% endtimezone %}
 </div>
 {% endblock content %}

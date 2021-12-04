@@ -1,4 +1,4 @@
-<!-- 7 days wind speed forecast widget -->
+<!-- forecast_7d_wind_speed.html -->
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
@@ -30,21 +30,21 @@
             data: {
                 labels: daily.timeline,
                 datasets: [{
-                        label: 'Wind gust [meter/sec.]',
-                        data: daily.wind_gust,
-                        backgroundColor: ['rgba(255, 0, 0, 1)'],
-                        borderColor: ['rgba(255, 0, 0, 1)'],
-                        fill: false,
-                        borderWidth: 2,
-                        type: 'line'
-                    }, {
-                        label: 'Wind speed [meter/sec.]',
-                        data: daily.wind_speed,
-                        backgroundColor: ['rgba(0, 127, 0, 0.5)'],
-                        borderColor: ['rgba(0, 127, 0, 0.5)'],
-                        fill: true,
-                        borderWidth: 0
-                    }]
+                    label: 'Wind gust [meter/sec.]',
+                    data: daily.wind_gust,
+                    backgroundColor: ['rgba(255, 0, 0, 1)'],
+                    borderColor: ['rgba(255, 0, 0, 1)'],
+                    fill: false,
+                    borderWidth: 2,
+                    type: 'line'
+                }, {
+                    label: 'Wind speed [meter/sec.]',
+                    data: daily.wind_speed,
+                    backgroundColor: ['rgba(0, 127, 0, 0.5)'],
+                    borderColor: ['rgba(0, 127, 0, 0.5)'],
+                    fill: true,
+                    borderWidth: 0
+                }]
             },
             options: {
                 radius: 1.5,
