@@ -1,58 +1,51 @@
 <!-- dashboard.html -->
 {% extends 'weather_app/base.html' %}
 {% block content %}
+{% load tz %}
+{% timezone weather.timezone %}
+<!-- Chart data -->
+{{ charts|json_script:"charts" }}
+<!-- Weather widgets -->
 <div class="card-columns">
-    {% load tz %}
-    {% timezone weather.timezone %}
-
-    <!-- Chart data -->
-    {{ charts|json_script:"charts" }}
-
     <!-- Common widgets -->
     {% include 'weather_app/widgets/current_summary.html' %}
-
     {% if weather.alerts %}
     {% include 'weather_app/widgets/weather_alerts.html' %}
     {% endif %}
-
     {% include 'weather_app/widgets/current_weather_details.html' %}
-
     {% if query.display_mode == '7d_detail' %}
-
-    <!-- 7 days widgets -->
-    {% include 'weather_app/widgets/forecast_5d_air_pollution.html' %}
-    {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
-
-    {% if weather.minutely %}
-    {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
-    {% endif %}
-
-    {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
-    {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
-    {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
-    {% include 'weather_app/widgets/forecast_7d_pressure.html' %}
-    {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
-    {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
+    <!-- 7 days forecast -->
+    <div>
+        {% include 'weather_app/widgets/forecast_5d_air_pollution.html' %}
+        {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
+        {% if weather.minutely %}
+        {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
+        {% endif %}
+        {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
+        {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
+        {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
+        {% include 'weather_app/widgets/forecast_7d_pressure.html' %}
+        {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
+        {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
+    </div>
     {% else %}
-
-    <!-- 48 hours widgets -->
-    {% include 'weather_app/widgets/forecast_48h_air_pollution.html' %}
-    {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
-    {% include 'weather_app/widgets/forecast_48h_dew_point.html' %}
-
-    {% if weather.minutely %}
-    {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
-    {% endif %}
-
-    {% include 'weather_app/widgets/forecast_48h_precipitation.html' %}
-    {% include 'weather_app/widgets/forecast_48h_clouds.html' %}
-    {% include 'weather_app/widgets/forecast_48h_humidity.html' %}
-    {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
-    {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
-    {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
-    {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
-    {% endif %}
-
-    {% endtimezone %}
+    <!-- 48 hours forecast (default) -->
+    <div>
+        {% include 'weather_app/widgets/forecast_48h_air_pollution.html' %}
+        {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
+        {% include 'weather_app/widgets/forecast_48h_dew_point.html' %}
+        {% if weather.minutely %}
+        {% include 'weather_app/widgets/forecast_1h_precipitation.html' %}
+        {% endif %}
+        {% include 'weather_app/widgets/forecast_48h_precipitation.html' %}
+        {% include 'weather_app/widgets/forecast_48h_clouds.html' %}
+        {% include 'weather_app/widgets/forecast_48h_humidity.html' %}
+        {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
+        {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
+        {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
+        {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
+        {% endif %}
+    </div>
 </div>
+{% endtimezone %}
 {% endblock content %}

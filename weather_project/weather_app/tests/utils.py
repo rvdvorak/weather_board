@@ -71,7 +71,7 @@ def sample_user():
 
 
 def required_current_weather_keys():
-    # Those keys must be alwyas present in "current" weather data
+    # Those keys must be always contained in "current" weather data
     return {
         'dt', 'temp', 'feels_like', 'pressure', 'humidity', 'dew_point',
         'clouds', 'uvi', 'visibility', 'wind_speed', 'wind_deg', 'weather'}

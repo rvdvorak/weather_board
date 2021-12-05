@@ -5,9 +5,10 @@ from pprint import pprint
 
 
 def update_location(request):
+    # Update the location record in DB.
+    # Currently updates only the "is_favorite" attribute.
     if not request.user.is_authenticated:
         return redirect_to_login(get_query(request))
-    # Currently updates only the "is_favorite" attribute.
     location_id = request.POST.get('location_id')  # type string
     is_favorite = request.POST.get('is_favorite')  # type string
     if location_id and is_favorite:

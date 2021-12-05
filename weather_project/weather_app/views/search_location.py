@@ -8,7 +8,8 @@ import pprint
 
 
 def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
-    # Get list of matching locations from Open Route Service free API:
+    # Obtain list of locations matching the search text
+    # using the Open Route Service free API:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
@@ -30,9 +31,9 @@ def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
 
 def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
     # Handle the location search process.
-    # Location search is available on every page.
+    # Location search is available on all pages.
     query = get_query(request)
-    query['search_text'] = request.GET.get('search_text')
+    query['search_text'] = request.GET.get('search_text') or ''
     if not query['search_text']:
         # Nothing to search
         return redirect_to_dashboard(query)
@@ -73,11 +74,9 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
         return render_dashboard(request)
     elif len(search_results) == 1:
         # Single match => rerdirect to Dashboard
-        return redirect_to_dashboard({
-            'display_mode': query['display_mode'],
-            'label': search_results[0]['label'],
-            'latitude': search_results[0]['latitude'],
-            'longitude': search_results[0]['longitude']})
+        query.update(search_results[0])
+        query.pop('search_text')
+        return redirect_to_dashboard(query)
     elif len(search_results) > 1:
         # Multiple matches => show search results in message
         description = None

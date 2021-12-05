@@ -15,7 +15,7 @@ import pickle
 
 def get_weather(location, weather_key, weather_timeout):
     # Obtain weather data for given location
-    # from Open Weather Map free API:
+    # from the Open Weather Map free API:
     # https://openweathermap.org/api/one-call-api
     url = 'https://api.openweathermap.org/data/2.5/onecall'
     params = {
@@ -37,7 +37,7 @@ def get_weather(location, weather_key, weather_timeout):
 
 def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
     # Obtain air pollution data for given location
-    # from Open Weather Map free API:
+    # from the Open Weather Map free API:
     # https://openweathermap.org/api/air-pollution
     url = 'http://api.openweathermap.org/data/2.5/air_pollution/forecast'
     params = {
@@ -55,8 +55,8 @@ def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
 
 
 def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
-    # Recursively iterate over JSON-like data structure and
-    # convert values of given keys from UTC timestamp to local datetime
+    # Recursively converts values of given keys
+    # from UTC timestamp to local datetime
     if isinstance(data, dict):
         for key, value in data.items():
             if key in keys_to_convert:
@@ -72,7 +72,7 @@ def convert_timestamps_to_datetimes(data, keys_to_convert, timezone):
 
 
 def get_charts(weather, air_pollution):
-    # Generate chart data for Chart.JS library
+    # Returns chart data for the Chart.JS library
     # from weather and air pollution data
     charts = {
         'minutely': {
@@ -177,7 +177,7 @@ def get_charts(weather, air_pollution):
 
 
 def get_location_instance(query, user):
-    # Obtain a DB record that matches the location query
+    # Returns the DB record that matches the location query
     # or the new location instance
     if query['label'] and query['latitude'] and query['longitude']:
         location_instance = Location(

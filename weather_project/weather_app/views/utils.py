@@ -18,6 +18,8 @@ def get_credentials(request):
 
 
 def get_query(request):
+    # Return a subset of HTTP request parameters
+    # which must be preserved across all pages.
     valid_modes = ['48h_detail', '7d_detail']
     query = {}
     if request.method == 'GET':
@@ -36,6 +38,7 @@ def get_query(request):
 
 
 def get_location_history(user):
+    # Return all location records owned by the user
     if user.is_authenticated:
         location_history = Location.objects.filter(
             user=user).order_by('-date_last_showed')
@@ -47,6 +50,7 @@ def get_location_history(user):
 
 
 def get_favorite_locations(user):
+    # Return only favorite location records owned by the user
     if user.is_authenticated:
         favorite_locations = Location.objects.filter(
             user=user,
@@ -73,6 +77,7 @@ def redirect_to_login(query):
 
 
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
+    # Handle appropriate rendering of dashboard
     query = get_query(request)
     location_history = get_location_history(request.user)
     favorite_locations = get_favorite_locations(request.user)
