@@ -526,7 +526,21 @@ class TestSearchLocation(TestCase):
     # Location API docs:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
 
-    def test_search_location_with_too_many_matches_without_login(self):
+    def test_search_location_with_too_many_matches_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Set up request
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
@@ -535,25 +549,57 @@ class TestSearchLocation(TestCase):
             'label': 'Lhota, OK, Czechia',
             'latitude': 49.71667,
             'longitude': 17.28333}
-        response = Client().get(url, query)
+        # Set up test client
+        client = Client()
+        client.login(**credentials)
+        # Send request
+        response = client.get(url, query)
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/messages.html')
+        # Search results as a message
+        assert len(list(response.context['messages'])) == 1
         message = list(response.context['messages'])[0].message
-        assert message['header'] == 'Select location'
+        self.assertEquals(
+            message['header'],
+            'Select location')
         self.assertEquals(
             message['description'],
             'Showing only first 20 matching locations:')
         assert lhota in message['search_results']
         assert len(message['search_results']) == 20
-        assert response.context['query']['display_mode'] == display_modes()[1]
+        # Query
+        assert response.context['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
         assert response.context['location'] == None
         assert response.context['weather'] == None
         assert response.context['air_pollution'] == None
         assert response.context['charts'] == None
-        assert response.context['location_history'] == None
-        assert response.context['favorite_locations'] == None
+        # User (private) data
+        assert favorite_location in response.context['location_history']
+        assert ordinary_location in response.context['location_history']
+        assert favorite_location in response.context['favorite_locations']
+        assert not ordinary_location in response.context['favorite_locations']
 
-    def test_search_location_with_multiple_matches(self):
+    def test_search_location_with_multiple_matches_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Set up request
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
@@ -562,23 +608,51 @@ class TestSearchLocation(TestCase):
             'label': 'Prague, Czechia',
             'latitude': 50.06694,
             'longitude': 14.460249}
-        response = Client().get(url, query)
+        # Set up test client
+        client = Client()
+        client.login(**credentials)
+        # Send request
+        response = client.get(url, query)
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/messages.html')
+        # Search results as a message
+        assert len(list(response.context['messages'])) == 1
         message = list(response.context['messages'])[0].message
-        assert message['header'] == 'Select location'
+        self.assertEquals(
+            message['header'],
+            'Select location')
+        self.assertEquals(
+            message['description'],
+            None)
         assert praha in message['search_results']
         assert len(message['search_results']) > 3
-        assert response.context['query']['display_mode'] == display_modes()[1]
-        assert response.context['favorite_locations'] == None
-        assert response.context['location_history'] == None
+        # Query
+        assert response.context['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context['location'] == None
+        assert response.context['weather'] == None
+        assert response.context['air_pollution'] == None
+        assert response.context['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context['location_history']
+        assert ordinary_location in response.context['location_history']
+        assert favorite_location in response.context['favorite_locations']
+        assert not ordinary_location in response.context['favorite_locations']
 
-    def test_search_location_with_single_match(self):
+    def test_search_location_with_single_match_without_login(self):
+        # Set up request
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
             'search_text': 'Růžďka'}
+        # Send request
         response = Client().get(url, query)
+        # Test response
         redirect_query = {
             'display_mode': display_modes()[1],
             'label': 'Růžďka, ZK, Czechia',
@@ -587,36 +661,91 @@ class TestSearchLocation(TestCase):
         redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_query)}"
         self.assertRedirects(response, redirect_uri)
 
-    def test_search_location_without_match(self):
+    def test_search_location_without_match_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Set up request
         url = reverse('search_location')
         query = {
             'display_mode': display_modes()[1],
             'search_text': 'incorrect_location_name'}
-        response = Client().get(url, query)
+        # Set up test client
+        client = Client()
+        client.login(**credentials)
+        # Send request
+        response = client.get(url, query)
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/messages.html')
+        # Search results as a message
+        assert len(list(response.context['messages'])) == 1
         message = list(response.context['messages'])[0].message
-        assert message['header'] == 'Location not found'
+        self.assertEquals(
+            message['header'],
+            'Location not found')
         assert message['search_results'] == None
-        assert response.context['query']['display_mode'] == display_modes()[1]
+        # Query
+        assert response.context['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context['location'] == None
+        assert response.context['weather'] == None
+        assert response.context['air_pollution'] == None
+        assert response.context['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context['location_history']
+        assert ordinary_location in response.context['location_history']
+        assert favorite_location in response.context['favorite_locations']
+        assert not ordinary_location in response.context['favorite_locations']
 
-    def test_search_location_without_query(self):
+    def test_search_location_without_query_without_login(self):
+        # Send request
         response = Client().get(reverse('search_location'))
-        assert response.status_code == 200
-        self.assertTemplateUsed(response, 'weather_app/messages.html')
-        message = list(response.context['messages'])[0].message
-        assert message['header'] == 'Nothing to search'
-        assert message['search_results'] == None
-        assert response.context['query']['display_mode'] == display_modes()[0]
+        # Test response
+        redirect_query = {
+            'display_mode': display_modes()[0],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_query)}"
+        self.assertRedirects(response, redirect_uri)
 
-    def test_search_location_with_ORS_timeout(self):
+    def test_search_location_with_API_timeout_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Setup request
         base_url = reverse('search_location')
-        query_string = urlencode({
+        query = {
             'display_mode': display_modes()[1],
-            'search_text': 'Praha'})
-        uri = f'{base_url}?{query_string}'
+            'search_text': 'Brno'}
+        uri = f'{base_url}?{urlencode(query)}'
         request = RequestFactory().get(uri)
-        request.user = AnonymousUser()
+        request.user = user
         # Add session to request
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -625,25 +754,55 @@ class TestSearchLocation(TestCase):
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         # Send request
-        response = search_location(request, ORS_timeout=0.0001)
+        response = search_location(request, ORS_timeout=0.00001)
         # Test response
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        message = list(messages)[0].message
-        assert message['header'] == 'Location service time out'
-        assert message['search_results'] == None
-        assert response.context_data['query']['display_mode'] == display_modes()[
-            1]
-        assert response.context_data['favorite_locations'] == None
-        assert response.context_data['location_history'] == None
+        # Error message
+        assert len(list(messages)) == 1
+        self.assertEquals(
+            list(messages)[0].message['header'],
+            'Location service time out')
+        # Query
+        assert response.context_data['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context_data['location'] == None
+        assert response.context_data['weather'] == None
+        assert response.context_data['air_pollution'] == None
+        assert response.context_data['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context_data['location_history']
+        assert ordinary_location in response.context_data['location_history']
+        assert favorite_location in response.context_data['favorite_locations']
+        assert not ordinary_location in response.context_data['favorite_locations']
 
-    def test_search_location_with_ORS_http_error(self):
+    def test_search_location_with_API_http_error_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Setup request
         base_url = reverse('search_location')
-        query_string = urlencode({'search_text': 'Praha'})
-        uri = f'{base_url}?{query_string}'
+        query = {
+            'display_mode': display_modes()[1],
+            'search_text': 'Brno'}
+        uri = f'{base_url}?{urlencode(query)}'
         request = RequestFactory().get(uri)
-        request.user = AnonymousUser()
+        request.user = user
         # Add session to request
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -651,40 +810,80 @@ class TestSearchLocation(TestCase):
         # Add messages to request
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
+        # Send request
         response = search_location(request, ORS_key='bad_key')
+        # Test response
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        message = list(messages)[0].message
-        assert response.context_data['favorite_locations'] == None
-        assert response.context_data['location_history'] == None
-        assert message['header'] == 'Location service error'
-        assert message['search_results'] == None
+        # Error message
+        assert len(list(messages)) == 1
+        self.assertEquals(
+            list(messages)[0].message['header'],
+            'Location service error')
+        # Query
+        assert response.context_data['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context_data['location'] == None
+        assert response.context_data['weather'] == None
+        assert response.context_data['air_pollution'] == None
+        assert response.context_data['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context_data['location_history']
+        assert ordinary_location in response.context_data['location_history']
+        assert favorite_location in response.context_data['favorite_locations']
+        assert not ordinary_location in response.context_data['favorite_locations']
 
 
 class TestRandomLocation(TestCase):
     # Location API docs:
     # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
 
-    def test_show_random_location(self):
+    def test_show_random_location_without_login(self):
+        # Set up request
         url = reverse('random_location')
-        params = {'display_mode': '7d_detail'}
-        response = Client().get(url, params)
+        query = {'display_mode': display_modes()[1]}
+        # Send request
+        response = Client().get(url, query)
+        # Test response
         assert response.status_code == 302
         redirect_uri = urlparse(response.url)
         assert redirect_uri.path == reverse('dashboard')
-        redirect_params = parse_qs(redirect_uri.query)
-        location_label = redirect_params['label'][0]
+        redirect_query = parse_qs(redirect_uri.query)
+        location_label = redirect_query['label'][0]
         assert not location_label in ['', None]
-        location_latitude = float(redirect_params['latitude'][0])
+        location_latitude = float(redirect_query['latitude'][0])
         assert -90.0 <= location_latitude <= 90.0
-        location_longitude = float(redirect_params['longitude'][0])
+        location_longitude = float(redirect_query['longitude'][0])
         assert -180.0 <= location_longitude <= 180.0
-        assert params['display_mode'] == redirect_params['display_mode'][0]
+        assert redirect_query['display_mode'][0] == query['display_mode']
 
-    def test_show_random_location_with_ORS_timeout(self):
-        request = RequestFactory().get(reverse('random_location'))
-        request.user = AnonymousUser()
+    def test_show_random_location_with_API_timeout_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Setup request
+        base_url = reverse('random_location')
+        query = {
+            'display_mode': display_modes()[1],
+            'search_text': 'Brno'}
+        uri = f'{base_url}?{urlencode(query)}'
+        request = RequestFactory().get(uri)
+        request.user = user
         # Add session to request
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -692,18 +891,56 @@ class TestRandomLocation(TestCase):
         # Add messages to request
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
-        response = random_location(request, ORS_timeout=0.0001)
+        # Send request
+        response = search_location(request, ORS_timeout=0.00001)
+        # Test response
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        assert response.context_data['favorite_locations'] == None
-        assert response.context_data['location_history'] == None
-        message = list(messages)[0].message
-        assert message['header'] == 'Location service time out'
-
-    def test_show_random_location_with_ORS_http_error(self):
-        request = RequestFactory().get(reverse('random_location'))
-        request.user = AnonymousUser()
+        # Error message
+        assert len(list(messages)) == 1
+        self.assertEquals(
+            list(messages)[0].message['header'],
+            'Location service time out')
+        # Query
+        assert response.context_data['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context_data['location'] == None
+        assert response.context_data['weather'] == None
+        assert response.context_data['air_pollution'] == None
+        assert response.context_data['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context_data['location_history']
+        assert ordinary_location in response.context_data['location_history']
+        assert favorite_location in response.context_data['favorite_locations']
+        assert not ordinary_location in response.context_data['favorite_locations']
+        
+    def test_show_random_location_with_API_http_error_with_login(self):
+        # Set up user account and user's data
+        credentials = sample_credentials()
+        user = User.objects.create_user(**credentials)
+        ordinary_location = Location(
+            **sample_location_params_2(),
+            is_favorite=False,
+            user=user)
+        ordinary_location.save()
+        favorite_location = Location(
+            **sample_location_params_3(),
+            is_favorite=True,
+            user=user)
+        favorite_location.save()
+        # Setup request
+        base_url = reverse('random_location')
+        query = {
+            'display_mode': display_modes()[1],
+            'search_text': 'Brno'}
+        uri = f'{base_url}?{urlencode(query)}'
+        request = RequestFactory().get(uri)
+        request.user = user
         # Add session to request
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -711,251 +948,246 @@ class TestRandomLocation(TestCase):
         # Add messages to request
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
-        response = random_location(request, ORS_key='bad_key')
+        # Send request
+        response = search_location(request, ORS_key='bad_key')
+        # Test response
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
-        assert response.context_data['favorite_locations'] == None
-        assert response.context_data['location_history'] == None
-        message = list(messages)[0].message
-        assert message['header'] == 'Location service error'
-
+        # Error message
+        assert len(list(messages)) == 1
+        self.assertEquals(
+            list(messages)[0].message['header'],
+            'Location service error')
+        # Query
+        assert response.context_data['query'] == {
+            'display_mode': query['display_mode'],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        # No dashboard (public) data
+        assert response.context_data['location'] == None
+        assert response.context_data['weather'] == None
+        assert response.context_data['air_pollution'] == None
+        assert response.context_data['charts'] == None
+        # User (private) data
+        assert favorite_location in response.context_data['location_history']
+        assert ordinary_location in response.context_data['location_history']
+        assert favorite_location in response.context_data['favorite_locations']
+        assert not ordinary_location in response.context_data['favorite_locations']
 
 class TestUpdateLocation(TestCase):
 
     def test_add_favorite_location_with_login(self):
+        # Set up user account and user's data
         credentials = sample_credentials()
         user = User.objects.create_user(**credentials)
+        location_params = sample_location_params_1()
         location = Location(
-            **sample_location_params_1(),
+            **location_params,
             is_favorite=False,
             user=user)
         location.save()
+        # Set up test client
         client = Client()
         client.login(**credentials)
+        # Set up request
         url = reverse('update_location')
-        params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
+        query = {
+            'display_mode': display_modes()[1],
+            **location_params,
             'location_id': location.id,
-            'is_favorite': True  # Add the location to favorites
-        }
-        redirect_params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude
-        }
-        response = client.post(url, params)
+            'is_favorite': True}  # Add the location to favorites
+        # Send request
+        response = client.post(url, query)
+        # Test response
+        redirect_query = {
+            'display_mode': query['display_mode'],
+            **location_params}
         updated_location = Location.objects.get(pk=location.id)
         assert updated_location.is_favorite  # Location updated successfully
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_params)}"
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_query)}"
         self.assertRedirects(response, redirect_uri)
 
     def test_remove_favorite_location_with_login(self):
+        # Set up user account and user's data
         credentials = sample_credentials()
         user = User.objects.create_user(**credentials)
+        location_params = sample_location_params_1()
         location = Location(
-            **sample_location_params_1(),
+            **location_params,
             is_favorite=True,
             user=user)
         location.save()
+        # Set up test client
         client = Client()
         client.login(**credentials)
+        # Set up request
         url = reverse('update_location')
-        params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
+        query = {
+            'display_mode': display_modes()[1],
+            **location_params,
             'location_id': location.id,
-            'is_favorite': False  # Remove the location from favorites
-        }
-        redirect_params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude
-        }
-        response = client.post(url, params)
+            'is_favorite': False}  # Remove the location from favorites
+        # Send request
+        response = client.post(url, query)
+        # Test response
+        redirect_query = {
+            'display_mode': query['display_mode'],
+            **location_params}
         updated_location = Location.objects.get(pk=location.id)
-        assert updated_location.is_favorite == False  # Location updated successfully
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_params)}"
-        self.assertRedirects(response, redirect_uri)
-
-    def test_add_favorite_location_without_location_id(self):
-        credentials = sample_credentials()
-        user = User.objects.create_user(**credentials)
-        location = Location(
-            **sample_location_params_1(),
-            is_favorite=False,
-            user=user)
-        location.save()
-        client = Client()
-        client.login(**credentials)
-        url = reverse('update_location')
-        params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-            # MISSING 'location_id': location.id,
-            'is_favorite': True  # Try to add the location to favorites
-        }
-        redirect_params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude
-        }
-        response = client.post(url, params)
-        updated_location = Location.objects.get(pk=location.id)
-        assert updated_location.is_favorite == False  # Location NOT updated
-        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_params)}"
+        assert not updated_location.is_favorite  # Location updated successfully
+        redirect_uri = f"{reverse('dashboard')}?{urlencode(redirect_query)}"
         self.assertRedirects(response, redirect_uri)
 
     def test_add_favorite_location_without_login(self):
+        # Set up user account and user's data
         credentials = sample_credentials()
         user = User.objects.create_user(**credentials)
         location_params = sample_location_params_1()
-        location = Location(**location_params, user=user)
-        location.is_favorite = True
+        location = Location(
+            **location_params,
+            is_favorite=False,
+            user=user)
         location.save()
-        params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
+        # Set up test client
+        client = Client()
+        # Set up request
+        url = reverse('update_location')
+        query = {
+            'display_mode': display_modes()[1],
+            **location_params,
             'location_id': location.id,
-            'is_favorite': False  # Try to remove the location from favorites
-        }
-        update_url = reverse('update_location')
-        login_url = reverse('login_user')
-        response = Client().post(update_url, params)
-        self.assertRedirects(
-            response,
-            f"{login_url}?next_url={update_url}")
+            'is_favorite': True}  # Try to add the location to favorites
+        # Send request
+        response = client.post(url, query)
+        # Test response
+        redirect_url = reverse('login_user')
+        redirect_query = {
+            'display_mode': query['display_mode'],
+            **location_params}
         updated_location = Location.objects.get(pk=location.id)
-        assert updated_location.is_favorite == True  # Location NOT updated
-        assert login_url == settings.LOGIN_URL
-
-    def test_remove_favorite_location_without_login(self):
-        credentials = sample_credentials()
-        user = User.objects.create_user(**credentials)
-        location_params = sample_location_params_1()
-        location = Location(**location_params, user=user)
-        location.is_favorite = False
-        location.save()
-        params = {
-            'display_mode': '7d_detail',
-            'label': location.label,
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-            'location_id': location.id,
-            'is_favorite': True  # Try to add the location to favorites
-        }
-        update_url = reverse('update_location')
-        login_url = reverse('login_user')
-        response = Client().post(update_url, params)
-        self.assertRedirects(
-            response,
-            f"{login_url}?next_url={update_url}")
-        updated_location = Location.objects.get(pk=location.id)
-        assert updated_location.is_favorite == False  # Location NOT updated
-        assert login_url == settings.LOGIN_URL
+        assert not updated_location.is_favorite  # Location NOT updated
+        redirect_uri = f"{redirect_url}?{urlencode(redirect_query)}"
+        self.assertRedirects(response, redirect_uri)
 
 
 class TestRegisterUser(TestCase):
 
     def test_show_user_registration_page_with_query(self):
+        # Set up request
         url = reverse('register_user')
-        location_params = sample_location_params_1()
-        display_mode = '7d_detail'
         query = {
-            **location_params,
-            'display_mode': display_mode}
+            'display_mode': display_modes()[1],
+            'label': 'Some Location',
+            'latitude': '30',
+            'longitude': '40'}
+        # Send request
         response = Client().get(url, query)
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
-        assert response.context['location'] == location_params
-        assert response.context['query']['display_mode'] == display_mode
+        assert response.context['query'] == query
 
     def test_show_user_registration_page_without_query(self):
-        url = reverse('register_user')
-        response = Client().get(url)
+        # Send request
+        response = Client().get(reverse('register_user'))
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
-        assert response.context['location'] == {}
-        assert response.context['query']['display_mode'] == display_modes()[0]
-
+        assert response.context['query'] == {
+            'display_mode': display_modes()[0],
+            'label': '',
+            'latitude': '',
+            'longitude': ''}
+        
     def test_register_new_user_with_unmatched_passwords(self):
+        # Set up request
         url = reverse('register_user')
-        display_mode = display_modes()[0]
-        location_params = sample_location_params_1()
         credentials = {
             'username': 'new user',
             'password1': '123456',
             'password2': '123456789'}
         query = {
-            **credentials,
-            **location_params,
-            'display_mode': display_mode}
-        client = Client()
-        response = client.post(url, query)
+            'display_mode': display_modes()[1],
+            'label': 'Some Location',
+            'latitude': '30',
+            'longitude': '40'}
+        # Send request
+        response = Client().post(url, {**query, **credentials})
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
-        assert not auth.get_user(client).is_authenticated
         assert response.context['error_message'] == 'Passwords do not match.'
-        assert response.context['location'] == location_params
-        assert response.context['query']['display_mode'] == display_mode
+        assert response.context['query'] == query
+        # User NOT registered
+        assert len(User.objects.filter(username=credentials['username'])) == 0
 
     def test_register_existing_user(self):
-        url = reverse('register_user')
-        display_mode = display_modes()[0]
-        location_params = sample_location_params_1()
-        User.objects.create_user(
-            username='new user',
-            password='123456')
+        # Set up user account
         credentials = {
             'username': 'new user',
-            'password1': '123456',
-            'password2': '123456'}
+            'password': '123456'}
+        User.objects.create_user(**credentials)        
+        # Set up request
+        url = reverse('register_user')
+        display_mode = {'display_mode': display_modes()[1]}
+        location_params = {
+            'label': 'Some Location',
+            'latitude': '30',
+            'longitude': '40'}
         query = {
-            **credentials,
+            **display_mode,
             **location_params,
-            'display_mode': display_mode}
-        client = Client()
-        response = client.post(url, {**location_params, **credentials})
+            'username': credentials['username'],
+            'password1': credentials['password'],
+            'password2': credentials['password']}
+        # Send request
+        response = Client().post(url, query)
+        # Test response
         assert response.status_code == 200
         self.assertTemplateUsed(response, 'weather_app/register_user.html')
-        assert response.context['error_message'] == 'User already exists. Please choose different username.'
-        assert response.context['location'] == location_params
-        assert response.context['query']['display_mode'] == display_mode
-
+        self.assertEquals(
+            response.context['error_message'],
+            'User already exists. Please choose different username.')
+        self.assertEquals(
+            response.context['query'],
+            {**display_mode, **location_params})
+        
     def test_register_new_user(self):
+        # Set up request
         url = reverse('register_user')
-        display_mode = display_modes()[0]
-        location_params = sample_location_params_1()
+        display_mode = {'display_mode': display_modes()[1]}
+        location_params = {
+            'label': 'Some Location',
+            'latitude': '30',
+            'longitude': '40'}
         credentials = {
             'username': 'new user',
             'password1': '123456',
             'password2': '123456'}
         query = {
-            **credentials,
+            **display_mode,
             **location_params,
-            'display_mode': display_mode}
-        redirect_query = {
-            **location_params,
-            'display_mode': display_mode}
-        redirect_base_url = reverse('dashboard')
-        redirect_query_string = urlencode(redirect_query)
-        redirect_uri = f"{redirect_base_url}?{redirect_query_string}"
+            **credentials}
+        # Set up test client
         client = Client()
+        # Send request
         response = client.post(url, query)
-        self.assertRedirects(response, redirect_uri)
+        # Test response
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, 'weather_app/register_user.html')
+        self.assertEquals(
+            response.context['success_message'],
+            'Your account has been created successfully.')
+        self.assertEquals(
+            response.context['query'],
+            {**display_mode, **location_params})
+        # New user successfully registered and logged in
         assert auth.get_user(client).is_authenticated
+        assert authenticate(
+            username=credentials['username'],
+            password=credentials['password1'])
 
 
 class TestLoginUser(TestCase):

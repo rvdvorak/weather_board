@@ -2,8 +2,8 @@
 <div class="info-box bg-lightblue shadow">
     <div class="info-box-content" style="text-align: center">
         <h3>{{ location.label }}</h3>
-        <h6>Latitude: {{ location.latitude }}</h6>
-        <h6>Longitude: {{ location.longitude }}</h6>
+        <small>Latitude: {{ location.latitude }}</small>
+        <small>Longitude: {{ location.longitude }}</small>
         <br>
         <h4>{{ weather.current.dt|date:"D, j. M Y, H:i" }}</h4>
         <div>
