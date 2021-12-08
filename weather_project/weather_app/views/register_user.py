@@ -2,13 +2,13 @@ from django.template.response import TemplateResponse
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login
-from weather_app.views.utils import get_query
+from weather_app.views.utils import get_location_query
 
 # TODO Password validation
 
 
 def render_registration_page(request, error_message='', success_message=''):
-    query = get_query(request)
+    query = get_location_query(request)
     return TemplateResponse(
         request,
         'weather_app/register_user.html', {

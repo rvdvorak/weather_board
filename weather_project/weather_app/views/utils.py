@@ -17,23 +17,27 @@ def get_credentials(request):
         'password': request.POST.get('password')}
 
 
-def get_query(request):
+def get_location_query(request):
     # Return a subset of HTTP request parameters
     # which must be preserved across all pages.
-    valid_modes = ['48h_detail', '7d_detail']
     query = {}
+    params = [
+        'display_mode',
+        'search_text',
+        'label',
+        'latitude',
+        'longitude']
     if request.method == 'GET':
-        query['display_mode'] = request.GET.get('display_mode')
-        query['label'] = request.GET.get('label') or ''
-        query['latitude'] = request.GET.get('latitude') or ''
-        query['longitude'] = request.GET.get('longitude') or ''
+        for key in params:
+            query[key] = request.GET.get(key) or ''
     elif request.method == 'POST':
-        query['display_mode'] = request.POST.get('display_mode')
-        query['label'] = request.POST.get('label') or ''
-        query['latitude'] = request.POST.get('latitude') or ''
-        query['longitude'] = request.POST.get('longitude') or ''
-    if not query['display_mode'] in valid_modes:
-        query['display_mode'] = valid_modes[0]
+        for key in params:
+            query[key] = request.POST.get(key) or ''
+    valid_display_modes = [
+        '48h_detail',
+        '7d_detail']
+    if not query['display_mode'] in valid_display_modes:
+        query['display_mode'] = valid_display_modes[0]
     return query
 
 
@@ -78,7 +82,7 @@ def redirect_to_login(query):
 
 def render_dashboard(request, location=None, weather=None, air_pollution=None, charts=None):
     # Handle appropriate rendering of dashboard
-    query = get_query(request)
+    query = get_location_query(request)
     location_history = get_location_history(request.user)
     favorite_locations = get_favorite_locations(request.user)
     if get_messages(request):
@@ -98,11 +102,7 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
         return TemplateResponse(
             request,
             'weather_app/dashboard.html', {
-                'query': {
-                    'display_mode': query['display_mode'],
-                    'label': location.label,
-                    'latitude': location.latitude,
-                    'longitude': location.longitude},
+                'query': query,
                 'location': location,
                 'weather': weather,
                 'air_pollution': air_pollution,

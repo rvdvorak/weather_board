@@ -1,7 +1,7 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import get_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
+from weather_app.views.utils import get_location_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
 from weather_app.views.API_keys import ORS_key
 from random import random
 import requests
@@ -30,7 +30,7 @@ def get_random_location_params(ORS_key, ORS_timeout):
 
 def random_location(request, ORS_key=ORS_key, ORS_timeout=5):
     # Show weather forecast for random location
-    query = get_query(request)
+    query = get_location_query(request)
     try:
         location = get_random_location_params(ORS_key, ORS_timeout)
     except Timeout as err:

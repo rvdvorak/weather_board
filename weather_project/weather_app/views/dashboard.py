@@ -3,7 +3,7 @@ from requests.exceptions import Timeout, HTTPError
 from django.core.exceptions import ValidationError
 from datetime import datetime
 import pytz
-from weather_app.views.utils import get_query, render_dashboard
+from weather_app.views.utils import get_location_query, render_dashboard
 from weather_app.views.API_keys import OWM_key
 from weather_app.models import Location
 import requests
@@ -203,7 +203,7 @@ def get_location_instance(query, user):
 
 def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeout=5, air_pltn_timeout=5):
     # Gather all data. Handle exceptions. Render dashboard.
-    query = get_query(request)
+    query = get_location_query(request)
     user = request.user
     try:
         location = get_location_instance(query, user)

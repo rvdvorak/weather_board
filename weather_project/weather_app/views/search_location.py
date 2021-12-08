@@ -1,7 +1,7 @@
 from requests.exceptions import Timeout, HTTPError
 from django.template.response import TemplateResponse
 from django.contrib import messages
-from weather_app.views.utils import get_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
+from weather_app.views.utils import get_location_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
 from weather_app.views.API_keys import ORS_key
 import requests
 import pprint
@@ -32,8 +32,7 @@ def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
 def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
     # Handle the location search process.
     # Location search is available on all pages.
-    query = get_query(request)
-    query['search_text'] = request.GET.get('search_text') or ''
+    query = get_location_query(request)
     if not query['search_text']:
         # Nothing to search
         return redirect_to_dashboard(query)

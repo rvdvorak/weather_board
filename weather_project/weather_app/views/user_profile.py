@@ -1,6 +1,6 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from weather_app.views.utils import get_query, get_credentials, redirect_to_login, get_location_history, get_favorite_locations
+from weather_app.views.utils import get_location_query, get_credentials, redirect_to_login, get_location_history, get_favorite_locations
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.template.response import TemplateResponse
@@ -10,7 +10,7 @@ def render_user_profile(request, error_message='', success_message=''):
     return TemplateResponse(
         request,
         'weather_app/user_profile.html', {
-            'query': get_query(request),
+            'query': get_location_query(request),
             'error_message': error_message,
             'success_message': success_message,
             'location_history': get_location_history(request.user),
@@ -20,7 +20,7 @@ def render_user_profile(request, error_message='', success_message=''):
 def user_profile(request):
     # Handle user profile changes
     if not request.user.is_authenticated:
-        return redirect_to_login(get_query(request))
+        return redirect_to_login(get_location_query(request))
     if request.method == 'GET':
         # Show user profile page
         return render_user_profile(request)
