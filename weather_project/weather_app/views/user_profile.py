@@ -26,13 +26,14 @@ def user_profile(request):
         return render_user_profile(request)
     if request.method == 'POST':
         # Try to apply changes
-        user = authenticate(**get_credentials(request))
+        username = request.POST['username']
+        old_password = request.POST['password']
+        user = authenticate(username=username, password=old_password)
         if not user:
             # Authentication failed
             return render_user_profile(
                 request,
                 error_message='Current username and password do not match.')
-        # Gather form data
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
         clear_history = request.POST.get('clear_history')
@@ -41,14 +42,14 @@ def user_profile(request):
         i_am_sure = request.POST.get('i_am_sure')
         if new_password1 and new_password2:
             # Change password
-            if password != new_password1 == new_password2:
+            if old_password != new_password1 == new_password2:
                 user.set_password(new_password1)
                 user.save()
                 login(request, user)
                 return render_user_profile(
                     request,
                     success_message='New password has been set successfully.')
-            elif password == new_password1 == new_password2:
+            elif old_password == new_password1 == new_password2:
                 return render_user_profile(
                     request,
                     error_message='New password must be different from the old one.')

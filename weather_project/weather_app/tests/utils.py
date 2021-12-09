@@ -33,21 +33,6 @@ def get_test_location_query():
         'longitude': '-58.4'}
 
 
-def setup_get_request_with_messages(url, query, user):
-    # Setup request
-    uri = f'{url}?{urlencode(query)}'
-    request = RequestFactory().get(uri)
-    request.user = user
-    # Add session to request
-    middleware = SessionMiddleware()
-    middleware.process_request(request)
-    request.session.save()
-    # Add messages to request
-    messages = FallbackStorage(request)
-    setattr(request, '_messages', messages)
-    return request, messages
-
-
 def get_test_user_credentials():
     return {
         'username': 'test_user',
@@ -55,6 +40,7 @@ def get_test_user_credentials():
 
 
 def setup_test_user_data():
+    # Create user account and location data
     credentials = get_test_user_credentials()
     user = User.objects.create_user(**credentials)
     ordinary_location_params = {
@@ -77,6 +63,8 @@ def setup_test_user_data():
     favorite_location.save()
     return {
         'credentials': credentials,
+        'username': credentials['username'],
+        'password': credentials['password'],
         'user': user,
         'ordinary_location': ordinary_location,
         'favorite_location': favorite_location,
@@ -84,8 +72,31 @@ def setup_test_user_data():
         'favorite_location_params': favorite_location_params}
 
 
-def check_context_with_user_data(context, user_data):
-    # Context data depending on user authentication
+def setup_get_request_with_messages(url, query, user):
+    # Setup request
+    uri = f'{url}?{urlencode(query)}'
+    request = RequestFactory().get(uri)
+    request.user = user
+    # Add session to request
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
+    # Add messages to request
+    messages = FallbackStorage(request)
+    setattr(request, '_messages', messages)
+    return request, messages
+
+
+def check_query_is_preserved(context, query):
+    # Subset of query params which must be preserved
+    # in template context across all pages
+    expected_query = get_empty_location_query()
+    expected_query.update(query)
+    assert context['query'] == expected_query
+    
+
+def check_user_data_with_login(context, user_data):
+    # User location data available after authentication
     location_history = context['location_history']
     assert user_data['favorite_location'] in location_history
     assert user_data['ordinary_location'] in location_history
@@ -94,26 +105,14 @@ def check_context_with_user_data(context, user_data):
     assert not user_data['ordinary_location'] in favorite_locations
 
 
-def check_context_with_no_user_data(context):
-    # Context data depending on user authentication
+def check_user_data_with_no_login(context):
+    # User location data available after authentication
     assert context['location_history'] == None
     assert context['favorite_locations'] == None
 
 
-def check_context_with_message(context, query):
-    # Context data depending on query
-    expected_query = get_empty_location_query()
-    expected_query.update(query)
-    assert context['query'] == expected_query
-    assert context['location'] == None
-    assert context['weather'] == None
-    assert context['air_pollution'] == None
-    assert context['charts'] == None
-
-
-def check_context_with_location_query(context, query):
-    # Context data depending on query
-    assert context['query'] == query
+def check_weather_data(context, query):
+    # Weather data depending on location query
     location = context['location']
     assert location.label == query['label']
     assert location.latitude == float(query['latitude'])
@@ -132,95 +131,26 @@ def check_context_with_location_query(context, query):
         'minutely', 'hourly', 'daily', 'air_pollution'}
 
 
-def check_context_with_no_query(context):
-    # Context data depending on query
-    assert context['query'] == get_empty_location_query()
-    assert context['location'] == None
-    assert context['weather'] == None
-    assert context['air_pollution'] == None
-    assert context['charts'] == None
-
-
-def sample_location_params_1():
-    return {
-        'label': 'San Matías, SC, Bolivia',
-        'latitude': -16.3667,
-        'longitude': -58.4}
-
-
-def sample_location_params_2():
-    return {
-        'label': 'Clair, SK, Canada',
-        'latitude': 52.0167,
-        'longitude': -104.0843}
-
-
-def sample_location_params_3():
-    return {
-        'label': 'Sydney, NSW, Australia',
-        'latitude': -33.8686,
-        'longitude': 151.2094}
-
-
-def sample_timezone_1():
-    return 'America/La_Paz'
-
-
-def sample_location_instance_1():
-    location_params = sample_location_params_1()
-    return Location(
-        latitude=float(location_params['latitude']),
-        longitude=float(location_params['longitude']),
-        label=location_params['label'])
-
-
-# def sample_location_instance_2():
-#     location_params = sample_location_params_2()
-#     return Location(
-#         latitude=float(location_params['latitude']),
-#         longitude=float(location_params['longitude']),
-#         label=location_params['label'])
-
-
-# def sample_location_instance_3():
-#     location_params = sample_location_params_3()
-#     return Location(
-#         latitude=float(location_params['latitude']),
-#         longitude=float(location_params['longitude']),
-#         label=location_params['label'])
-
-
-def sample_user():
-    return User(**get_test_user_credentials())
-
-
-def required_current_weather_keys():
-    # Those keys must be always contained in "current" weather data
-    return {
-        'dt', 'temp', 'feels_like', 'pressure', 'humidity', 'dew_point',
-        'clouds', 'uvi', 'visibility', 'wind_speed', 'wind_deg', 'weather'}
-
-
-def sample_weather():
+def get_sample_weather():
     with open('weather_app/tests/sample_data/weather.pkl', 'rb') as file:
         return pickle.load(file)
 
 
-def sample_air_pollution():
+def get_sample_air_pollution():
     with open('weather_app/tests/sample_data/air_pollution.pkl', 'rb') as file:
         return pickle.load(file)
 
 
-def sample_charts():
+def get_sample_charts():
     with open('weather_app/tests/sample_data/charts.pkl', 'rb') as file:
         return pickle.load(file)
 
 
-# def sample_location_history():
+# def get_sample_location_history():
 #     with open('weather_app/tests/sample_data/location_history.pkl', 'rb') as file:
 #         return pickle.load(file)
 
 
-# def sample_favorite_locations():
+# def get_sample_favorite_locations():
 #     with open('weather_app/tests/sample_data/favorite_locations.pkl', 'rb') as file:
 #         pickle.load(file)

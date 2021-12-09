@@ -23,12 +23,9 @@ def register_user(request):
         return render_registration_page(request)
     if request.method == 'POST':
         # Try to register new user
-        username = request.POST.get('username')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        if not username and password1 and password2:
-            # Missing credentials
-            return render_registration_page(request, 'All fields are required.')
+        username = request.POST['username']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
         if not password1 == password2:
             # Passwords do not match
             return render_registration_page(request, 'Passwords do not match.')
@@ -36,7 +33,7 @@ def register_user(request):
             user = User.objects.create_user(username, password=password1)
             user.save()
         except IntegrityError:
-            # Username already registered
+            # Username already exists
             return render_registration_page(
                 request,
                 'User already exists. Please choose different username.')

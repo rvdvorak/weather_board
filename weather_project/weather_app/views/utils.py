@@ -91,10 +91,6 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
             request,
             'weather_app/messages.html', {
                 'query': query,
-                'location': None,
-                'weather': None,
-                'air_pollution': None,
-                'charts': None,
                 'location_history': location_history,
                 'favorite_locations': favorite_locations})
     elif location and weather and air_pollution and charts:
@@ -115,10 +111,6 @@ def render_dashboard(request, location=None, weather=None, air_pollution=None, c
             request,
             'weather_app/search_location.html', {
                 'query': query,
-                'location': None,
-                'weather': None,
-                'air_pollution': None,
-                'charts': None,
                 'location_history': location_history,
                 'favorite_locations': favorite_locations,
                 'location_search_page': True})
