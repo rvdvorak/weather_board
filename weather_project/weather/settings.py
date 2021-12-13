@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import dj_database_url
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,11 +129,19 @@ STATICFILES_FINDERS = [
     'sass_processor.finders.CssFinder',
 ]
 
-STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# The URL to use when referring to static files (where they will be served from)
+STATIC_URL = '/static/'
+
 
 SASS_PROCESSOR_ROOT = BASE_DIR / "static"
 
@@ -143,10 +153,15 @@ SASS_PRECISION = 8
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MESSAGE_TAGS = {
-# Adjusting tags to AdminLTE
+    # Adjusting tags to AdminLTE
     messages.DEBUG: 'indigo',
     messages.INFO: 'lightblue',
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+# Heroku: Update database configuration from $DATABASE_URL.
+# https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Deployment
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
