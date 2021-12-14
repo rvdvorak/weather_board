@@ -2,7 +2,7 @@ from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
 from weather_app.views.utils import get_location_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
-from weather_app.views.API_keys import ORS_key
+from weather.secrets import ORS_key
 from random import random
 import requests
 

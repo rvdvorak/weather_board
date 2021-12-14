@@ -7,4 +7,4 @@ from weather_app.views.random_location import *
 from weather_app.views.search_location import *
 from weather_app.views.update_location import *
 from weather_app.views.utils import *
-from weather_app.views.API_keys import *
+from weather.secrets import *

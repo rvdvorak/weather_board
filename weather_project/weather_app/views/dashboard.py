@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from datetime import datetime
 import pytz
 from weather_app.views.utils import get_location_query, render_dashboard
-from weather_app.views.API_keys import OWM_key
+from weather.secrets import OWM_key
 from weather_app.models import Location
 import requests
 import pprint
