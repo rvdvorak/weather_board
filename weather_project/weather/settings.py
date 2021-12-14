@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import dj_database_url
 from pathlib import Path
 from django.contrib.messages import constants as messages
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -61,7 +60,7 @@ ROOT_URLCONF = 'weather.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates")],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

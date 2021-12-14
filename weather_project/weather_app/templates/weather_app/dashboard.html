@@ -26,7 +26,7 @@
         {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
         {% include 'weather_app/widgets/forecast_7d_pressure.html' %}
         {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
-        {% include 'weather_app/widgets/forecast_7d_uv_index.html' %}
+        {% include 'weather_app/widgets/forecast_7d_uvi.html' %}
     </div>
     {% else %}
     <!-- 48 hours forecast (default display mode) -->
@@ -42,7 +42,7 @@
         {% include 'weather_app/widgets/forecast_48h_humidity.html' %}
         {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
         {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
-        {% include 'weather_app/widgets/forecast_48h_uv_index.html' %}
+        {% include 'weather_app/widgets/forecast_48h_uvi.html' %}
         {% include 'weather_app/widgets/forecast_48h_visibility.html' %}
         {% endif %}
     </div>
