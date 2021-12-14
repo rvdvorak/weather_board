@@ -1,3 +1,6 @@
+# Production secrets
+*/secrets.py
+
 # MS Visual Studio Code
 .vscode/*
 
