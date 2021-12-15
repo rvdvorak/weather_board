@@ -4,11 +4,13 @@ from django.core.exceptions import ValidationError
 from datetime import datetime
 import pytz
 from weather_app.views.utils import get_location_query, render_dashboard
-from weather.secrets import OWM_key
 from weather_app.models import Location
 import requests
 import pprint
 import pickle
+import os
+
+OWM_key = os.environ.get('OWM_KEY')
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean

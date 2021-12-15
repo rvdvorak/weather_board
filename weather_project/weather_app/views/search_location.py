@@ -2,10 +2,11 @@ from requests.exceptions import Timeout, HTTPError
 from django.template.response import TemplateResponse
 from django.contrib import messages
 from weather_app.views.utils import get_location_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
-from weather.secrets import ORS_key
 import requests
 import pprint
+import os
 
+ORS_key = os.environ.get('ORS_KEY')
 
 def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
     # Obtain list of locations matching the search text

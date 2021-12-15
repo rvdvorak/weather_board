@@ -13,7 +13,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import dj_database_url
 from pathlib import Path
 from django.contrib.messages import constants as messages
-from weather.secrets import django_key, debug_mode
+import os
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = django_key
+SECRET_KEY = os.environ.get('DJANGO_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = debug_mode
+DEBUG = os.environ.get('DJANGO_DEBUG') != 'False'
 
 ALLOWED_HOSTS = ['jakbude.herokuapp.com', '127.0.0.1']
 

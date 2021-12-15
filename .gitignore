@@ -1,6 +1,3 @@
-# Production secrets
-*/secrets.py
-
 # MS Visual Studio Code
 .vscode/*
 
@@ -143,3 +140,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 weather_project/.coveragerc
+weather_project/weather/api_keys.py

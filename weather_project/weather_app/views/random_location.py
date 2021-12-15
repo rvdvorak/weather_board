@@ -2,9 +2,11 @@ from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
 from weather_app.views.utils import get_location_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
-from weather.secrets import ORS_key
 from random import random
 import requests
+import os
+
+ORS_key = os.environ.get('ORS_KEY')
 
 
 def get_random_location_params(ORS_key, ORS_timeout):
