@@ -1,25 +1,30 @@
 # WeatherBoard
 
-[WeatherBoard](https://jakbude.herokuapp.com) is a weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework and the [AdminLTE](https://adminlte.io) HTML/CSS/JS templates based on [Bootstrap](https://getbootstrap.com). Charts are rendered using the [Chart.js](https://www.chartjs.org) library. WeatherBoard uses weather data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org). The application uses [Font Awesome icons](https://fontawesome.com) and [Bootstrap icons](https://icons.getbootstrap.com).
+[WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library.
 
-If you sign up, WeatherBoard will automatically save every location you visit as long as you stay logged in. No personal or other data will be stored.
+WeatherBoard uses weather data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org).
 
-WeatherBoard is an experimental application. Any data stored in WeatherBoard may be deleted anytime without warning. Making any decision based on provided data is completely at your own risk.
-
-## Usage
-Simply visit [https://jakbude.herokuapp.com](https://jakbude.herokuapp.com)
+If you sign up, WeatherBoard will automatically save every location you visit as long as you stay logged in. WeatherBoard has no direct access to user location.
+No personal or other data are stored. 
 
 ![Screenshot of WeatherBoard](screenshot.png "WeatherBoard")
 
+## Usage
+Simply visit [jakbude.herokuapp.com](https://jakbude.herokuapp.com)
+
 ## Installation
+The result of this installation process will be accessible only on your local computer. Deploying the application to the public internet is out of scope of this document.
 
 ### 1. Obtain free API keys
 
-In order to run this application you will need to obtain free API keys to access the data from [OpenWeatherMap.org](https://openweathermap.org/api) and [OpenRouteService.org](https://openrouteservice.org/dev/#/api-docs).
+You need to obtain free API keys to access the following data resources (registration required):
+
+* [OpenWeatherMap.org](https://openweathermap.org/api/one-call-api) One Call API
+* [OpenRouteService.org](https://openrouteservice.org/dev/#/api-docs/geocode/) Geocode API
 
 ### 2. Set up a Python virtual environment
 
-Using a [virtual environment](https://docs.djangoproject.com/en/3.2/howto/windows/#setting-up-a-virtual-environment) is not necessary but highly recommended in order to keep WeatherBoard dependencies isolated from the rest of your system. Ofcourse you need to have [Python](https://www.python.org/downloads/) installed on your computer.
+Using a [virtual environment](https://docs.djangoproject.com/en/3.2/howto/windows/#setting-up-a-virtual-environment) is not necessary but highly recommended in order to keep WeatherBoard dependencies isolated from the rest of your system. [Python](https://www.python.org/downloads/) is required, recommended version 3.9.9.
 
 Create virtual environment. On Linux/MacOS type `python3` instead of `python`.
 ```shell
@@ -47,7 +52,7 @@ Set working directory to WeatherBoard project root directory:
 ```shell
 cd weather_board
 ```
-Install WeatherBoard dependencies. Tthis can take a while.
+Install WeatherBoard dependencies. This may take a while.
 On Linux/MacOS type `pip3` instead of `pip`.
 ```shell
 pip install -r ./requirements.txt
@@ -64,7 +69,7 @@ You should consider upgrading via the 'C:\DEV\test_weather_board\weatherboard_en
 ```
 
 ### 5. Set up environment variables
-Create a file named `.env` (without extension) with the following structure:
+Create a file named `.env` (no extension) in the WeatherBoard project root directory with the following contents:
 ```
 DJANGO_DEBUG=True
 DJANGO_KEY=********
@@ -72,14 +77,14 @@ OWM_KEY=********
 ORS_KEY=********
 ```
 Replace the ``********`` by the appropriate keys:
-* `OWM_KEY` stands for OpenVeatherMap.org API key.
-* `ORS_KEY` stands for OpenRouteService.org API key.
+* `OWM_KEY` stands for [OpenVeatherMap.org API key](https://home.openweathermap.org/api_keys).
+* `ORS_KEY` stands for [OpenRouteService.org API key](https://openrouteservice.org/dev/#/home).
 * `DJANGO_KEY` should be 50 characters long (no whitespaces) randomly generated string kept in secret.
-* `DJANGO_DEBUG` set to `True` only while running locally (development and testing). In production must be set to `False`, otherwise you may expose sensitive informations to hackers.
+* Set `DJANGO_DEBUG` to `True` only while running locally. In production must be set to `False`, otherwise you may expose sensitive informations to hackers.
 
 **IMPORTANT:**
 
-The file `.env` contains secret keys. Therefore it should be always excluded from publicly available repositories (`.gitignore`).
+The file `.env` contains secret keys. Therefore it must be always excluded from publicly available repositories (`.gitignore`).
 
 ### 6. Setup the database
 Set working directory to `weather_board/weather_project/`.
@@ -141,12 +146,12 @@ Ran 56 tests in 26.935s
 OK
 Destroying test database for alias 'default'...
 ```
-Furthermore (if curious) you may check the coverage by tests.
+Furthermore you may check the coverage by tests.
 ```shell
 coverage report
 ```
 
-### 8. Run the application (on your local machine)
+### 8. Run the application (on your local computer)
 Make sure your working directory is set to `weather_board/weather_project/`.
 
 Run Django development server locally.
@@ -165,3 +170,6 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CTRL-BREAK.
 ```
 Now you should be able to open the WeatherBoard application in your web browser by following the URL printed out in the last screen (`Starting development server at http://127.0.0.1:8000/`). The actual URL may be different on your computer.
+
+# License
+WeatherBoard is provided under the [MIT License](LICENSE.txt) (Open Source).
