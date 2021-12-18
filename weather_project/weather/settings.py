@@ -16,7 +16,7 @@ from django.contrib.messages import constants as messages
 import os
 from dotenv import load_dotenv
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()  # Load environment variables from .env file
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,7 +40,6 @@ ALLOWED_HOSTS = ['jakbude.herokuapp.com', '127.0.0.1']
 INSTALLED_APPS = [
     # NOTE Order DOES matter!
     'weather_app',
-    'sass_processor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,7 +135,6 @@ USE_TZ = True
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'sass_processor.finders.CssFinder',
 ]
 
 STATICFILES_DIRS = [
@@ -152,10 +150,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # The URL to use when referring to static files (where they will be served from)
 STATIC_URL = '/static/'
 
-
-SASS_PROCESSOR_ROOT = BASE_DIR / "static"
-
-SASS_PRECISION = 8
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
