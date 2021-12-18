@@ -72,15 +72,17 @@ You should consider upgrading via the 'C:\DEV\test_weather_board\weatherboard_en
 Create a file named `.env` (no extension) in the WeatherBoard project root directory with the following contents:
 ```
 DJANGO_DEBUG=True
+FORCE_HTTPS=False
 DJANGO_KEY=********
 OWM_KEY=********
 ORS_KEY=********
 ```
-Replace the ``********`` by the appropriate keys:
+Replace the ``********`` by the appropriate keys (do NOT use any quotation marks):
 * `OWM_KEY` stands for [OpenVeatherMap.org API key](https://home.openweathermap.org/api_keys).
 * `ORS_KEY` stands for [OpenRouteService.org API key](https://openrouteservice.org/dev/#/home).
 * `DJANGO_KEY` should be 50 characters long (no whitespaces) randomly generated string kept in secret.
-* Set `DJANGO_DEBUG` to `True` only while running locally. In production must be set to `False`, otherwise you may expose sensitive informations to hackers.
+* `DJANGO_DEBUG` shows usefull informations for debugging. In production must be set to `False`, otherwise you may expose sensitive informations to hackers.
+* `FORCE_HTTPS` redirects all HTTP requests to secure HTTPS connection. This must be `False` on local computer. HTTPS will not work on development server.
 
 **IMPORTANT:**
 
