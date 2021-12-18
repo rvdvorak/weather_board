@@ -3,10 +3,10 @@
 {% load static %}
 {% block content %}
 <div>
-    <h2 style="font-weight: 400; text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+    <h2 class="ml-2 mr-2 mt-2 mb-4" style="font-weight: 400; text-align: center;">
         Detailed weather forecast for up to 7&nbsp;days
     </h2>
-    <div class="row justify-content-sm-center">
+    <div class="row justify-content-sm-center ml-2 mr-2">
         <div class="col-sm-9 col-md-7 col-lg-5 col-xl-4">
             <!-- Search form -->
             <form action="{% url 'search_location' %}" method="GET">
@@ -21,8 +21,8 @@
                     </div>
                 </div>
             </form>
-            <img src="{% static 'earth.svg' %}" alt="Image of the planet Earth"
-                style="margin-left: 3rem; margin-right: 3rem; margin-top: 2rem; aspect-ratio: 1;">
+            <img class="mt-4 mb-5" src="{% static 'earth.svg' %}" alt="Image of the planet Earth"
+                style="aspect-ratio: 1;">
             <br>
         </div>
     </div>

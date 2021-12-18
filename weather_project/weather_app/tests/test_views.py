@@ -238,8 +238,9 @@ class TestSearchLocation(TestCase):
         assert len(messages) == 1
         message = messages[0].message
         self.assertEquals(message['header'], 'Select location')
-        self.assertEquals(message['description'],
-                          'Showing only first 20 matching locations:')
+        self.assertEquals(
+            message['description'],
+            'Showing only first 20 matching locations:')
         assert london in message['search_results']
         assert len(message['search_results']) == 20
         check_query_is_preserved(response.context, query)
