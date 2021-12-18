@@ -223,11 +223,11 @@ class TestSearchLocation(TestCase):
         url = reverse('search_location')
         query = {
             'display_mode': get_valid_display_modes()[1],
-            'search_text': 'Lhota'}
-        lhota = {
-            'label': 'Lhota, OK, Czechia',
-            'latitude': 49.71667,
-            'longitude': 17.28333}
+            'search_text': 'City'}
+        london = {
+            "label": "City of London, London, England, United Kingdom",
+            "latitude": 51.513263,
+            "longitude": -0.089878}
         client = Client()
         client.login(**user_data['credentials'])
         response = client.get(url, query)
@@ -240,7 +240,7 @@ class TestSearchLocation(TestCase):
         self.assertEquals(message['header'], 'Select location')
         self.assertEquals(message['description'],
                           'Showing only first 20 matching locations:')
-        assert lhota in message['search_results']
+        assert london in message['search_results']
         assert len(message['search_results']) == 20
         check_query_is_preserved(response.context, query)
         check_user_data_with_login(response.context, user_data)

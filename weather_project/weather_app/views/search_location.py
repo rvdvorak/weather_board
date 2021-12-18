@@ -19,14 +19,17 @@ def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
         'text': search_text}
     response = requests.get(url, params=params, timeout=ORS_timeout)
     response.raise_for_status()
-    json_items = response.json()['features']
+    matching_locations = response.json()['features']
     search_results = []
-    if not len(json_items) == 0:
-        for item in json_items:
-            search_results.append({
-                'label': item['properties']['label'],
-                'latitude': item['geometry']['coordinates'][1],
-                'longitude': item['geometry']['coordinates'][0]})
+    if not len(matching_locations) == 0:
+        labels = set([])
+        for item in matching_locations:
+            if not item['properties']['label'] in labels:
+                search_results.append({
+                    'label': item['properties']['label'],
+                    'latitude': item['geometry']['coordinates'][1],
+                    'longitude': item['geometry']['coordinates'][0]})
+            labels.add(item['properties']['label'])
     return search_results
 
 

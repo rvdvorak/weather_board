@@ -2,8 +2,12 @@
 <div class="info-box bg-lightblue shadow">
     <div class="info-box-content" style="text-align: center">
         <h3>{{ location.label }}</h3>
-        <small>Latitude: {{ location.latitude }}</small>
-        <small>Longitude: {{ location.longitude }}</small>
+        <a href="https://www.google.com/maps/@{{ location.latitude }},{{ location.longitude }},14z"
+        target="_blank" style="color: white;">
+            <small>Latitude: {{ location.latitude }}</small>
+            <br>
+            <small>Longitude: {{ location.longitude }}</small>
+        </a>
         <br>
         <h4>{{ weather.current.dt|date:"D, j. M Y, H:i" }}</h4>
         <div>
