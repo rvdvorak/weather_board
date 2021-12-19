@@ -174,4 +174,4 @@ Quit the server with CTRL-BREAK.
 Now you should be able to open the WeatherBoard application in your web browser by following the URL printed out in the last screen (`Starting development server at http://127.0.0.1:8000/`). The actual URL may be different on your computer.
 
 # License
-WeatherBoard is provided under the [MIT License](LICENSE.txt) (Open Source).
+WeatherBoard is an open-source project provided under the [MIT License](LICENSE.txt).
