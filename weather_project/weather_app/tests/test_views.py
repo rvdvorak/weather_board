@@ -10,8 +10,6 @@ from datetime import datetime
 import pytz
 import copy
 
-# TODO Implement fixtures
-
 
 class TestDashboard(TestCase):
     # Weather API docs:
@@ -152,7 +150,6 @@ class TestDashboard(TestCase):
         check_user_data_with_login(response.context, user_data)
 
     def test_convert_timestamps_to_datetimes(self):
-        # TODO Test timestamps just before/after DST begin/end
         utc_timestamp = 1636339065
         timezone = pytz.timezone('Europe/Prague')
         local_datetime = datetime.fromtimestamp(utc_timestamp, timezone)

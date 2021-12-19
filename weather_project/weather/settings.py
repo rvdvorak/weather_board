@@ -39,14 +39,13 @@ OWM_KEY = os.environ.get('OWM_KEY')
 ORS_KEY = os.environ.get('ORS_KEY')
 
 
-
 ALLOWED_HOSTS = ['jakbude.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    # NOTE Order DOES matter!
+    # Order DOES matter!
     'weather_app',
     'django.contrib.admin',
     'django.contrib.auth',

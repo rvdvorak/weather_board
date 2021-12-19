@@ -14,8 +14,6 @@ from django.conf import settings
 OWM_KEY = settings.OWM_KEY
 
 
-# TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
-
 def get_weather(location, weather_key, weather_timeout):
     # Obtain weather data for given location
     # from the Open Weather Map free API:
@@ -30,7 +28,7 @@ def get_weather(location, weather_key, weather_timeout):
     response = requests.get(url, params=params, timeout=weather_timeout)
     response.raise_for_status()
     weather = response.json()
-    # Convert timestamps to datetime 
+    # Convert timestamps to datetime
     timezone = pytz.timezone(weather['timezone'])
     keys_to_convert = ['dt', 'sunrise', 'sunset', 'start', 'end']
     weather = convert_timestamps_to_datetimes(
@@ -51,7 +49,7 @@ def get_air_pollution(location, timezone, air_pltn_key, air_pltn_timeout):
     response = requests.get(url, params=params, timeout=air_pltn_timeout)
     response.raise_for_status()
     air_pollution = response.json()
-    # Convert timestamps to datetime 
+    # Convert timestamps to datetime
     air_pollution = convert_timestamps_to_datetimes(
         air_pollution, ['dt'], timezone)
     return air_pollution

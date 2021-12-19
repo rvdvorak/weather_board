@@ -1,8 +1,8 @@
 # WeatherBoard
 
-[WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library. Icons come from [Font Awesome](https://fontawesome.com) and [Bootstrap](https://icons.getbootstrap.com)
+[WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library. Icons come from [Font Awesome](https://fontawesome.com) and [Bootstrap](https://icons.getbootstrap.com).
 
-WeatherBoard uses weather data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org).
+WeatherBoard uses weather and air pollution data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org).
 
 If you sign up, WeatherBoard will automatically save every location you visit as long as you stay logged in. WeatherBoard has no direct access to user location.
 No personal or other data are stored. 
@@ -18,7 +18,6 @@ The result of this installation process will be accessible only on your local co
 ### 1. Obtain free API keys
 
 You need to obtain free API keys to access the following data resources (registration required):
-
 * OpenWeatherMap.org
   * [One Call API](https://openweathermap.org/api/one-call-api)
   * [Air Pollution API](https://openweathermap.org/api/air-pollution)
@@ -74,17 +73,17 @@ You should consider upgrading via the 'C:\DEV\test_weather_board\weatherboard_en
 ### 5. Set up environment variables
 Create a file named `.env` (no extension) in the WeatherBoard project root directory with the following contents:
 ```
-DJANGO_DEBUG=True
-FORCE_HTTPS=False
-DJANGO_KEY=********
 OWM_KEY=********
 ORS_KEY=********
+DJANGO_KEY=********
+DJANGO_DEBUG=True
+FORCE_HTTPS=False
 ```
-Replace the ``********`` by the appropriate keys (do NOT use any quotation marks):
-* `OWM_KEY` stands for [OpenVeatherMap.org API key](https://home.openweathermap.org/api_keys).
-* `ORS_KEY` stands for [OpenRouteService.org API key](https://openrouteservice.org/dev/#/home).
-* `DJANGO_KEY` should be 50 characters long (no whitespaces) randomly generated string kept in secret.
-* `DJANGO_DEBUG` shows usefull informations for debugging. In production must be set to `False`, otherwise you may expose sensitive informations to hackers.
+* Replace the ``********`` by the appropriate keys (do NOT use any quotation marks):
+  * `OWM_KEY` stands for [OpenVeatherMap.org API key](https://home.openweathermap.org/api_keys).
+  * `ORS_KEY` stands for [OpenRouteService.org API key](https://openrouteservice.org/dev/#/home).
+  * `DJANGO_KEY` should be 50 characters long (no whitespaces) randomly generated string kept in secret.
+* `DJANGO_DEBUG` shows usefull informations for debugging. In production must be `False`, otherwise you may expose sensitive informations to hackers.
 * `FORCE_HTTPS` redirects all HTTP requests to secure HTTPS connection. This must be `False` on local computer. HTTPS will not work on development server.
 
 **IMPORTANT:**
