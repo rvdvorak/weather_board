@@ -1,20 +1,20 @@
 from requests.exceptions import Timeout, HTTPError
-from django.template.response import TemplateResponse
 from django.contrib import messages
-from weather_app.views.utils import get_location_query, get_location_history, get_favorite_locations, redirect_to_dashboard, render_dashboard
+from weather_app.views.utils import get_location_query, redirect_to_dashboard, render_dashboard
 import requests
 import pprint
-import os
+from django.conf import settings
 
-ORS_key = os.environ.get('ORS_KEY')
+ORS_KEY = settings.ORS_KEY
 
-def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
+
+def get_search_results(search_text, ORS_KEY, ORS_timeout, max_count):
     # Obtain list of locations matching the search text
     # using the Open Route Service free API:
     # https://openrouteservice.org/dev/#/api-docs/geocode/search/get
     url = 'https://api.openrouteservice.org/geocode/search'
     params = {
-        'api_key': ORS_key,
+        'api_key': ORS_KEY,
         'size': max_count,
         'text': search_text}
     response = requests.get(url, params=params, timeout=ORS_timeout)
@@ -33,7 +33,7 @@ def get_search_results(search_text, ORS_key, ORS_timeout, max_count):
     return search_results
 
 
-def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
+def search_location(request, ORS_KEY=ORS_KEY, ORS_timeout=5, max_count=20):
     # Handle the location search process.
     # Location search is available on all pages.
     query = get_location_query(request)
@@ -42,7 +42,7 @@ def search_location(request, ORS_key=ORS_key, ORS_timeout=5, max_count=20):
         return redirect_to_dashboard(query)
     try:
         search_results = get_search_results(
-            query['search_text'], ORS_key, ORS_timeout, max_count)
+            query['search_text'], ORS_KEY, ORS_timeout, max_count)
     except Timeout as err:
         # API request time out
         messages.warning(

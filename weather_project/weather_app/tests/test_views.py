@@ -1,19 +1,12 @@
-from django.contrib.messages.storage.fallback import FallbackStorage
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import login, authenticate
 from django.contrib import auth
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, Client
 from django.urls import reverse
-from urllib.parse import urlencode, urlparse, parse_qs, quote_plus
-from requests.exceptions import Timeout, HTTPError
-from django.db.models.query import QuerySet
+from urllib.parse import urlencode, urlparse, parse_qs
 from weather_app.views import *
 from weather_app.models import User, Location
 from weather_app.tests.utils import *
 from datetime import datetime
-from django.conf import settings
-import pprint
 import pytz
 import copy
 
@@ -346,7 +339,7 @@ class TestSearchLocation(TestCase):
             'search_text': 'Brno'}
         request, messages = setup_get_request_with_messages(
             url, query, user_data['user'])
-        response = search_location(request, ORS_key='bad_key')
+        response = search_location(request, ORS_KEY='bad_key')
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()
@@ -404,7 +397,7 @@ class TestRandomLocation(TestCase):
         user_data = setup_test_user_data()
         request, messages = setup_get_request_with_messages(
             url, query, user_data['user'])
-        response = random_location(request, ORS_key='bad_key')
+        response = random_location(request, ORS_KEY='bad_key')
         assert response.status_code == 200
         with self.assertTemplateUsed('weather_app/messages.html'):
             response.render()

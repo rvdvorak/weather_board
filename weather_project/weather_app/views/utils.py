@@ -1,13 +1,9 @@
-from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from urllib.parse import urlencode
 from weather_app.models import Location
-import requests
-import json
-import pytz
 import pickle
 
 

@@ -1,9 +1,6 @@
 from django.template.response import TemplateResponse
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import User
 from weather_app.views.utils import get_location_query, redirect_to_dashboard, get_credentials
-from django.shortcuts import redirect
-from urllib.parse import urlencode
 
 
 def render_login_page(request, error_message=''):

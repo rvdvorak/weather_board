@@ -1,7 +1,6 @@
 from weather_app.models import User, Location
 from datetime import datetime
 import pickle
-import pytz
 from django.test import RequestFactory
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.middleware import SessionMiddleware

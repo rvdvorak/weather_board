@@ -9,8 +9,9 @@ import requests
 import pprint
 import pickle
 import os
+from django.conf import settings
 
-OWM_key = os.environ.get('OWM_KEY')
+OWM_KEY = settings.OWM_KEY
 
 
 # TODO Sunrise/Sunset: http://127.0.0.1:8000/?latitude=81.475139&longitude=-161.169992&label=Arctic+Ocean
@@ -203,7 +204,7 @@ def get_location_instance(query, user):
     return None
 
 
-def dashboard(request, weather_key=OWM_key, air_pltn_key=OWM_key, weather_timeout=5, air_pltn_timeout=5):
+def dashboard(request, weather_key=OWM_KEY, air_pltn_key=OWM_KEY, weather_timeout=5, air_pltn_timeout=5):
     # Gather all data. Handle exceptions. Render dashboard.
     query = get_location_query(request)
     user = request.user

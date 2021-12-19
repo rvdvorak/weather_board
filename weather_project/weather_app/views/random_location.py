@@ -1,22 +1,22 @@
 from requests.exceptions import Timeout, HTTPError
 from django.contrib import messages
 import pprint
-from weather_app.views.utils import get_location_query, redirect_to_dashboard, get_favorite_locations, get_location_history, render_dashboard
+from weather_app.views.utils import get_location_query, redirect_to_dashboard, render_dashboard
 from random import random
 import requests
-import os
+from django.conf import settings
 
-ORS_key = os.environ.get('ORS_KEY')
+ORS_KEY = settings.ORS_KEY
 
 
-def get_random_location_params(ORS_key, ORS_timeout):
+def get_random_location_params(ORS_KEY, ORS_timeout):
     # Generates random coordinates and returns matching location
     # using the Open Route Service free API:
     # https://openrouteservice.org/dev/#/api-docs/geocode/reverse/get
     latitude = round(random() * 180 - 90, 6)
     longitude = round(random() * 360 - 180, 6)
     params = {
-        'api_key': ORS_key,
+        'api_key': ORS_KEY,
         'point.lat': latitude,
         'point.lon': longitude,
         'size': 1}
@@ -30,11 +30,11 @@ def get_random_location_params(ORS_key, ORS_timeout):
         'label': location['properties']['label']}
 
 
-def random_location(request, ORS_key=ORS_key, ORS_timeout=5):
+def random_location(request, ORS_KEY=ORS_KEY, ORS_timeout=5):
     # Show weather forecast for random location
     query = get_location_query(request)
     try:
-        location = get_random_location_params(ORS_key, ORS_timeout)
+        location = get_random_location_params(ORS_KEY, ORS_timeout)
     except Timeout as err:
         # Location API timeout
         messages.warning(

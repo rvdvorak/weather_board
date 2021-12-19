@@ -1,8 +1,6 @@
 from weather_app.models import Location
 from django.contrib.auth import login, authenticate
-from weather_app.views.utils import get_location_query, get_credentials, redirect_to_login, get_location_history, get_favorite_locations
-from django.shortcuts import redirect
-from django.urls import reverse
+from weather_app.views.utils import get_location_query, redirect_to_login, get_location_history, get_favorite_locations
 from django.template.response import TemplateResponse
 
 

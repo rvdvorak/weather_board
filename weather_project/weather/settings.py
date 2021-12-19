@@ -32,6 +32,14 @@ SECRET_KEY = os.environ.get('DJANGO_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 
+# OpenWeatherMap.org API key
+OWM_KEY = os.environ.get('OWM_KEY')
+
+# OpenRouteService.org API key
+ORS_KEY = os.environ.get('ORS_KEY')
+
+
+
 ALLOWED_HOSTS = ['jakbude.herokuapp.com', '127.0.0.1']
 
 

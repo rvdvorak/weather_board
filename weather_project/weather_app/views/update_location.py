@@ -1,6 +1,5 @@
 from weather_app.models import Location
 from weather_app.views.utils import get_location_query, redirect_to_login, redirect_to_dashboard
-from django.urls import reverse
 from pprint import pprint
 
 
