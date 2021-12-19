@@ -1,6 +1,6 @@
 # WeatherBoard
 
-[WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library.
+[WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library. Icons come from [Font Awesome](https://fontawesome.com) and [Bootstrap](https://icons.getbootstrap.com)
 
 WeatherBoard uses weather data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org).
 
@@ -19,8 +19,11 @@ The result of this installation process will be accessible only on your local co
 
 You need to obtain free API keys to access the following data resources (registration required):
 
-* [OpenWeatherMap.org](https://openweathermap.org/api/one-call-api) One Call API
-* [OpenRouteService.org](https://openrouteservice.org/dev/#/api-docs/geocode/) Geocode API
+* OpenWeatherMap.org
+  * [One Call API](https://openweathermap.org/api/one-call-api)
+  * [Air Pollution API](https://openweathermap.org/api/air-pollution)
+* OpenRouteService.org
+  * [Geocode API](https://openrouteservice.org/dev/#/api-docs/geocode/)
 
 ### 2. Set up a Python virtual environment
 
