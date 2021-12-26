@@ -2,9 +2,11 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-tachometer-alt" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-tachometer-alt"></i>
 {% endblock %}
-{% block widget_header_text %}Atmospheric pressure{% endblock %}
+{% block widget_header_text %}Atmospheric pressure <span class="badge bg-white">48 hours</span>
+<br><small>on the sea level</small>
+{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.pressure %}
 <div class="chart p-2">
@@ -30,7 +32,15 @@
             data: {
                 labels: hourly.timeline,
                 datasets: [{
-                    label: 'Atmospheric pressure (sea level) [hPa]',
+                    label: 'Normal pressure [hPa]',
+                    data: hourly.normal_pressure,
+                    backgroundColor: ['rgba(255, 0, 255, 1)'],
+                    borderColor: ['rgba(255, 0, 255, 1)'],
+                    fill: false,
+                    borderWidth: 2,
+                    type: 'line'
+                }, {
+                    label: 'Predicted pressure [hPa]',
                     data: hourly.pressure,
                     backgroundColor: ['rgba(0, 127, 127, 0.5)'],
                     borderColor: ['rgba(0, 127, 127, 0.5)'],
@@ -39,7 +49,7 @@
                 }]
             },
             options: {
-                radius: 1.5,
+                radius: 0,
                 pointBackground: '#f00',
                 scales: {
                     x: {

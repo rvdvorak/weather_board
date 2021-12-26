@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-binoculars" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-binoculars"></i>
 {% endblock %}
-{% block widget_header_text %}Visibility{% endblock %}
+{% block widget_header_text %}Visibility <span class="badge bg-white">48 hours</span>{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.visibility %}
 <div class="chart p-2">

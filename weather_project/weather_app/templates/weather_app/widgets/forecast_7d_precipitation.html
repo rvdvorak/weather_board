@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-cloud-showers-heavy" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-cloud-showers-heavy"></i>
 {% endblock %}
-{% block widget_header_text %}Precipitation probability{% endblock %}
+{% block widget_header_text %}Precipitation probability <span class="badge bg-white">7 days</span>{% endblock %}
 {% block widget_content %}
 {% if charts.daily.pop %}
 <div class="chart p-2">

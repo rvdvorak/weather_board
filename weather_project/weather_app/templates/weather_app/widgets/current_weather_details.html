@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-info-circle" style="width: 1.5em;"></i>
+<i class="fas fa-info-circle"></i>
 {% endblock %}
-{% block widget_header_text %}Current weather details{% endblock %}
+{% block widget_header_text %}Weather details <span class="badge bg-white">now</span>{% endblock %}
 {% block widget_content %}
 <table class="table table-hover">
     <tbody>

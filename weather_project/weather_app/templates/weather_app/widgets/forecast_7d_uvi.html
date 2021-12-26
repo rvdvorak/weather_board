@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-sun" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-sun"></i>
 {% endblock %}
-{% block widget_header_text %}UV index{% endblock %}
+{% block widget_header_text %}UV index <span class="badge bg-white">7 days</span>{% endblock %}
 {% block widget_content %}
 {% if charts.daily.uvi %}
 <div class="chart p-2">

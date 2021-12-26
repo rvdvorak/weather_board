@@ -16,6 +16,7 @@
     {% if query.display_mode == '7d_detail' %}
     <!-- 7 days forecast -->
     <div>
+        {% include 'weather_app/widgets/forecast_7d_pressure.html' %}
         {% include 'weather_app/widgets/forecast_5d_air_pollution.html' %}
         {% include 'weather_app/widgets/forecast_7d_temperature.html' %}
         {% if weather.minutely %}
@@ -24,13 +25,13 @@
         {% include 'weather_app/widgets/forecast_7d_precipitation.html' %}
         {% include 'weather_app/widgets/forecast_7d_clouds.html' %}
         {% include 'weather_app/widgets/forecast_7d_humidity.html' %}
-        {% include 'weather_app/widgets/forecast_7d_pressure.html' %}
         {% include 'weather_app/widgets/forecast_7d_wind_speed.html' %}
         {% include 'weather_app/widgets/forecast_7d_uvi.html' %}
     </div>
     {% else %}
     <!-- 48 hours forecast (default display mode) -->
     <div>
+        {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
         {% include 'weather_app/widgets/forecast_48h_air_pollution.html' %}
         {% include 'weather_app/widgets/forecast_48h_temperature.html' %}
         {% include 'weather_app/widgets/forecast_48h_dew_point.html' %}
@@ -40,7 +41,6 @@
         {% include 'weather_app/widgets/forecast_48h_precipitation.html' %}
         {% include 'weather_app/widgets/forecast_48h_clouds.html' %}
         {% include 'weather_app/widgets/forecast_48h_humidity.html' %}
-        {% include 'weather_app/widgets/forecast_48h_pressure.html' %}
         {% include 'weather_app/widgets/forecast_48h_wind_speed.html' %}
         {% include 'weather_app/widgets/forecast_48h_uvi.html' %}
         {% include 'weather_app/widgets/forecast_48h_visibility.html' %}

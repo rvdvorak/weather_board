@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-temperature-low" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-temperature-low"></i>
 {% endblock %}
-{% block widget_header_text %}Temperature{% endblock %}
+{% block widget_header_text %}Temperature <span class="badge bg-white">7 days</span>{% endblock %}
 {% block widget_content %}
 {% if charts.daily.max_temp and charts.daily.min_temp %}
 <div class="chart p-2">

@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-tint" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-tint"></i>
 {% endblock %}
-{% block widget_header_text %}Humidity{% endblock %}
+{% block widget_header_text %}Humidity <span class="badge bg-white">7 days</span>{% endblock %}
 {% block widget_content %}
 {% if charts.daily.humidity %}
 <div class="chart p-2">

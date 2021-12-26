@@ -91,6 +91,7 @@ def get_charts(weather, air_pollution):
             'clouds': [],
             'humidity': [],
             'pressure': [],
+            'normal_pressure': [],
             'wind_speed': [],
             'wind_gust': [],
             'uvi': [],
@@ -105,6 +106,7 @@ def get_charts(weather, air_pollution):
             'clouds': [],
             'humidity': [],
             'pressure': [],
+            'normal_pressure': [],
             'wind_speed': [],
             'wind_gust': [],
             'uvi': []},
@@ -122,58 +124,37 @@ def get_charts(weather, air_pollution):
                 round(minute['precipitation'], 2))
     for hour in weather['hourly']:
         # 48 hours weather forecast
-        charts['hourly']['timeline'].append(
-            hour['dt'].strftime("%a %H:%M"))
-        charts['hourly']['temp'].append(
-            round(hour['temp'], 1))
-        charts['hourly']['feels_like'].append(
-            round(hour['feels_like'], 1))
-        charts['hourly']['dew_point'].append(
-            round(hour['dew_point'], 1))
-        charts['hourly']['pop'].append(
-            hour['pop']*100)
-        charts['hourly']['clouds'].append(
-            hour['clouds'])
-        charts['hourly']['humidity'].append(
-            hour['humidity'])
-        charts['hourly']['pressure'].append(
-            hour['pressure'])
-        charts['hourly']['wind_speed'].append(
-            hour['wind_speed'])
-        charts['hourly']['wind_gust'].append(
-            hour['wind_gust'])
-        charts['hourly']['uvi'].append(
-            hour['uvi'])
-        charts['hourly']['visibility'].append(
-            hour['visibility'])
+        charts['hourly']['timeline'].append(hour['dt'].strftime("%a %H:%M"))
+        charts['hourly']['temp'].append(round(hour['temp'], 1))
+        charts['hourly']['feels_like'].append(round(hour['feels_like'], 1))
+        charts['hourly']['dew_point'].append(round(hour['dew_point'], 1))
+        charts['hourly']['pop'].append(hour['pop']*100)
+        charts['hourly']['clouds'].append(hour['clouds'])
+        charts['hourly']['humidity'].append(hour['humidity'])
+        charts['hourly']['pressure'].append(hour['pressure'])
+        charts['hourly']['normal_pressure'].append(1013.25)
+        charts['hourly']['wind_speed'].append(hour['wind_speed'])
+        charts['hourly']['wind_gust'].append(hour['wind_gust'])
+        charts['hourly']['uvi'].append(hour['uvi'])
+        charts['hourly']['visibility'].append(hour['visibility'])
     for day in weather['daily']:
         # 7 days weather forecast
-        charts['daily']['timeline'].append(
-            day['dt'].strftime('%a %d. %b'))
-        charts['daily']['min_temp'].append(
-            round(day['temp']['min'], 1))
-        charts['daily']['max_temp'].append(
-            round(day['temp']['max'], 1))
-        charts['daily']['pop'].append(
-            day['pop']*100)
-        charts['daily']['clouds'].append(
-            day['clouds'])
-        charts['daily']['humidity'].append(
-            day['humidity'])
-        charts['daily']['pressure'].append(
-            day['pressure'])
-        charts['daily']['wind_speed'].append(
-            day['wind_speed'])
-        charts['daily']['wind_gust'].append(
-            day['wind_gust'])
-        charts['daily']['uvi'].append(
-            day['uvi'])
+        charts['daily']['timeline'].append(day['dt'].strftime('%a %d. %b'))
+        charts['daily']['min_temp'].append(round(day['temp']['min'], 1))
+        charts['daily']['max_temp'].append(round(day['temp']['max'], 1))
+        charts['daily']['pop'].append(day['pop']*100)
+        charts['daily']['clouds'].append(day['clouds'])
+        charts['daily']['humidity'].append(day['humidity'])
+        charts['daily']['pressure'].append(day['pressure'])
+        charts['daily']['normal_pressure'].append(1013.25)
+        charts['daily']['wind_speed'].append(day['wind_speed'])
+        charts['daily']['wind_gust'].append(day['wind_gust'])
+        charts['daily']['uvi'].append(day['uvi'])
     for hour in air_pollution['list']:
         # 5 days air pollution forecast
         charts['air_pollution']['timeline'].append(
             hour['dt'].strftime("%a %d. %H:%M"))
-        charts['air_pollution']['aqi'].append(
-            hour['main']['aqi'])
+        charts['air_pollution']['aqi'].append(hour['main']['aqi'])
     return charts
 
 

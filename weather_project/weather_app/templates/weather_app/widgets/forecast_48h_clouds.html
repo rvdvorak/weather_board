@@ -2,9 +2,9 @@
 {% extends 'weather_app/widgets/_widget.html' %}
 {% block widget_style %}lightblue{% endblock %}
 {% block widget_header_icon %}
-<i class="fas fa-cloud" style="width: 1.5em; text-align: left"></i>
+<i class="fas fa-cloud"></i>
 {% endblock %}
-{% block widget_header_text %}Cloudiness{% endblock %}
+{% block widget_header_text %}Cloudiness <span class="badge bg-white">48 hours</span>{% endblock %}
 {% block widget_content %}
 {% if charts.hourly.clouds %}
 <div class="chart p-2">
