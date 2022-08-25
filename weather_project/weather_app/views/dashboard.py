@@ -134,7 +134,7 @@ def get_charts(weather, air_pollution):
         charts['hourly']['pressure'].append(hour['pressure'])
         charts['hourly']['normal_pressure'].append(1013.25)
         charts['hourly']['wind_speed'].append(hour['wind_speed'])
-        charts['hourly']['wind_gust'].append(hour['wind_gust'])
+        charts['hourly']['wind_gust'].append(hour.get('wind_gust'))
         charts['hourly']['uvi'].append(hour['uvi'])
         charts['hourly']['visibility'].append(hour['visibility'])
     for day in weather['daily']:
