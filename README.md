@@ -1,5 +1,7 @@
 # WeatherBoard
 
+⚠️**WeatherBoard is no longer working since the [OpenWeatherMap's One Call API 2.5 was discontinued in June 2024](https://openweathermap.org/one-call-transfer).**
+
 [WeatherBoard](https://jakbude.herokuapp.com) is an experimental weather forecast web application written in [Python](https://www.python.org) using the [Django](https://www.djangoproject.com) web framework. [AdminLTE](https://adminlte.io) and [Bootstrap](https://getbootstrap.com) are used in templates. Charts are rendered using the [Chart.js](https://www.chartjs.org) library. Icons come from [Font Awesome](https://fontawesome.com) and [Bootstrap](https://icons.getbootstrap.com).
 
 WeatherBoard uses weather and air pollution data from [OpenWeatherMap.org](https://openweathermap.org) and location data from [OpenRouteService.org](https://openrouteservice.org).
